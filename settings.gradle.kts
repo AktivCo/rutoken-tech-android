@@ -10,6 +10,9 @@ dependencyResolutionManagement {
     repositories {
         google()
         mavenCentral()
+        maven {
+            url = uri("https://nexus.aktivco.ru/repository/maven-public")
+        }
     }
 }
 

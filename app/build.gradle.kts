@@ -1,6 +1,14 @@
+import java.nio.file.Files
+import java.nio.file.Path
+import java.nio.file.StandardCopyOption
+
 plugins {
-    id("com.android.application")
-    id("org.jetbrains.kotlin.android")
+    alias(libs.plugins.androidApplication)
+    alias(libs.plugins.jetbrains.kotlinAndroid)
+}
+
+base {
+    archivesName.set("rutoken-tech")
 }
 
 android {
@@ -20,25 +28,60 @@ android {
         }
     }
 
+    signingConfigs {
+        create("defaultSigningConfig") {
+            storeFile = if (project.hasProperty("keystorePath")) file(project.property("keystorePath")!!) else null
+            storePassword = project.findProperty("keystorePass") as String?
+            keyAlias = project.findProperty("keyAlias") as String?
+            keyPassword = project.findProperty("keyPass") as String?
+        }
+    }
+
     buildTypes {
+        val hasSigningParameters = project.hasProperty("keystorePath") && project.property("keystorePath") != "" &&
+                project.hasProperty("keyAlias") && project.property("keyAlias") != "" &&
+                project.hasProperty("keystorePass") && project.hasProperty("keyPass")
+
         release {
             isMinifyEnabled = false
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+            signingConfig = if (hasSigningParameters) signingConfigs.getByName("defaultSigningConfig") else null
+        }
+
+        debug {
+            if (hasSigningParameters)
+                signingConfig = signingConfigs.getByName("defaultSigningConfig")
         }
     }
+
+    applicationVariants.all {
+        val copyJniLibsTask = tasks.register("${name}CopyExternalJniLibs") {
+            doLast { architectures.forEach { arch -> copyJniLibs(project, arch) } }
+        }
+        tasks.named("merge${name.firstCharToUpper()}JniLibFolders") {
+            dependsOn(copyJniLibsTask)
+        }
+    }
+
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        isCoreLibraryDesugaringEnabled = true
+
+        sourceCompatibility = JavaVersion.VERSION_11
+        targetCompatibility = JavaVersion.VERSION_11
     }
+
     kotlinOptions {
-        jvmTarget = "1.8"
+        jvmTarget = "11"
     }
+
     buildFeatures {
         compose = true
     }
+
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.1"
+        kotlinCompilerExtensionVersion = libs.versions.compose.compiler.get()
     }
+
     packaging {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
@@ -47,20 +90,71 @@ android {
 }
 
 dependencies {
+    coreLibraryDesugaring(libs.desugarJdkLibs)
 
-    implementation("androidx.core:core-ktx:1.12.0")
-    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.6.2")
-    implementation("androidx.activity:activity-compose:1.7.0")
-    implementation(platform("androidx.compose:compose-bom:2023.08.00"))
-    implementation("androidx.compose.ui:ui")
-    implementation("androidx.compose.ui:ui-graphics")
-    implementation("androidx.compose.ui:ui-tooling-preview")
-    implementation("androidx.compose.material3:material3")
-    testImplementation("junit:junit:4.13.2")
-    androidTestImplementation("androidx.test.ext:junit:1.1.5")
-    androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
-    androidTestImplementation(platform("androidx.compose:compose-bom:2023.08.00"))
-    androidTestImplementation("androidx.compose.ui:ui-test-junit4")
-    debugImplementation("androidx.compose.ui:ui-tooling")
-    debugImplementation("androidx.compose.ui:ui-test-manifest")
+    implementation(libs.androidx.activity.compose)
+    implementation(libs.androidx.core.ktx)
+    implementation(libs.androidx.lifecycle.runtime.ktx)
+    implementation(platform(libs.compose.bom))
+    implementation(libs.compose.material3)
+    implementation(libs.compose.ui)
+    implementation(libs.compose.ui.graphics)
+    implementation(libs.compose.ui.tooling.preview)
+    implementation(libs.rtpcscbridge)
+
+    testImplementation(libs.junit)
+
+    androidTestImplementation(libs.androidx.test.ext.junit)
+    androidTestImplementation(platform(libs.compose.bom))
+    androidTestImplementation(libs.compose.ui.test.junit4)
+    androidTestImplementation(libs.espresso.core)
+
+    debugImplementation(libs.compose.ui.test.manifest)
+    debugImplementation(libs.compose.ui.tooling)
+}
+
+val architectures = listOf(
+    Architecture("armv7a", "armeabi-v7a"),
+    Architecture("arm64", "arm64-v8a"),
+)
+
+data class Architecture(val depArch: String, val jniArch: String)
+
+fun String.firstCharToUpper() = replaceFirstChar { it.uppercase() }
+
+fun copyJniLibs(proj: Project, architecture: Architecture) {
+    val jniLibs = "${proj.projectDir}/src/main/jniLibs/${architecture.jniArch}"
+    val dependencyArch = "android-${architecture.depArch}"
+
+    copyFromBinaryDeps(rootDir.absolutePath, "pkcs11ecp", dependencyArch, "librtpkcs11ecp.so", jniLibs)
+}
+
+fun requireFileInDirectory(directory: String, file: String) =
+    check(File(directory, file).exists()) { "Not found $file in directory $directory" }
+
+fun copyFile(file: String, sourcePath: String, destinationPath: String, destinationFile: String = file) {
+    requireFileInDirectory(sourcePath, file)
+    Files.createDirectories(Path.of(destinationPath))
+    Files.copy(
+        Path.of(sourcePath, file),
+        Path.of(destinationPath, destinationFile),
+        StandardCopyOption.REPLACE_EXISTING
+    )
+}
+
+fun copyFromBinaryDeps(
+    rootDir: String,
+    projectName: String,
+    architecture: String,
+    file: String,
+    destinationPath: String
+) {
+    val sourcePath = "$rootDir/external/$projectName/$architecture/lib"
+    copyFile(file, sourcePath, destinationPath)
+}
+
+tasks.named("clean") {
+    doLast {
+        delete("src/main/jniLibs")
+    }
 }

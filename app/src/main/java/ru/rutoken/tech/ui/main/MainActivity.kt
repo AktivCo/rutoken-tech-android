@@ -1,4 +1,4 @@
-package ru.rutoken.tech
+package ru.rutoken.tech.ui.main
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity

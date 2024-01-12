@@ -3,6 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <application
+        android:name=".RutokenTechApplication"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
@@ -11,7 +12,7 @@
         android:theme="@style/Theme.Rutokentechandroid"
         tools:targetApi="31">
         <activity
-            android:name=".MainActivity"
+            android:name=".ui.main.MainActivity"
             android:exported="true"
             android:theme="@style/Theme.Rutokentechandroid">
             <intent-filter>
@@ -21,5 +22,4 @@
             </intent-filter>
         </activity>
     </application>
-
 </manifest>

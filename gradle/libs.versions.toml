@@ -12,6 +12,9 @@ koin = "3.5.3"
 kotlin = "1.9.22"
 lifecycle-runtime-ktx = "2.7.0"
 rtpcscbridge = "1.1.1"
+jna = "5.14.0"
+pkcs11jna = "4.0.0"
+pkcs11wrapper = "4.0.0"
 
 [libraries]
 androidx-activity-compose = { group = "androidx.activity", name = "activity-compose", version.ref = "activity-compose" }
@@ -31,6 +34,9 @@ espresso-core = { group = "androidx.test.espresso", name = "espresso-core", vers
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 koin = { group = "io.insert-koin", name = "koin-androidx-compose", version.ref = "koin" }
 rtpcscbridge = { module = "ru.rutoken.rtpcscbridge:rtpcscbridge", version.ref = "rtpcscbridge" }
+jna = { module = "net.java.dev.jna:jna", version.ref = "jna" }
+pkcs11jna = { module = "ru.rutoken:pkcs11jna", version.ref = "pkcs11jna" }
+pkcs11wrapper = { module = "ru.rutoken.pkcs11wrapper:pkcs11wrapper", version.ref = "pkcs11wrapper" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }

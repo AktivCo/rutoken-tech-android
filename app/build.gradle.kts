@@ -102,6 +102,9 @@ dependencies {
     implementation(libs.compose.ui.tooling.preview)
     implementation(libs.koin)
     implementation(libs.rtpcscbridge)
+    implementation(libs.jna) { artifact { type = "aar" } }
+    implementation(libs.pkcs11jna) { isTransitive = false }
+    implementation(libs.pkcs11wrapper) { isTransitive = false }
 
     testImplementation(libs.junit)
 

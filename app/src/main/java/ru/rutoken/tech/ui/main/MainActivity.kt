@@ -10,11 +10,15 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import org.koin.android.ext.android.get
+import ru.rutoken.tech.pkcs11.Pkcs11Launcher
 import ru.rutoken.tech.ui.theme.RutokentechandroidTheme
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        lifecycle.addObserver(get<Pkcs11Launcher>())
+
         setContent {
             RutokentechandroidTheme {
                 // A surface container using the 'background' color from the theme

@@ -105,6 +105,7 @@ dependencies {
     implementation(libs.jna) { artifact { type = "aar" } }
     implementation(libs.pkcs11jna) { isTransitive = false }
     implementation(libs.pkcs11wrapper) { isTransitive = false }
+    implementation(libs.kstatemachine)
 
     testImplementation(libs.junit)
 

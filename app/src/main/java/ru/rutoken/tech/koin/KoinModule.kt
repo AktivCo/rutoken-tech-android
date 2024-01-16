@@ -12,6 +12,7 @@ import ru.rutoken.tech.repository.document.DocumentRepository
 import ru.rutoken.tech.repository.document.DocumentRepositoryImpl
 import ru.rutoken.tech.repository.user.UserRepository
 import ru.rutoken.tech.repository.user.UserRepositoryImpl
+import ru.rutoken.tech.tokenmanager.TokenManager
 
 val koinModule = module {
     single { RtPkcs11Module() } bind Pkcs11Module::class
@@ -21,4 +22,5 @@ val koinModule = module {
     }
     single<UserRepository> { UserRepositoryImpl(get()) }
     single<DocumentRepository> { DocumentRepositoryImpl(get()) }
+    single { TokenManager() }
 }

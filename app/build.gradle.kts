@@ -48,12 +48,14 @@ android {
                 project.hasProperty("keystorePass") && project.hasProperty("keyPass")
 
         release {
+            buildConfigField("int", "LOG_LEVEL", "android.util.Log.ERROR")
             isMinifyEnabled = false
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
             signingConfig = if (hasSigningParameters) signingConfigs.getByName("defaultSigningConfig") else null
         }
 
         debug {
+            buildConfigField("int", "LOG_LEVEL", "android.util.Log.VERBOSE")
             if (hasSigningParameters)
                 signingConfig = signingConfigs.getByName("defaultSigningConfig")
         }
@@ -81,6 +83,7 @@ android {
 
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 
     composeOptions {

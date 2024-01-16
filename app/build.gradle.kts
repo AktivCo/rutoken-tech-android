@@ -103,20 +103,16 @@ dependencies {
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
-    implementation(platform(libs.compose.bom))
-    implementation(libs.compose.material3)
-    implementation(libs.compose.ui)
-    implementation(libs.compose.ui.graphics)
-    implementation(libs.compose.ui.tooling.preview)
-    implementation(libs.koin)
-    implementation(libs.rtpcscbridge)
-    implementation(libs.jna) { artifact { type = "aar" } }
-    implementation(libs.pkcs11jna) { isTransitive = false }
-    implementation(libs.pkcs11wrapper) { isTransitive = false }
-    implementation(libs.kstatemachine)
     implementation(libs.bouncycastle.bcpkix)
-    implementation(libs.room.runtime)
-    implementation(libs.room.ktx)
+    implementation(platform(libs.compose.bom))
+    implementation(libs.bundles.compose)
+    implementation(libs.jna) { artifact { type = "aar" } }
+    implementation(libs.koin)
+    implementation(libs.kstatemachine)
+    implementation(libs.bundles.room)
+    implementation(libs.rutoken.pkcs11jna) { isTransitive = false }
+    implementation(libs.rutoken.pkcs11wrapper) { isTransitive = false }
+    implementation(libs.rutoken.rtpcscbridge)
 
     ksp(libs.room.compiler)
 
@@ -129,8 +125,7 @@ dependencies {
     androidTestImplementation(libs.kotest.assertions.core)
     androidTestImplementation(libs.room.testing)
 
-    debugImplementation(libs.compose.ui.test.manifest)
-    debugImplementation(libs.compose.ui.tooling)
+    debugImplementation(libs.bundles.compose.debug)
 }
 
 val architectures = listOf(

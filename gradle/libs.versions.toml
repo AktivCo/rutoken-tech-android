@@ -42,15 +42,20 @@ junit = { group = "junit", name = "junit", version.ref = "junit" }
 koin = { group = "io.insert-koin", name = "koin-androidx-compose", version.ref = "koin" }
 kotest-assertions-core = { module = "io.kotest:kotest-assertions-core", version.ref = "kotest" }
 kstatemachine = { module = "io.github.nsk90:kstatemachine", version.ref = "kstatemachine" }
-pkcs11jna = { module = "ru.rutoken:pkcs11jna", version.ref = "pkcs11jna" }
-pkcs11wrapper = { module = "ru.rutoken.pkcs11wrapper:pkcs11wrapper", version.ref = "pkcs11wrapper" }
 room-compiler = { group = "androidx.room", name = "room-compiler", version.ref = "room" }
 room-ktx = { group = "androidx.room", name = "room-ktx", version.ref = "room" }
 room-runtime = { group = "androidx.room", name = "room-runtime", version.ref = "room" }
 room-testing = { group = "androidx.room", name = "room-testing", version.ref = "room" }
-rtpcscbridge = { module = "ru.rutoken.rtpcscbridge:rtpcscbridge", version.ref = "rtpcscbridge" }
+rutoken-pkcs11jna = { module = "ru.rutoken:pkcs11jna", version.ref = "pkcs11jna" }
+rutoken-pkcs11wrapper = { module = "ru.rutoken.pkcs11wrapper:pkcs11wrapper", version.ref = "pkcs11wrapper" }
+rutoken-rtpcscbridge = { module = "ru.rutoken.rtpcscbridge:rtpcscbridge", version.ref = "rtpcscbridge" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }
 jetbrains-kotlinAndroid = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
+
+[bundles]
+compose = ["compose-material3", "compose-ui", "compose-ui-graphics", "compose-ui-tooling-preview"]
+compose-debug = ["compose-ui-test-manifest", "compose-ui-tooling"]
+room = ["room-ktx", "room-runtime"]

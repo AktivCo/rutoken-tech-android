@@ -5,6 +5,7 @@ import java.nio.file.StandardCopyOption
 plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.jetbrains.kotlinAndroid)
+    alias(libs.plugins.ksp)
 }
 
 base {
@@ -25,6 +26,10 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
             useSupportLibrary = true
+        }
+
+        ksp {
+            arg("room.schemaLocation", "$projectDir/schemas")
         }
     }
 
@@ -106,6 +111,11 @@ dependencies {
     implementation(libs.pkcs11jna) { isTransitive = false }
     implementation(libs.pkcs11wrapper) { isTransitive = false }
     implementation(libs.kstatemachine)
+    implementation(libs.bouncycastle.bcpkix)
+    implementation(libs.room.runtime)
+    implementation(libs.room.ktx)
+
+    ksp(libs.room.compiler)
 
     testImplementation(libs.junit)
 
@@ -113,6 +123,8 @@ dependencies {
     androidTestImplementation(platform(libs.compose.bom))
     androidTestImplementation(libs.compose.ui.test.junit4)
     androidTestImplementation(libs.espresso.core)
+    androidTestImplementation(libs.kotest.assertions.core)
+    androidTestImplementation(libs.room.testing)
 
     debugImplementation(libs.compose.ui.test.manifest)
     debugImplementation(libs.compose.ui.tooling)

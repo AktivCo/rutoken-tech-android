@@ -2,6 +2,7 @@
 activity-compose = "1.8.2"
 agp = "8.2.1"
 androidx-test-ext-junit = "1.1.5"
+bouncycastle = "1.77"
 compose-bom = "2023.10.01"
 compose-compiler = "1.5.8"
 core-ktx = "1.12.0"
@@ -10,11 +11,14 @@ espresso-core = "3.5.1"
 jna = "5.14.0"
 junit = "4.13.2"
 koin = "3.5.3"
+kotest = "5.8.0"
 kotlin = "1.9.22"
+ksp = "1.9.22-1.0.16" # ksp version must be aligned with kotlin version
 kstatemachine = "0.24.1"
 lifecycle-runtime-ktx = "2.7.0"
 pkcs11jna = "4.0.0"
 pkcs11wrapper = "4.0.0"
+room = "2.6.1"
 rtpcscbridge = "1.1.1"
 
 [libraries]
@@ -22,6 +26,7 @@ androidx-activity-compose = { group = "androidx.activity", name = "activity-comp
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "core-ktx" }
 androidx-lifecycle-runtime-ktx = { group = "androidx.lifecycle", name = "lifecycle-runtime-ktx", version.ref = "lifecycle-runtime-ktx" }
 androidx-test-ext-junit = { group = "androidx.test.ext", name = "junit", version.ref = "androidx-test-ext-junit" }
+bouncycastle-bcpkix = { module = "org.bouncycastle:bcpkix-jdk18on", version.ref = "bouncycastle" }
 compose-bom = { group = "androidx.compose", name = "compose-bom", version.ref = "compose-bom" }
 compose-material3 = { group = "androidx.compose.material3", name = "material3" }
 compose-ui = { group = "androidx.compose.ui", name = "ui" }
@@ -35,11 +40,17 @@ espresso-core = { group = "androidx.test.espresso", name = "espresso-core", vers
 jna = { module = "net.java.dev.jna:jna", version.ref = "jna" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 koin = { group = "io.insert-koin", name = "koin-androidx-compose", version.ref = "koin" }
+kotest-assertions-core = { module = "io.kotest:kotest-assertions-core", version.ref = "kotest" }
 kstatemachine = { module = "io.github.nsk90:kstatemachine", version.ref = "kstatemachine" }
 pkcs11jna = { module = "ru.rutoken:pkcs11jna", version.ref = "pkcs11jna" }
 pkcs11wrapper = { module = "ru.rutoken.pkcs11wrapper:pkcs11wrapper", version.ref = "pkcs11wrapper" }
+room-compiler = { group = "androidx.room", name = "room-compiler", version.ref = "room" }
+room-ktx = { group = "androidx.room", name = "room-ktx", version.ref = "room" }
+room-runtime = { group = "androidx.room", name = "room-runtime", version.ref = "room" }
+room-testing = { group = "androidx.room", name = "room-testing", version.ref = "room" }
 rtpcscbridge = { module = "ru.rutoken.rtpcscbridge:rtpcscbridge", version.ref = "rtpcscbridge" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }
 jetbrains-kotlinAndroid = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }

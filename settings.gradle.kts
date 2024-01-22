@@ -5,17 +5,16 @@ pluginManagement {
         gradlePluginPortal()
     }
 }
+
 dependencyResolutionManagement {
     repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
     repositories {
         google()
         mavenCentral()
-        maven {
-            url = uri("https://nexus.aktivco.ru/repository/maven-public")
-        }
+        maven("https://nexus.aktivco.ru/repository/maven-public")
     }
 }
 
 rootProject.name = "rutoken-tech-android"
-include(":app")
- 
+
+include(":module.rutoken-tech", ":test.use-cases-tests")

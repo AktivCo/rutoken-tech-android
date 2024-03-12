@@ -77,7 +77,7 @@ fun CaStartScreen() {
 @PreviewLight
 @PreviewDark
 @Composable
-fun CaStartScreenPreview() {
+private fun CaStartScreenPreview() {
     RutokenTechTheme {
         CaStartScreen()
     }

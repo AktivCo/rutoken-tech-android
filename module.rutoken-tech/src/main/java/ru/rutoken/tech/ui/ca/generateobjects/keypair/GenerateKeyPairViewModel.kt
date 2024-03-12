@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -17,18 +18,20 @@ import ru.rutoken.tech.pkcs11.createobjects.GostKeyPairParams
 import ru.rutoken.tech.pkcs11.createobjects.createGostKeyPair
 import ru.rutoken.tech.pkcs11.createobjects.generateCkaId
 import ru.rutoken.tech.tokenmanager.TokenManager
+import ru.rutoken.tech.ui.tokenconnector.TokenConnector
 import ru.rutoken.tech.ui.utils.DialogData
 import ru.rutoken.tech.ui.utils.DialogState
 import ru.rutoken.tech.ui.utils.callPkcs11Operation
 import ru.rutoken.tech.ui.utils.toErrorDialogData
-import ru.rutoken.tech.utils.BusinessRuleCase
-import ru.rutoken.tech.utils.BusinessRuleException
+import ru.rutoken.tech.utils.logd
 import ru.rutoken.tech.utils.loge
 
 class GenerateKeyPairViewModel(
     private val tokenManager: TokenManager,
     private val contextStorage: TokenContextStorage
 ) : ViewModel() {
+    val tokenConnector = TokenConnector()
+
     private val _showProgress = MutableLiveData<Boolean>()
     val showProgress: LiveData<Boolean> = _showProgress
 
@@ -55,9 +58,7 @@ class GenerateKeyPairViewModel(
                 try {
                     val currentContext = contextStorage.requireCurrentContext()
                     val tokenSerial = currentContext.tokenSerial
-                    // TODO: Add waiting for token logic
-                    val token = tokenManager.getTokenBySerialNumber(tokenSerial)
-                        ?: throw BusinessRuleException(BusinessRuleCase.WRONG_RUTOKEN)
+                    val token = tokenConnector.findTokenBySerialNumber(tokenManager, tokenSerial)
 
                     callPkcs11Operation(_showProgress, tokenManager, tokenSerial) {
                         createGostKeyPair(token, currentContext.tokenUserPin, ckaId, keyPairParams)
@@ -69,6 +70,8 @@ class GenerateKeyPairViewModel(
                             )
                         )
                     }
+                } catch (e: CancellationException) {
+                    logd(e) { "Connect token dialog was dismissed" }
                 } catch (e: Exception) {
                     loge<GenerateKeyPairViewModel>(e) { "Key pair generation failed" }
                     _errorDialogState.postValue(DialogState(showDialog = true, data = e.toErrorDialogData()))

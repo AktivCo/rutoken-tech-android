@@ -55,7 +55,7 @@ fun ProgressIndicatorDialog() {
 @PreviewLight
 @PreviewDark
 @Composable
-fun ProgressIndicatorDialogPreview() {
+private fun ProgressIndicatorDialogPreview() {
     RutokenTechTheme {
         Surface(modifier = Modifier.fillMaxSize()) {
             ProgressIndicatorDialog()

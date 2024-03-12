@@ -39,7 +39,7 @@ fun ErrorAlertDialog(
 @PreviewLight
 @PreviewDark
 @Composable
-fun ErrorAlertDialogPreview() {
+private fun ErrorAlertDialogPreview() {
     RutokenTechTheme {
         Surface(modifier = Modifier.fillMaxSize()) {
             ErrorAlertDialog(

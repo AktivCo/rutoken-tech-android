@@ -55,7 +55,7 @@ fun PrimaryButton(
 @PreviewLight
 @PreviewDark
 @Composable
-fun PrimaryButtonPreview() {
+private fun PrimaryButtonPreview() {
     RutokenTechTheme {
         Surface {
             Column {

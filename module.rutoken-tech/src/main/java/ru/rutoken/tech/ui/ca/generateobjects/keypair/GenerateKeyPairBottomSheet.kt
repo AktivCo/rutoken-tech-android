@@ -31,6 +31,7 @@ import org.koin.androidx.compose.koinViewModel
 import ru.rutoken.tech.R
 import ru.rutoken.tech.pkcs11.createobjects.GostKeyPairParams
 import ru.rutoken.tech.ui.components.BottomSheetTitle
+import ru.rutoken.tech.ui.components.ConnectTokenDialog
 import ru.rutoken.tech.ui.components.ErrorAlertDialog
 import ru.rutoken.tech.ui.components.PrimaryButtonBox
 import ru.rutoken.tech.ui.components.ProgressIndicatorDialog
@@ -48,10 +49,10 @@ import ru.rutoken.tech.ui.utils.figmaPaddingValues
  * TODO: Convert this to navigation node
  */
 @Composable
-fun GenerateKeyPairBottomSheet() {
+fun GenerateKeyPairBottomSheetRoute() {
     val viewModel = koinViewModel<GenerateKeyPairViewModel>()
     var showBottomSheet by remember { mutableStateOf(false) }
-    GenerateKeyPairBottomSheetAdapter(
+    GenerateKeyPairBottomSheet(
         viewModel = viewModel,
         showBottomSheet = showBottomSheet,
         onDismiss = { showBottomSheet = false }
@@ -63,7 +64,7 @@ fun GenerateKeyPairBottomSheet() {
 }
 
 @Composable
-private fun GenerateKeyPairBottomSheetAdapter(
+private fun GenerateKeyPairBottomSheet(
     viewModel: GenerateKeyPairViewModel,
     showBottomSheet: Boolean,
     onDismiss: () -> Unit
@@ -72,8 +73,9 @@ private fun GenerateKeyPairBottomSheetAdapter(
     val scope = rememberCoroutineScope()
     val keyPairId by viewModel.keyPairId.observeAsState("")
 
-    ProgressIndicatorDialogAdapter(viewModel)
-    SuccessDialogAdapter(
+    ConnectTokenDialog(viewModel)
+    ProgressIndicatorDialog(viewModel)
+    SuccessDialog(
         viewModel = viewModel,
         onDismissOrConfirm = {
             scope.launch { sheetState.hide() }.invokeOnCompletion {
@@ -83,7 +85,7 @@ private fun GenerateKeyPairBottomSheetAdapter(
             }
         }
     )
-    ErrorDialogAdapter(viewModel)
+    ErrorDialog(viewModel)
 
     if (keyPairId.isNotEmpty() && showBottomSheet) {
         GenerateKeyPairBottomSheet(
@@ -137,7 +139,16 @@ fun GenerateKeyPairBottomSheet(
 }
 
 @Composable
-private fun ProgressIndicatorDialogAdapter(viewModel: GenerateKeyPairViewModel) {
+private fun ConnectTokenDialog(viewModel: GenerateKeyPairViewModel) {
+    val showDialog by viewModel.tokenConnector.showConnectTokenDialog.observeAsState(false)
+
+    if (showDialog) {
+        ConnectTokenDialog(onDismissRequest = { viewModel.tokenConnector.onDismissConnectTokenDialog() })
+    }
+}
+
+@Composable
+private fun ProgressIndicatorDialog(viewModel: GenerateKeyPairViewModel) {
     val showProgress by viewModel.showProgress.observeAsState(false)
 
     if (showProgress) {
@@ -146,10 +157,7 @@ private fun ProgressIndicatorDialogAdapter(viewModel: GenerateKeyPairViewModel) 
 }
 
 @Composable
-private fun SuccessDialogAdapter(
-    viewModel: GenerateKeyPairViewModel,
-    onDismissOrConfirm: () -> Unit
-) {
+private fun SuccessDialog(viewModel: GenerateKeyPairViewModel, onDismissOrConfirm: () -> Unit) {
     val dialogState by viewModel.successDialogState.observeAsState(DialogState())
 
     if (dialogState.showDialog) {
@@ -164,7 +172,7 @@ private fun SuccessDialogAdapter(
 }
 
 @Composable
-private fun ErrorDialogAdapter(viewModel: GenerateKeyPairViewModel) {
+private fun ErrorDialog(viewModel: GenerateKeyPairViewModel) {
     val dialogState by viewModel.errorDialogState.observeAsState(DialogState())
 
     if (dialogState.showDialog) {
@@ -179,7 +187,7 @@ private fun ErrorDialogAdapter(viewModel: GenerateKeyPairViewModel) {
 @PreviewLight
 @PreviewDark
 @Composable
-fun GenerateKeyPairBottomSheetPreview() {
+private fun GenerateKeyPairBottomSheetPreview() {
     RutokenTechTheme {
         GenerateKeyPairBottomSheet(
             keyPairId = "12345678-90abcdef",

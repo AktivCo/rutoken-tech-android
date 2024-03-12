@@ -76,7 +76,7 @@ fun TextGroupItem(item: TextGroupItem) {
 @PreviewLight
 @PreviewDark
 @Composable
-fun TextGroupPreview() {
+private fun TextGroupPreview() {
     RutokenTechTheme {
         Surface {
             Column {

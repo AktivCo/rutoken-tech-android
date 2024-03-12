@@ -37,7 +37,7 @@ fun SimpleAlertDialog(
 @PreviewLight
 @PreviewDark
 @Composable
-fun SimpleAlertDialogPreview() {
+private fun SimpleAlertDialogPreview() {
     RutokenTechTheme {
         Surface(modifier = Modifier.fillMaxSize()) {
             SimpleAlertDialog(

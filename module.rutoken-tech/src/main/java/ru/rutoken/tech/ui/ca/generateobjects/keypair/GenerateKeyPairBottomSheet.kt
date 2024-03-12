@@ -1,19 +1,12 @@
 package ru.rutoken.tech.ui.ca.generateobjects.keypair
 
-import android.os.Build
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.WindowInsetsSides
-import androidx.compose.foundation.layout.asPaddingValues
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.systemBars
-import androidx.compose.foundation.layout.systemBarsIgnoringVisibility
-import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.SheetState
-import androidx.compose.material3.SheetValue
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -22,8 +15,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
@@ -33,6 +24,7 @@ import ru.rutoken.tech.pkcs11.createobjects.GostKeyPairParams
 import ru.rutoken.tech.ui.components.BottomSheetTitle
 import ru.rutoken.tech.ui.components.ConnectTokenDialog
 import ru.rutoken.tech.ui.components.ErrorAlertDialog
+import ru.rutoken.tech.ui.components.NavigationBarSpacer
 import ru.rutoken.tech.ui.components.PrimaryButtonBox
 import ru.rutoken.tech.ui.components.ProgressIndicatorDialog
 import ru.rutoken.tech.ui.components.SimpleAlertDialog
@@ -43,6 +35,7 @@ import ru.rutoken.tech.ui.utils.DialogState
 import ru.rutoken.tech.ui.utils.PreviewDark
 import ru.rutoken.tech.ui.utils.PreviewLight
 import ru.rutoken.tech.ui.utils.errorDialogData
+import ru.rutoken.tech.ui.utils.expandedSheetState
 import ru.rutoken.tech.ui.utils.figmaPaddingValues
 
 /**
@@ -128,13 +121,7 @@ fun GenerateKeyPairBottomSheet(
 
         PrimaryButtonBox(stringResource(R.string.generate)) { onGenerationButtonClicked() }
 
-        Spacer(
-            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) {
-                Modifier.height(WindowInsets.systemBarsIgnoringVisibility.asPaddingValues().calculateBottomPadding())
-            } else {
-                Modifier.windowInsetsPadding(WindowInsets.systemBars.only(WindowInsetsSides.Bottom))
-            }
-        )
+        NavigationBarSpacer()
     }
 }
 
@@ -191,13 +178,8 @@ private fun GenerateKeyPairBottomSheetPreview() {
     RutokenTechTheme {
         GenerateKeyPairBottomSheet(
             keyPairId = "12345678-90abcdef",
-            sheetState = SheetState(
-                skipPartiallyExpanded = true,
-                density = LocalDensity.current,
-                initialValue = SheetValue.Expanded
-            ),
-            onDismiss = { /* Nothing to do */ },
-            onGenerationButtonClicked = { /* Nothing to do */ }
-        )
+            sheetState = expandedSheetState(),
+            onDismiss = {}
+        ) {}
     }
 }

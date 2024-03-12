@@ -16,6 +16,7 @@ import ru.rutoken.tech.repository.user.UserRepository
 import ru.rutoken.tech.repository.user.UserRepositoryImpl
 import ru.rutoken.tech.tokenmanager.TokenManager
 import ru.rutoken.tech.ui.ca.generateobjects.keypair.GenerateKeyPairViewModel
+import ru.rutoken.tech.ui.tokenauth.EnterPinViewModel
 
 val koinModule = module {
     single { RtPkcs11Module() } bind Pkcs11Module::class
@@ -29,4 +30,5 @@ val koinModule = module {
     single { TokenContextStorage() }
 
     viewModel { GenerateKeyPairViewModel(get(), get()) }
+    viewModel { EnterPinViewModel() }
 }

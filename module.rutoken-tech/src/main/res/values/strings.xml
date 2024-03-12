@@ -45,4 +45,10 @@
     <string name="connect_nfc_token">Включите NFC на устройстве и поднесите к нему Рутокен</string>
     <string name="usb">USB</string>
     <string name="connect_usb_token">Подключите Рутокен к USB-разъему</string>
+
+    <!--Related to pin dialog-->
+    <string name="enter_pin">Введите PIN-код</string>
+    <string name="pin_code">PIN-код</string>
+    <string name="proceed">Продолжить</string>
+    <string name="invalid_pin_supporting">Неверный PIN-код. Осталось попыток: %d</string>
 </resources>

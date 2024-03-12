@@ -9,4 +9,9 @@
     <!--TODO: Replace "\n" with the unicode character &#x2028; when https://scm.aktivco.ru/rutoken/dev/android-projects/rutoken-tech-android/-/issues/32 will be resolved-->
     <string name="connect_rutoken_tip">Чтобы воспользоваться\n«Удостоверяющим центром»</string>
     <string name="connect">Подключить</string>
+
+    <!--Related to simple dialogs-->
+    <string name="key_pair_generated">Ключевая пара сгенерирована</string>
+    <string name="no_key_pairs_without_certificates">На Рутокене нет ключевых пар без\u00A0сертификата</string>
+    <string name="test_certificate_generated">Тестовый сертификат сгенерирован</string>
 </resources>

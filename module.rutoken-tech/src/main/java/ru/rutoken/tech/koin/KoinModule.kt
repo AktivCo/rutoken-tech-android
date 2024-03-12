@@ -2,6 +2,7 @@ package ru.rutoken.tech.koin
 
 import androidx.room.Room
 import org.koin.android.ext.koin.androidContext
+import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.bind
 import org.koin.dsl.module
 import ru.rutoken.pkcs11wrapper.main.Pkcs11Module
@@ -13,6 +14,7 @@ import ru.rutoken.tech.repository.document.DocumentRepositoryImpl
 import ru.rutoken.tech.repository.user.UserRepository
 import ru.rutoken.tech.repository.user.UserRepositoryImpl
 import ru.rutoken.tech.tokenmanager.TokenManager
+import ru.rutoken.tech.ui.ca.generateobjects.keypair.GenerateKeyPairViewModel
 
 val koinModule = module {
     single { RtPkcs11Module() } bind Pkcs11Module::class
@@ -23,4 +25,6 @@ val koinModule = module {
     single<UserRepository> { UserRepositoryImpl(get()) }
     single<DocumentRepository> { DocumentRepositoryImpl(get()) }
     single { TokenManager() }
+
+    viewModel { GenerateKeyPairViewModel() }
 }

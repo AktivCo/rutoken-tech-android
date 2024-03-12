@@ -5,11 +5,18 @@
 
     <string name="tab_certificate_authority">Удостоверяющий центр</string>
 
-    <!--Related to CA tab-->
+    <!--Related to CA start screen-->
     <string name="connect_rutoken">Подключите Рутокен</string>
     <!--TODO: Replace "\n" with the unicode character &#x2028; when https://scm.aktivco.ru/rutoken/dev/android-projects/rutoken-tech-android/-/issues/32 will be resolved-->
     <string name="connect_rutoken_tip">Чтобы воспользоваться\n«Удостоверяющим центром»</string>
     <string name="connect">Подключить</string>
+
+    <!--Related to CA key pair generation dialog-->
+    <string name="key_pair_title">Ключевая пара</string>
+    <string name="key_pair_id">ID</string>
+    <string name="key_pair_algorithm">Алгоритм</string>
+    <string name="gost256_algorithm">ГОСТ Р 34.10-2012 256-бит</string>
+    <string name="generate">Сгенерировать</string>
 
     <!--Related to simple dialogs-->
     <string name="key_pair_generated">Ключевая пара сгенерирована</string>

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!--TODO: Replace all "\n" in file with the unicode character &#x2028; when https://scm.aktivco.ru/rutoken/dev/android-projects/rutoken-tech-android/-/issues/32 will be resolved-->
     <string name="app_name">Рутокен Технологии</string>
 
     <string name="tab_certificate_authority">Удостоверяющий центр</string>
@@ -14,4 +15,16 @@
     <string name="key_pair_generated">Ключевая пара сгенерирована</string>
     <string name="no_key_pairs_without_certificates">На Рутокене нет ключевых пар без\u00A0сертификата</string>
     <string name="test_certificate_generated">Тестовый сертификат сгенерирован</string>
+
+    <!--Related to error dialogs-->
+    <string name="unknown_error_title">Неизвестная ошибка</string>
+    <string name="unknown_error_text">Попробуйте еще раз или обратитесь в\u00A0Техническую поддержку</string>
+    <string name="connection_lost_title">Потеряно соединение\nс Рутокеном</string>
+    <string name="connection_lost_text">Повторите подключение\nи не убирайте Рутокен до завершения обмена данными</string>
+    <string name="wrong_token_title">Неподходящий Рутокен</string>
+    <string name="wrong_token_text">Приложите Рутокен, который использовали ранее для входа</string>
+    <string name="no_such_key_pair_title">На Рутокене нет подходящей ключевой пары</string>
+    <string name="no_such_key_pair_text">Выберите другую ключевую пару</string>
+    <string name="pin_blocked_title">PIN-код Рутокена заблокирован</string>
+    <string name="pin_blocked_text">Разблокируйте его в Панели Управления Рутокен либо\nобратитесь к администратору</string>
 </resources>

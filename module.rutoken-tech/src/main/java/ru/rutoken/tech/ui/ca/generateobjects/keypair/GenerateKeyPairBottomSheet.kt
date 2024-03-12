@@ -29,13 +29,19 @@ import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 import ru.rutoken.tech.R
+import ru.rutoken.tech.pkcs11.createobjects.GostKeyPairParams
 import ru.rutoken.tech.ui.components.BottomSheetTitle
+import ru.rutoken.tech.ui.components.ErrorAlertDialog
 import ru.rutoken.tech.ui.components.PrimaryButtonBox
+import ru.rutoken.tech.ui.components.ProgressIndicatorDialog
+import ru.rutoken.tech.ui.components.SimpleAlertDialog
 import ru.rutoken.tech.ui.components.TextGroupBox
 import ru.rutoken.tech.ui.components.TextGroupItem
 import ru.rutoken.tech.ui.theme.RutokenTechTheme
+import ru.rutoken.tech.ui.utils.DialogState
 import ru.rutoken.tech.ui.utils.PreviewDark
 import ru.rutoken.tech.ui.utils.PreviewLight
+import ru.rutoken.tech.ui.utils.errorDialogData
 import ru.rutoken.tech.ui.utils.figmaPaddingValues
 
 /**
@@ -66,19 +72,25 @@ private fun GenerateKeyPairBottomSheetAdapter(
     val scope = rememberCoroutineScope()
     val keyPairId by viewModel.keyPairId.observeAsState("")
 
+    ProgressIndicatorDialogAdapter(viewModel)
+    SuccessDialogAdapter(
+        viewModel = viewModel,
+        onDismissOrConfirm = {
+            scope.launch { sheetState.hide() }.invokeOnCompletion {
+                if (!sheetState.isVisible) {
+                    onDismiss()
+                }
+            }
+        }
+    )
+    ErrorDialogAdapter(viewModel)
+
     if (keyPairId.isNotEmpty() && showBottomSheet) {
         GenerateKeyPairBottomSheet(
             keyPairId = keyPairId,
             sheetState = sheetState,
             onDismiss = onDismiss,
-            onGenerationButtonClicked = {
-                // TODO: call key pair generation logic from view model
-                scope.launch { sheetState.hide() }.invokeOnCompletion {
-                    if (!sheetState.isVisible) {
-                        onDismiss()
-                    }
-                }
-            }
+            onGenerationButtonClicked = { viewModel.generateGostKeyPair(keyPairId, GostKeyPairParams.GOST_2012_256) }
         )
     }
 }
@@ -124,6 +136,46 @@ fun GenerateKeyPairBottomSheet(
     }
 }
 
+@Composable
+private fun ProgressIndicatorDialogAdapter(viewModel: GenerateKeyPairViewModel) {
+    val showProgress by viewModel.showProgress.observeAsState(false)
+
+    if (showProgress) {
+        ProgressIndicatorDialog()
+    }
+}
+
+@Composable
+private fun SuccessDialogAdapter(
+    viewModel: GenerateKeyPairViewModel,
+    onDismissOrConfirm: () -> Unit
+) {
+    val dialogState by viewModel.successDialogState.observeAsState(DialogState())
+
+    if (dialogState.showDialog) {
+        SimpleAlertDialog(
+            text = stringResource(id = dialogState.data.text),
+            onDismissOrConfirm = {
+                viewModel.dismissSuccessDialog()
+                onDismissOrConfirm()
+            }
+        )
+    }
+}
+
+@Composable
+private fun ErrorDialogAdapter(viewModel: GenerateKeyPairViewModel) {
+    val dialogState by viewModel.errorDialogState.observeAsState(DialogState())
+
+    if (dialogState.showDialog) {
+        ErrorAlertDialog(
+            title = stringResource(id = dialogState.errorDialogData.title),
+            text = stringResource(id = dialogState.errorDialogData.text),
+            onDismissOrConfirm = { viewModel.dismissErrorDialog() }
+        )
+    }
+}
+
 @PreviewLight
 @PreviewDark
 @Composable
@@ -136,7 +188,8 @@ fun GenerateKeyPairBottomSheetPreview() {
                 density = LocalDensity.current,
                 initialValue = SheetValue.Expanded
             ),
-            onDismiss = {}
-        ) {}
+            onDismiss = { /* Nothing to do */ },
+            onGenerationButtonClicked = { /* Nothing to do */ }
+        )
     }
 }

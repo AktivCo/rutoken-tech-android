@@ -25,7 +25,7 @@ fun SimpleAlertDialog(
         onDismissRequest = { onDismissOrConfirm() },
         confirmButton = {
             TextButton(onClick = { onDismissOrConfirm() }) {
-                Text(stringResource(id = android.R.string.ok))
+                Text(stringResource(id = R.string.ok))
             }
         },
         modifier = Modifier.width(312.dp),

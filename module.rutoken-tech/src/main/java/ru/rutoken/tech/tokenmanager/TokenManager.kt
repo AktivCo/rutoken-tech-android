@@ -10,12 +10,15 @@ import kotlinx.coroutines.withContext
 import ru.rutoken.pkcs11wrapper.main.Pkcs11Module
 import ru.rutoken.pkcs11wrapper.main.Pkcs11Token
 import ru.rutoken.tech.pkcs11.Pkcs11Launcher
+import ru.rutoken.tech.pkcs11.SerialHexString
+import ru.rutoken.tech.pkcs11.getSerialNumber
 import ru.rutoken.tech.tokenmanager.slotevent.SlotEvent
 import ru.rutoken.tech.tokenmanager.slotevent.SlotEventProvider
+import ru.rutoken.tech.utils.loge
 import java.util.Collections
 
 class TokenManager : SlotEventProvider.Listener, Pkcs11Launcher.Listener {
-    private val tokens = Collections.synchronizedSet<Pkcs11Token>(mutableSetOf())
+    private val tokens = Collections.synchronizedMap<SerialHexString, Pkcs11Token>(mutableMapOf())
     private var waitTokenDeferred: CompletableDeferred<Pkcs11Token>? = null
 
     private lateinit var eventJob: Job
@@ -51,18 +54,24 @@ class TokenManager : SlotEventProvider.Listener, Pkcs11Launcher.Listener {
                     return waitTokenDeferred!!
                 }
 
-                else -> CompletableDeferred(tokens.first())
+                else -> CompletableDeferred(tokens.values.first())
             }
         }
     }
 
+    fun getTokenBySerialNumber(serialNumber: SerialHexString): Pkcs11Token? = tokens[serialNumber]
+
     private fun addToken(token: Pkcs11Token) {
-        tokens.add(token)
-        waitTokenDeferred?.complete(token)
-        waitTokenDeferred = null
+        try {
+            tokens[token.getSerialNumber()] = token
+            waitTokenDeferred?.complete(token)
+            waitTokenDeferred = null
+        } catch (e: Exception) {
+            loge(e) { "Adding a token to the token manager failed" }
+        }
     }
 
     private fun removeToken(token: Pkcs11Token) {
-        tokens.remove(token)
+        tokens.values.remove(token)
     }
 }

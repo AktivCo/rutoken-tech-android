@@ -31,6 +31,8 @@ import ru.rutoken.pkcs11wrapper.`object`.key.Pkcs11GostPublicKeyObject
 import ru.rutoken.pkcs11wrapper.rutoken.main.RtPkcs11Session
 import ru.rutoken.tech.ca.LocalCA
 
+typealias GostKeyPair = Pkcs11KeyPair<Pkcs11GostPublicKeyObject, Pkcs11GostPrivateKeyObject>
+
 private const val CKA_ID_GROUP_SIZE = 8
 private val CKA_ID_GROUP_CHARSET = ('a'..'f') + ('0'..'9')
 private const val CKA_ID_GROUP_SEPARATOR = '-'
@@ -41,7 +43,7 @@ fun generateCkaId() = generateCkaIdGroup() + CKA_ID_GROUP_SEPARATOR.code.toByte(
  * Method supposes that the user is logged in.
  */
 fun RtPkcs11Session.createGostCertificate(
-    keyPair: Pkcs11KeyPair<Pkcs11GostPublicKeyObject, Pkcs11GostPrivateKeyObject>,
+    keyPair: GostKeyPair,
     dn: List<String>,
     attributes: List<String>,
     extensions: List<String>
@@ -59,10 +61,7 @@ fun RtPkcs11Session.createGostCertificate(
 /**
  * Method supposes that the user is logged in.
  */
-fun Pkcs11Session.createGostKeyPair(
-    keyPairParams: GostKeyPairParams,
-    ckaId: ByteArray
-): Pkcs11KeyPair<Pkcs11GostPublicKeyObject, Pkcs11GostPrivateKeyObject> {
+fun Pkcs11Session.createGostKeyPair(keyPairParams: GostKeyPairParams, ckaId: ByteArray): GostKeyPair {
     if (!token.isMechanismSupported(keyPairParams.mechanismType))
         throw IllegalStateException("${keyPairParams.mechanismType} not supported by token")
 

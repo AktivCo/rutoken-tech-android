@@ -3,11 +3,16 @@
     <!--TODO: Replace all "\n" in file with the unicode character &#x2028; when https://scm.aktivco.ru/rutoken/dev/android-projects/rutoken-tech-android/-/issues/32 will be resolved-->
     <string name="app_name">Рутокен Технологии</string>
 
+    <!--Common strings-->
+    <string name="generate">Сгенерировать</string>
+    <string name="ok">ОК</string>
+    <string name="cancel">Отмена</string>
+
+    <!--Tab names-->
     <string name="tab_certificate_authority">Удостоверяющий центр</string>
 
     <!--Related to CA start screen-->
     <string name="connect_rutoken">Подключите Рутокен</string>
-    <!--TODO: Replace "\n" with the unicode character &#x2028; when https://scm.aktivco.ru/rutoken/dev/android-projects/rutoken-tech-android/-/issues/32 will be resolved-->
     <string name="connect_rutoken_tip">Чтобы воспользоваться\n«Удостоверяющим центром»</string>
     <string name="connect">Подключить</string>
 
@@ -16,7 +21,6 @@
     <string name="key_pair_id">ID</string>
     <string name="key_pair_algorithm">Алгоритм</string>
     <string name="gost256_algorithm">ГОСТ Р 34.10-2012 256-бит</string>
-    <string name="generate">Сгенерировать</string>
 
     <!--Related to simple dialogs-->
     <string name="key_pair_generated">Ключевая пара сгенерирована</string>

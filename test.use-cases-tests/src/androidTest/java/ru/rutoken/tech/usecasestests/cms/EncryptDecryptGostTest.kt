@@ -1,13 +1,13 @@
 package ru.rutoken.tech.usecasestests.cms
 
 import io.kotest.matchers.shouldBe
+import org.bouncycastle.cert.X509CertificateHolder
+import org.bouncycastle.cms.CMSAlgorithm.GOST28147_GCFB
 import org.junit.ClassRule
 import org.junit.Test
 import org.junit.rules.RuleChain
-import ru.rutoken.pkcs11wrapper.constant.standard.Pkcs11UserType.CKU_USER
-import ru.rutoken.tech.ca.LocalCA
-import ru.rutoken.tech.usecase.CmsOperationProvider
-import ru.rutoken.tech.usecase.CmsOperations
+import ru.rutoken.pkcs11wrapper.constant.standard.Pkcs11UserType
+import ru.rutoken.tech.bouncycastle.BouncyCastleCmsOperations
 import ru.rutoken.tech.usecasestests.DATA
 import ru.rutoken.tech.usecasestests.DEFAULT_USER_PIN
 import ru.rutoken.tech.usecasestests.appPackageName
@@ -23,54 +23,22 @@ import ru.rutoken.tech.usecasestests.rule.RtTransportRule
 import ru.rutoken.tech.usecasestests.rule.SlotRule
 import ru.rutoken.tech.usecasestests.rule.TokenWaitingRule
 import ru.rutoken.tech.usecasestests.rule.UsbDevicePermissionRule
-import ru.rutoken.tech.utils.VerifyCmsResult
 
 /**
  * This test class should be run with attached USB token. It does not support Bluetooth or NFC tokens.
  * Additionally, the device's screen should be on if test apk does not have USB permission for the token.
  */
-class VerifyDetachedGostCmsTest {
+class EncryptDecryptGostTest {
     @Test
-    fun verifyWrapperCmsViaBouncyCastle() {
-        val detachedCms = CmsOperations.signDetached(
-            CmsOperationProvider.PKCS11_WRAPPER,
-            session.value,
-            DATA,
-            keyPair.value.privateKey,
-            certificate.value
-        )
+    fun encryptDecrypt() {
+        val certificateHolder = X509CertificateHolder(certificate.encoded)
+        val encryptedData = BouncyCastleCmsOperations.encrypt(DATA, certificateHolder, GOST28147_GCFB)
 
-        val trustedCertificates = listOf(LocalCA.rootCertificate)
-        val verifyResult = CmsOperations.verifyDetached(
-            CmsOperationProvider.BOUNCY_CASTLE,
-            detachedCms,
-            DATA,
-            trustedCertificates
-        )
+        val certificates = listOf(certificateHolder)
+        val decryptedData =
+            BouncyCastleCmsOperations.decrypt(session.value, encryptedData, certificates, keyPair.value.privateKey)
 
-        verifyResult shouldBe VerifyCmsResult.SUCCESS
-    }
-
-    @Test
-    fun verifyBouncyCastleCmsViaWrapper() {
-        val detachedCms = CmsOperations.signDetached(
-            CmsOperationProvider.BOUNCY_CASTLE,
-            session.value,
-            DATA,
-            keyPair.value.privateKey,
-            certificate.value
-        )
-
-        val trustedCertificates = listOf(LocalCA.rootCertificate)
-        val verifyResult = CmsOperations.verifyDetached(
-            CmsOperationProvider.PKCS11_WRAPPER,
-            detachedCms,
-            DATA,
-            trustedCertificates,
-            session.value
-        )
-
-        verifyResult shouldBe VerifyCmsResult.SUCCESS
+        decryptedData shouldBe DATA
     }
 
     companion object {
@@ -84,7 +52,7 @@ class VerifyDetachedGostCmsTest {
         private val slot = SlotRule(module)
         private val token = RtTokenRule(slot)
         private val session = RtSessionRule(token)
-        private val login = LoginRule(session, CKU_USER, DEFAULT_USER_PIN)
+        private val login = LoginRule(session, Pkcs11UserType.CKU_USER, DEFAULT_USER_PIN)
         private val keyPair = attributeFactory.makeGostR3410_2012_256KeyPairRule(session)
         private val certificate = CreateGostCertificateRule(session, keyPair)
 

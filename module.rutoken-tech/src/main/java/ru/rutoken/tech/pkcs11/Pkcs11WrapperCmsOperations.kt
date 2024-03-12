@@ -14,20 +14,29 @@ import ru.rutoken.tech.utils.VerifyCmsResult
 import ru.rutoken.tech.utils.loge
 
 object Pkcs11WrapperCmsOperations {
-    fun signCmsDetached(
+    fun signDetached(
         session: RtPkcs11Session,
         data: ByteArray,
-        privateKey: Pkcs11GostPrivateKeyObject,
-        certificate: Pkcs11CertificateObject,
-    ): ByteArray = session.cmsManager.sign(data, certificate, privateKey, null, PKCS7_DETACHED_SIGNATURE)
+        signerPrivateKey: Pkcs11GostPrivateKeyObject,
+        signerCertificate: Pkcs11CertificateObject,
+        additionalCertificates: List<Pkcs11CertificateObject>?
+    ): ByteArray = session.cmsManager.sign(
+        data,
+        signerCertificate,
+        signerPrivateKey,
+        additionalCertificates,
+        PKCS7_DETACHED_SIGNATURE
+    )
 
-    fun verifyDetachedCms(
+    fun verifyDetached(
         session: RtPkcs11Session,
         cms: ByteArray,
         data: ByteArray,
-        trustedCertificates: List<ByteArray>
+        trustedCertificates: List<ByteArray>,
+        certificates: List<ByteArray>?,
+        crls: List<ByteArray>?
     ): VerifyCmsResult {
-        val store = VendorX509Store(trustedCertificates, null, null)
+        val store = VendorX509Store(trustedCertificates, certificates, crls)
         val code = session.cmsManager.verifyDetachedAtOnce(
             cms,
             data,

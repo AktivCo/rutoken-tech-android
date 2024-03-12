@@ -1,8 +1,7 @@
 package ru.rutoken.tech.usecasestests.rule
 
-import android.util.Log
-import io.kotest.assertions.until.fixed
-import io.kotest.assertions.until.until
+import io.kotest.assertions.nondeterministic.until
+import io.kotest.assertions.nondeterministic.untilConfig
 import io.kotest.assertions.withClue
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.runBlocking
@@ -11,6 +10,7 @@ import org.junit.runner.Description
 import org.junit.runners.model.Statement
 import ru.rutoken.rtpcscbridge.RtPcscBridge
 import ru.rutoken.rttransport.RtTransport
+import ru.rutoken.tech.utils.logv
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 
@@ -38,8 +38,11 @@ class TokenWaitingRule(private val waitTimeout: Duration = 5000L.milliseconds) :
 
             withClue("PC/SC reader should appear within $waitTimeout") {
                 runBlocking {
-                    until(waitTimeout, 500L.milliseconds.fixed(), suspend {
-                        Log.v(TokenWaitingRule::class.java.canonicalName, "Checking if token is attached...")
+                    until(untilConfig {
+                        duration = waitTimeout
+                        interval = 500L.milliseconds
+                    }, suspend {
+                        logv<TokenWaitingRule> { "Checking if token is attached..." }
                         pcscReaderExists
                     })
                 }

@@ -6,6 +6,7 @@ import ru.rutoken.pkcs11wrapper.constant.IPkcs11MechanismType
 import ru.rutoken.pkcs11wrapper.constant.standard.Pkcs11AttributeType.CKA_CERTIFICATE_CATEGORY
 import ru.rutoken.pkcs11wrapper.constant.standard.Pkcs11AttributeType.CKA_CERTIFICATE_TYPE
 import ru.rutoken.pkcs11wrapper.constant.standard.Pkcs11AttributeType.CKA_CLASS
+import ru.rutoken.pkcs11wrapper.constant.standard.Pkcs11AttributeType.CKA_DERIVE
 import ru.rutoken.pkcs11wrapper.constant.standard.Pkcs11AttributeType.CKA_GOSTR3410_PARAMS
 import ru.rutoken.pkcs11wrapper.constant.standard.Pkcs11AttributeType.CKA_GOSTR3411_PARAMS
 import ru.rutoken.pkcs11wrapper.constant.standard.Pkcs11AttributeType.CKA_ID
@@ -118,6 +119,7 @@ fun IPkcs11AttributeFactory.makeGostPrivateKeyTemplate(
         makeAttribute(CKA_GOSTR3411_PARAMS, keyPairParams.paramset3411),
         makeAttribute(CKA_TOKEN, true),
         makeAttribute(CKA_SIGN, true),
+        makeAttribute(CKA_DERIVE, true)
     )
 }
 

@@ -1,9 +1,24 @@
 package ru.rutoken.tech.ui.ca.tokeninfo
 
 import androidx.annotation.StringRes
-import androidx.compose.foundation.*
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.LocalOverscrollConfiguration
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.consumeWindowInsets
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -23,9 +38,11 @@ import androidx.compose.ui.unit.dp
 import ru.rutoken.tech.R
 import ru.rutoken.tech.ui.components.AppIcons
 import ru.rutoken.tech.ui.components.ScreenTopAppBar
+import ru.rutoken.tech.ui.components.SimpleAlertDialog
 import ru.rutoken.tech.ui.components.TextGroup
 import ru.rutoken.tech.ui.components.TextGroupItem
 import ru.rutoken.tech.ui.theme.RutokenTechTheme
+import ru.rutoken.tech.ui.utils.DialogState
 import ru.rutoken.tech.ui.utils.PreviewDark
 import ru.rutoken.tech.ui.utils.PreviewLight
 import ru.rutoken.tech.ui.utils.figmaPadding
@@ -39,12 +56,20 @@ fun CaTokenInfoScreen(
     openDrawer: () -> Unit
 ) {
     val tokenInfoUiState by viewModel.uiState.observeAsState()
+    val shouldNavigateToCertGeneration by viewModel.navigateToCertGenerationEvent.observeAsState(false)
+
+    if (shouldNavigateToCertGeneration) {
+        viewModel.resetNavigateToCertGenerationEvent()
+        onNavigateToGenerateCertificate()
+    }
+
+    NoKeyPairsOnTokenDialog(viewModel)
 
     tokenInfoUiState?.let { uiState ->
         TokenInfoScreen(
             uiState = uiState,
             onNavigateToGenerateKeyPair = onNavigateToGenerateKeyPair,
-            onNavigateToGenerateCertificate = onNavigateToGenerateCertificate,
+            onNavigateToGenerateCertificate = viewModel::onNavigateToGenerateCertificate,
             onLogout = onLogout,
             openDrawer = openDrawer
         )
@@ -159,6 +184,18 @@ private fun ActionButton(@StringRes textId: Int, modifier: Modifier = Modifier, 
         onClick = onClick
     ) {
         Text(stringResource(textId), textAlign = TextAlign.Center)
+    }
+}
+
+@Composable
+private fun NoKeyPairsOnTokenDialog(viewModel: CaTokenInfoViewModel) {
+    val dialogState by viewModel.noKeyPairsOnTokenDialogState.observeAsState(DialogState())
+
+    if (dialogState.showDialog) {
+        SimpleAlertDialog(
+            text = stringResource(id = dialogState.data.text),
+            onDismissOrConfirm = viewModel::onNoKeyPairsOnTokenDialogDismiss
+        )
     }
 }
 

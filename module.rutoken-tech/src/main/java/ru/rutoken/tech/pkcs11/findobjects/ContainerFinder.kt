@@ -9,6 +9,7 @@ import ru.rutoken.pkcs11wrapper.main.Pkcs11Session
 import ru.rutoken.pkcs11wrapper.`object`.certificate.Pkcs11X509PublicKeyCertificateObject
 import ru.rutoken.pkcs11wrapper.`object`.key.Pkcs11Gost256PrivateKeyObject
 import ru.rutoken.pkcs11wrapper.`object`.key.Pkcs11Gost256PublicKeyObject
+import ru.rutoken.tech.pkcs11.createobjects.GostKeyPair
 
 /**
  * It is supposed that key pairs and certificates are linked by CKA_ID.
@@ -18,8 +19,7 @@ fun Pkcs11Session.findGost256CertificateAndKeyContainers() =
 
 fun Pkcs11Session.findGost256KeyContainers() = findGost256Containers().filterIsInstance<Gost256KeyContainer>()
 
-fun Pkcs11Session.findGost256KeyPairByCkaId(ckaId: ByteArray)
-        : Pkcs11KeyPair<Pkcs11Gost256PublicKeyObject, Pkcs11Gost256PrivateKeyObject> {
+fun Pkcs11Session.findGost256KeyPairByCkaId(ckaId: ByteArray): GostKeyPair {
     val template = listOf(Pkcs11ByteArrayAttribute(Pkcs11AttributeType.CKA_ID, ckaId))
     val publicKey = objectManager.findObjectsAtOnce(Pkcs11Gost256PublicKeyObject::class.java, template).singleOrThrow()
     val privateKey =

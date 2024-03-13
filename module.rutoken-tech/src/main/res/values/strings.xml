@@ -28,6 +28,7 @@
     <string name="token_serial">Серийный номер</string>
     <string name="generate_key_pair">Сгенерировать ключевую пару</string>
     <string name="generate_certificate">Выпустить тестовый сертификат</string>
+    <string name="no_key_pairs_on_token">На Рутокене нет ключевых пар без\u00A0сертификата</string>
 
     <!--Related to CA key pair generation bottom sheet-->
     <string name="key_pair_title">Ключевая пара</string>
@@ -78,7 +79,7 @@
     <string name="connection_lost_text">Повторите подключение\nи не убирайте Рутокен до завершения обмена данными</string>
     <string name="wrong_token_title">Неподходящий Рутокен</string>
     <string name="wrong_token_text">Приложите Рутокен, который использовали ранее для входа</string>
-    <string name="no_such_key_pair_title">На Рутокене нет подходящей ключевой пары</string>
+    <string name="no_such_key_pair_title">На Рутокене нет выбранной ключевой пары</string>
     <string name="no_such_key_pair_text">Выберите другую ключевую пару</string>
     <string name="pin_locked_title">PIN-код Рутокена заблокирован</string>
     <string name="pin_locked_text">Разблокируйте его в Панели Управления Рутокен либо\nобратитесь к администратору</string>

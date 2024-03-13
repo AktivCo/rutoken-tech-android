@@ -57,6 +57,12 @@ object LocalCA {
                 certificationRequest.subjectPublicKeyInfo
             )
 
+            val certificateExtensions = certificationRequest.requestedExtensions
+            certificateExtensions.extensionOIDs.forEach { oid ->
+                val extension = certificateExtensions.getExtension(oid)
+                certificateBuilder.addExtension(oid, extension.isCritical, extension.parsedValue)
+            }
+
             val caPrivateKeySpec = PKCS8EncodedKeySpec(Base64.getDecoder().decode(caPrivateKey))
             val keyFactory = KeyFactory.getInstance(privateKeyAlgorithm)
             val caPrivateKey = keyFactory.generatePrivate(caPrivateKeySpec)

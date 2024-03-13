@@ -26,10 +26,13 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.SheetState
 import androidx.compose.material3.SheetValue.Expanded
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -41,28 +44,73 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.launch
 import ru.rutoken.tech.R
 import ru.rutoken.tech.session.CkaIdString
 import ru.rutoken.tech.ui.components.BottomSheetTitle
+import ru.rutoken.tech.ui.components.ConnectTokenDialog
+import ru.rutoken.tech.ui.components.ErrorAlertDialog
 import ru.rutoken.tech.ui.components.NavigationBarSpacer
 import ru.rutoken.tech.ui.components.PrimaryButtonBox
+import ru.rutoken.tech.ui.components.ProgressIndicatorDialog
+import ru.rutoken.tech.ui.components.SimpleAlertDialog
 import ru.rutoken.tech.ui.components.TextGroup
 import ru.rutoken.tech.ui.components.TextGroupItem
 import ru.rutoken.tech.ui.theme.RutokenTechTheme
+import ru.rutoken.tech.ui.utils.DialogState
 import ru.rutoken.tech.ui.utils.ImeFocusHelper
 import ru.rutoken.tech.ui.utils.PreviewDark
 import ru.rutoken.tech.ui.utils.PreviewLight
 import ru.rutoken.tech.ui.utils.bottomSheetWindowInsets
+import ru.rutoken.tech.ui.utils.errorDialogData
 import ru.rutoken.tech.ui.utils.expandedSheetState
 import ru.rutoken.tech.ui.utils.getHideKeyboardAction
 import ru.rutoken.tech.ui.utils.statusBarsPaddingHeight
+
+@Composable
+fun GenerateCertificateScreen(
+    viewModel: GenerateCertificateViewModel,
+    onNavigateBack: () -> Unit,
+    onLogout: () -> Unit
+) {
+    val keyPairs by viewModel.keyPairs.observeAsState(emptyList())
+    val shouldLogout by viewModel.shouldLogout.observeAsState(false)
+
+    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    val scope = rememberCoroutineScope()
+
+    if (shouldLogout) onLogout()
+
+    if (keyPairs.isNotEmpty()) {
+        GenerateCertificateBottomSheet(
+            sheetState = sheetState,
+            onDismissRequest = onNavigateBack,
+            keyPairs = keyPairs,
+            onGenerationButtonClicked = viewModel::generateGostCertificate
+        )
+    }
+
+    ConnectTokenDialog(viewModel)
+    ProgressIndicatorDialog(viewModel)
+    SuccessDialog(
+        viewModel = viewModel,
+        onDismissOrConfirm = {
+            scope.launch { sheetState.hide() }.invokeOnCompletion {
+                if (!sheetState.isVisible) {
+                    onNavigateBack()
+                }
+            }
+        }
+    )
+    ErrorDialog(viewModel)
+}
 
 @Composable
 fun GenerateCertificateBottomSheet(
     sheetState: SheetState,
     onDismissRequest: () -> Unit,
     keyPairs: List<CkaIdString>,
-    onGenerationButtonClicked: (CkaIdString) -> Unit
+    onGenerationButtonClicked: (CkaIdString, String) -> Unit
 ) {
     val windowInsets = bottomSheetWindowInsets()
     val dragHandle: @Composable (() -> Unit) = {
@@ -121,7 +169,7 @@ fun GenerateCertificateBottomSheet(
             buttonEnabled = buttonEnabled,
             onGenerationButtonClicked = {
                 hideKeyboardAction()
-                onGenerationButtonClicked(selectedKeyPair)
+                onGenerationButtonClicked(selectedKeyPair, owner)
             }
         )
     }
@@ -220,6 +268,52 @@ private fun StickyGenerationButton(
     }
 }
 
+@Composable
+private fun ConnectTokenDialog(viewModel: GenerateCertificateViewModel) {
+    val showDialog by viewModel.tokenConnector.showConnectTokenDialog.observeAsState(false)
+
+    if (showDialog) {
+        ConnectTokenDialog(onDismissRequest = { viewModel.tokenConnector.onDismissConnectTokenDialog() })
+    }
+}
+
+@Composable
+private fun ProgressIndicatorDialog(viewModel: GenerateCertificateViewModel) {
+    val showProgress by viewModel.showProgress.observeAsState(false)
+
+    if (showProgress) {
+        ProgressIndicatorDialog()
+    }
+}
+
+@Composable
+private fun SuccessDialog(viewModel: GenerateCertificateViewModel, onDismissOrConfirm: () -> Unit) {
+    val dialogState by viewModel.successDialogState.observeAsState(DialogState())
+
+    if (dialogState.showDialog) {
+        SimpleAlertDialog(
+            text = stringResource(id = dialogState.data.text),
+            onDismissOrConfirm = {
+                viewModel.dismissSuccessDialog()
+                onDismissOrConfirm()
+            }
+        )
+    }
+}
+
+@Composable
+private fun ErrorDialog(viewModel: GenerateCertificateViewModel) {
+    val dialogState by viewModel.errorDialogState.observeAsState(DialogState())
+
+    if (dialogState.showDialog) {
+        ErrorAlertDialog(
+            title = stringResource(id = dialogState.errorDialogData.title),
+            text = stringResource(id = dialogState.errorDialogData.text),
+            onDismissOrConfirm = { viewModel.dismissErrorDialog() }
+        )
+    }
+}
+
 @PreviewLight
 @PreviewDark
 @Composable
@@ -235,7 +329,7 @@ private fun GenerateCertificateBottomSheetPreview() {
                 "0af7e1f8-5c0972cb",
                 "b15cabee-0d86845d"
             ),
-            onGenerationButtonClicked = {}
+            onGenerationButtonClicked = { _, _ -> }
         )
     }
 }

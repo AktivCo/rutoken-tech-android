@@ -6,9 +6,8 @@ import ru.rutoken.pkcs11wrapper.`object`.key.Pkcs11GostPrivateKeyObject
 import ru.rutoken.pkcs11wrapper.`object`.key.Pkcs11GostPublicKeyObject
 import ru.rutoken.tech.ca.LocalCA
 import ru.rutoken.tech.pkcs11.createobjects.makeCertificateTemplate
-import ru.rutoken.tech.usecasestests.ATTRIBUTES
-import ru.rutoken.tech.usecasestests.DN
-import ru.rutoken.tech.usecasestests.EXTENSIONS
+import ru.rutoken.tech.ui.ca.generateobjects.certificate.EXTENSIONS
+import ru.rutoken.tech.ui.ca.generateobjects.certificate.createDN
 import ru.rutoken.tech.usecasestests.ID
 
 class CreateGostCertificateRule(
@@ -22,7 +21,7 @@ class CreateGostCertificateRule(
 
     override fun before() {
         with(session.value) {
-            val csr = createCsr(keyPair.value.publicKey, DN, keyPair.value.privateKey, ATTRIBUTES, EXTENSIONS)
+            val csr = createCsr(keyPair.value.publicKey, createDN("Ivanov"), keyPair.value.privateKey, null, EXTENSIONS)
             _encoded = LocalCA.issueCertificate(csr)
             _value = objectManager.createObject(
                 attributeFactory.makeCertificateTemplate(

@@ -2,7 +2,11 @@ package ru.rutoken.tech.ui.utils
 
 import androidx.annotation.StringRes
 import ru.rutoken.tech.R
-import ru.rutoken.tech.utils.BusinessRuleCase.*
+import ru.rutoken.tech.utils.BusinessRuleCase.IncorrectPin
+import ru.rutoken.tech.utils.BusinessRuleCase.NoSuchKeyPair
+import ru.rutoken.tech.utils.BusinessRuleCase.PinLocked
+import ru.rutoken.tech.utils.BusinessRuleCase.TokenRemoved
+import ru.rutoken.tech.utils.BusinessRuleCase.WrongRutoken
 import ru.rutoken.tech.utils.BusinessRuleException
 
 private val UNKNOWN_ERROR_DIALOG_DATA =
@@ -43,6 +47,11 @@ fun Throwable.toErrorDialogData(): ErrorDialogData {
             is IncorrectPin -> ErrorDialogData(
                 title = R.string.pin_changed_title,
                 text = R.string.pin_changed_text
+            )
+
+            is NoSuchKeyPair -> ErrorDialogData(
+                title = R.string.no_such_key_pair_title,
+                text = R.string.no_such_key_pair_text
             )
         }
 

@@ -45,7 +45,7 @@ fun generateCkaId() = generateCkaIdGroup() + CKA_ID_GROUP_SEPARATOR.code.toByte(
 fun RtPkcs11Session.createGostCertificate(
     keyPair: GostKeyPair,
     dn: List<String>,
-    attributes: List<String>,
+    attributes: List<String>?,
     extensions: List<String>
 ): Pkcs11CertificateObject {
     val ckaId = keyPair.publicKey.getByteArrayAttributeValue(this, CKA_ID).byteArrayValue

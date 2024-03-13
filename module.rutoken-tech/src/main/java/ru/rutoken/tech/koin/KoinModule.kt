@@ -16,9 +16,10 @@ import ru.rutoken.tech.repository.user.UserRepositoryImpl
 import ru.rutoken.tech.session.RutokenTechSessionHolder
 import ru.rutoken.tech.tokenmanager.TokenManager
 import ru.rutoken.tech.ui.ca.CaLoginViewModel
+import ru.rutoken.tech.ui.ca.generateobjects.certificate.GenerateCertificateViewModel
 import ru.rutoken.tech.ui.ca.generateobjects.keypair.GenerateKeyPairViewModel
-import ru.rutoken.tech.ui.tokenauth.EnterPinViewModel
 import ru.rutoken.tech.ui.ca.tokeninfo.CaTokenInfoViewModel
+import ru.rutoken.tech.ui.tokenauth.EnterPinViewModel
 
 val koinModule = module {
     single { RtPkcs11Module() } bind Pkcs11Module::class
@@ -35,4 +36,5 @@ val koinModule = module {
     viewModel { CaTokenInfoViewModel(androidContext(), get()) }
     viewModel { GenerateKeyPairViewModel(get(), get()) }
     viewModel { EnterPinViewModel() }
+    viewModel { GenerateCertificateViewModel(get(), get()) }
 }

@@ -5,9 +5,11 @@ import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import com.google.accompanist.navigation.material.bottomSheet
 import org.koin.androidx.compose.koinViewModel
+import ru.rutoken.tech.session.RutokenTechSessionHolder
+import ru.rutoken.tech.ui.ca.generateobjects.certificate.GenerateCertificateScreen
+import ru.rutoken.tech.ui.ca.generateobjects.certificate.GenerateCertificateViewModel
 import ru.rutoken.tech.ui.ca.generateobjects.keypair.GenerateKeyPairScreen
 import ru.rutoken.tech.ui.ca.generateobjects.keypair.GenerateKeyPairViewModel
-import ru.rutoken.tech.session.RutokenTechSessionHolder
 import ru.rutoken.tech.ui.ca.tokeninfo.CaTokenInfoScreen
 import ru.rutoken.tech.ui.ca.tokeninfo.CaTokenInfoViewModel
 import ru.rutoken.tech.ui.main.Destination
@@ -23,6 +25,7 @@ sealed class CaDestination(override val route: String) : Destination {
     data object TokenAuth : CaDestination("ca/tokenAuth")
     data object TokenInfo : CaDestination("ca/tokenInfo")
     data object KeyPairGeneration : CaDestination("ca/keyPairGeneration")
+    data object CertificateGeneration : CaDestination("ca/certificateGeneration")
 }
 
 fun NavGraphBuilder.addCaDestinations(
@@ -52,8 +55,12 @@ fun NavGraphBuilder.addCaDestinations(
     composable(CaDestination.TokenInfo) {
         CaTokenInfoScreen(
             viewModel = koinViewModel<CaTokenInfoViewModel>(),
-            onNavigateToGenerateKeyPair = { navController.navigate(CaDestination.KeyPairGeneration.route) },
-            onNavigateToGenerateCertificate = { /* TODO: navigate to bottom sheet dialog */ },
+            onNavigateToGenerateKeyPair = {
+                navController.navigate(CaDestination.KeyPairGeneration.route) { launchSingleTop = true }
+            },
+            onNavigateToGenerateCertificate = {
+                navController.navigate(CaDestination.CertificateGeneration.route) { launchSingleTop = true }
+            },
             onLogout = { navController.popBackStack() },
             openDrawer = openDrawer
         )
@@ -62,6 +69,14 @@ fun NavGraphBuilder.addCaDestinations(
     bottomSheet(CaDestination.KeyPairGeneration.route) {
         GenerateKeyPairScreen(
             viewModel = koinViewModel<GenerateKeyPairViewModel>(),
+            onNavigateBack = navController::popBackStack,
+            onLogout = { navController.popBackStack(CaDestination.Start.route, false) }
+        )
+    }
+
+    bottomSheet(CaDestination.CertificateGeneration.route) {
+        GenerateCertificateScreen(
+            viewModel = koinViewModel<GenerateCertificateViewModel>(),
             onNavigateBack = navController::popBackStack,
             onLogout = { navController.popBackStack(CaDestination.Start.route, false) }
         )

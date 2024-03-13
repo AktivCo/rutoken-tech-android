@@ -20,6 +20,7 @@ import androidx.compose.ui.unit.dp
 import ru.rutoken.tech.R
 import ru.rutoken.tech.ui.components.ScreenTopAppBar
 import ru.rutoken.tech.ui.theme.RutokenTechTheme
+import ru.rutoken.tech.ui.theme.bodyMediumOnSurfaceVariant
 import ru.rutoken.tech.ui.utils.PreviewDark
 import ru.rutoken.tech.ui.utils.PreviewLight
 import ru.rutoken.tech.ui.utils.figmaPadding
@@ -54,8 +55,7 @@ fun CaStartScreen() {
                 Text(
                     text = stringResource(id = R.string.connect_rutoken_tip),
                     textAlign = TextAlign.Center,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    style = MaterialTheme.typography.bodyMedium
+                    style = bodyMediumOnSurfaceVariant
                 )
             }
 

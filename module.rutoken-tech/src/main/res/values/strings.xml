@@ -16,6 +16,13 @@
     <string name="connect_rutoken_tip">Чтобы воспользоваться\n«Удостоверяющим центром»</string>
     <string name="connect">Подключить</string>
 
+    <!--Related to CA token info screen-->
+    <string name="token_label">Метка</string>
+    <string name="token_model">Модель</string>
+    <string name="token_serial">Серийный номер</string>
+    <string name="generate_key_pair">Сгенерировать ключевую пару</string>
+    <string name="generate_certificate">Выпустить тестовый сертификат</string>
+
     <!--Related to CA key pair generation dialog-->
     <string name="key_pair_title">Ключевая пара</string>
     <string name="key_pair_id">ID</string>

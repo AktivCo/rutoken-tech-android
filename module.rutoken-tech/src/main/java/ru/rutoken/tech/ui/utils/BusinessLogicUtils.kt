@@ -4,7 +4,7 @@ import androidx.lifecycle.MutableLiveData
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withTimeoutOrNull
 import ru.rutoken.pkcs11wrapper.main.Pkcs11Exception
-import ru.rutoken.tech.pkcs11.SerialHexString
+import ru.rutoken.tech.session.SerialHexString
 import ru.rutoken.tech.tokenmanager.TokenManager
 import ru.rutoken.tech.utils.BusinessRuleCase.TOKEN_REMOVED
 import ru.rutoken.tech.utils.BusinessRuleException

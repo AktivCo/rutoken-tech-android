@@ -111,6 +111,7 @@ dependencies {
     coreLibraryDesugaring(libs.desugarJdkLibs)
 
     implementation(libs.androidx.activity.compose)
+    implementation(libs.androidx.navigation.compose)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     // TODO: Replace with an external dependency after adding all GOST R 34.10 2012 key parameters curves in the Bouncy

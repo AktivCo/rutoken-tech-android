@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Rutoken models -->
+    <string name="rutoken_ecp_2">Рутокен ЭЦП 2.0</string>
+    <string name="rutoken_ecp_2_flash">Рутокен ЭЦП 2.0 Flash</string>
+    <string name="rutoken_model_ecp_2_2000">Рутокен ЭЦП 2.0 2000</string>
+    <string name="rutoken_model_ecp_2_2100">Рутокен ЭЦП 2.0 2100</string>
+    <string name="rutoken_model_ecp_2_2200">Рутокен ЭЦП 2.0 2200</string>
+    <string name="rutoken_model_ecp_2_3000">Рутокен ЭЦП 2.0 3000</string>
+    <string name="rutoken_model_ecp_2_4000">Рутокен ЭЦП 2.0 4000</string>
+    <string name="rutoken_model_ecp_2_4400">Рутокен ЭЦП 2.0 4400</string>
+    <string name="rutoken_model_ecp_2_4500">Рутокен ЭЦП 2.0 4500</string>
+    <string name="rutoken_model_ecp_2_4900">Рутокен ЭЦП 2.0 4900</string>
+    <string name="rutoken_model_ecp_2_8003">Рутокен ЭЦП 2.0 8003</string>
+    <string name="rutoken_model_ecp_3_nfc_3100">Рутокен ЭЦП 3.0 NFC 3100</string>
+    <string name="rutoken_model_ecp_3_nfc_mf_3110">Рутокен ЭЦП 3.0 NFC MF 3110</string>
+    <string name="rutoken_model_ecp_3_3100">Рутокен ЭЦП 3.0 3100</string>
+    <string name="rutoken_model_ecp_3_3200">Рутокен ЭЦП 3.0 3200</string>
+    <string name="rutoken_model_ecp_3_3220">Рутокен ЭЦП 3.0 3220</string>
+    <string name="rutoken_model_ecp_3_3120">Рутокен ЭЦП 3.0 3120</string>
+    <string name="rutoken_model_ecp_3_3250">Рутокен ЭЦП 3.0 3250</string>
+    <string name="rutoken_model_unknown">Не определена</string>
+</resources>

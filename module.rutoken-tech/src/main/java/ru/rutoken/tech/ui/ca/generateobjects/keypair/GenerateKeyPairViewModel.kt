@@ -11,12 +11,13 @@ import kotlinx.coroutines.withContext
 import ru.rutoken.pkcs11wrapper.constant.standard.Pkcs11UserType.CKU_USER
 import ru.rutoken.pkcs11wrapper.main.Pkcs11Token
 import ru.rutoken.tech.R
-import ru.rutoken.tech.pkcs11.CkaIdString
-import ru.rutoken.tech.pkcs11.TokenContextStorage
 import ru.rutoken.tech.pkcs11.createobjects.GostKeyPair
 import ru.rutoken.tech.pkcs11.createobjects.GostKeyPairParams
 import ru.rutoken.tech.pkcs11.createobjects.createGostKeyPair
 import ru.rutoken.tech.pkcs11.createobjects.generateCkaId
+import ru.rutoken.tech.session.CkaIdString
+import ru.rutoken.tech.session.RutokenTechSessionHolder
+import ru.rutoken.tech.session.requireCaSession
 import ru.rutoken.tech.tokenmanager.TokenManager
 import ru.rutoken.tech.ui.tokenconnector.TokenConnector
 import ru.rutoken.tech.ui.utils.DialogData
@@ -28,7 +29,7 @@ import ru.rutoken.tech.utils.loge
 
 class GenerateKeyPairViewModel(
     private val tokenManager: TokenManager,
-    private val contextStorage: TokenContextStorage
+    private val sessionHolder: RutokenTechSessionHolder
 ) : ViewModel() {
     val tokenConnector = TokenConnector()
 
@@ -56,13 +57,13 @@ class GenerateKeyPairViewModel(
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
                 try {
-                    val currentContext = contextStorage.requireCurrentContext()
-                    val tokenSerial = currentContext.tokenSerial
+                    val caSession = sessionHolder.requireCaSession()
+                    val tokenSerial = caSession.tokenSerial
                     val token = tokenConnector.findTokenBySerialNumber(tokenManager, tokenSerial)
 
                     callPkcs11Operation(_showProgress, tokenManager, tokenSerial) {
-                        createGostKeyPair(token, currentContext.tokenUserPin, ckaId, keyPairParams)
-                        currentContext.keyPairs.addFirst(ckaId)
+                        createGostKeyPair(token, caSession.tokenUserPin, ckaId, keyPairParams)
+                        caSession.keyPairs.add(0, ckaId)
                         _successDialogState.postValue(
                             DialogState(
                                 showDialog = true,

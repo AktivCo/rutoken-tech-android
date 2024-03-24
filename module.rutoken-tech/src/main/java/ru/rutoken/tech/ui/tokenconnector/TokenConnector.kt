@@ -8,8 +8,8 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancelChildren
 import kotlinx.coroutines.withContext
 import ru.rutoken.pkcs11wrapper.main.Pkcs11Token
-import ru.rutoken.tech.pkcs11.SerialHexString
 import ru.rutoken.tech.pkcs11.getSerialNumber
+import ru.rutoken.tech.session.SerialHexString
 import ru.rutoken.tech.tokenmanager.TokenManager
 import ru.rutoken.tech.utils.BusinessRuleCase.WRONG_RUTOKEN
 import ru.rutoken.tech.utils.BusinessRuleException
@@ -47,7 +47,7 @@ class TokenConnector {
      */
     suspend fun findTokenBySerialNumber(tokenManager: TokenManager, tokenSerial: SerialHexString): Pkcs11Token {
         return withContext(findTokenJob) {
-            tokenManager.getTokenBySerialNumber(tokenSerial)?.let { return@withContext it }
+            tokenManager.getTokenBySerialNumber(tokenSerial)?.let { return@withContext it.pkcs11Token }
 
             val token = tokenManager.waitForToken()
             return@withContext if (token.getSerialNumber() == tokenSerial) {
@@ -61,7 +61,7 @@ class TokenConnector {
     private suspend fun TokenManager.waitForToken(): Pkcs11Token {
         try {
             _showConnectTokenDialog.postValue(true)
-            return getFirstTokenAsync().await()
+            return getFirstTokenAsync().await().pkcs11Token
         } finally {
             _showConnectTokenDialog.postValue(false)
         }

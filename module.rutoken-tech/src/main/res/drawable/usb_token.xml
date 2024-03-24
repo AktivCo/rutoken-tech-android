@@ -1,0 +1,63 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
+    android:width="130dp"
+    android:height="58dp"
+    android:viewportWidth="130"
+    android:viewportHeight="58">
+    <group>
+        <group>
+            <clip-path
+                android:pathData="M2.11 48.33h30.64v8.06c0 .88.73 1.61 1.61 1.61h79.02c8.9 0 16.12-12.99 16.12-29 0-16.01-7.22-29-16.13-29h-79c-.9 0-1.62.72-1.62 1.61v8.06H2.11c-.88 0-1.61.72-1.61 1.6v35.45c0 .89.73 1.61 1.61 1.61Zm111.27-32.22c3.56 0 6.45 5.77 6.45 12.89 0 7.12-2.9 12.89-6.45 12.89-3.57 0-6.45-5.77-6.45-12.89 0-7.12 2.88-12.89 6.44-12.89Z"/>
+            <group>
+                <path
+                    android:fillColor="#FF990011"
+                    android:fillType="evenOdd"
+                    android:pathData="M113.38 58c8.9 0 16.12-12.99 16.12-29 0-16.01-7.22-29-16.13-29h-79c-0.9 0-1.62 0.72-1.62 1.61V56.4c0 0.88 0.73 1.61 1.61 1.61h79.02Z"/>
+                <path
+                    android:fillColor="#FFB3B3B3"
+                    android:pathData="M32.75 48.33H2.11c-0.88 0-1.61-0.72-1.61-1.6V11.27c0-0.89 0.73-1.61 1.61-1.61h30.64v38.66Z"/>
+                <path
+                    android:fillColor="#FFFFFFFF"
+                    android:fillAlpha="0.25"
+                    android:pathData="M113.38 16.11c3.28 0 6 4.91 6.4 11.28 0.03-0.53 0.05-1.06 0.05-1.61 0-7.12-2.9-12.9-6.45-12.9-3.57 0-6.45 5.78-6.45 12.9 0 0.55 0.01 1.08 0.04 1.6 0.4-6.36 3.11-11.27 6.4-11.27Z"/>
+                <path
+                    android:fillColor="#FF000000"
+                    android:fillAlpha="0.25"
+                    android:pathData="M113.38 41.89c-3.3 0-6-4.91-6.4-11.28-0.04 0.53-0.06 1.06-0.06 1.61 0 7.12 2.9 12.9 6.45 12.9 3.57 0 6.45-5.78 6.45-12.9 0-0.55-0.01-1.08-0.04-1.6-0.4 6.36-3.12 11.27-6.4 11.27Z"/>
+                <path
+                    android:fillColor="#FFFFFFFF"
+                    android:fillAlpha="0.25"
+                    android:fillType="evenOdd"
+                    android:pathData="M49.15 54.78h-16.4v1.6c0 0.9 0.73 1.62 1.61 1.62h79.01c5.71 0 10.71-5.33 13.57-13.37-3.49 4.32-7.92 6.93-12.76 6.93H55.05c-0.85 0-1.68 0.33-2.27 0.95l-1.34 1.33c-0.61 0.62-1.42 0.95-2.27 0.95l-0.02-0.01Z"/>
+                <path
+                    android:fillColor="#FF000000"
+                    android:fillAlpha="0.25"
+                    android:fillType="evenOdd"
+                    android:pathData="M49.15 3.22h-16.4v-1.6c0-0.9 0.73-1.62 1.61-1.62h79.01c5.71 0 10.71 5.33 13.57 13.37-3.49-4.32-7.92-6.93-12.76-6.93H55.05c-0.85 0-1.68-0.33-2.27-0.95l-1.34-1.33c-0.61-0.62-1.42-0.95-2.27-0.95l-0.02 0.01Z"/>
+                <path
+                    android:fillColor="#FFFFFFFF"
+                    android:fillAlpha="0.15"
+                    android:pathData="M55.33 41.89h38.7c3.56 0 6.44-5.77 6.44-12.89 0-7.12-2.88-12.89-6.44-12.89h-38.7c-3.57 0-6.45 5.77-6.45 12.89 0 7.12 2.88 12.89 6.45 12.89Z"/>
+                <path
+                    android:fillAlpha="0.05"
+                    android:pathData="M2.11 48.33h30.64v8.06c0 0.88 0.73 1.61 1.61 1.61h79.02c8.9 0 16.12-12.99 16.12-29 0-16.01-7.22-29-16.13-29h-79c-0.9 0-1.62 0.72-1.62 1.61v8.06H2.11c-0.88 0-1.61 0.72-1.61 1.6v35.45c0 0.89 0.73 1.61 1.61 1.61Z">
+                    <aapt:attr name="android:fillColor">
+                        <gradient
+                            android:type="linear"
+                            android:startX="65"
+                            android:startY="58"
+                            android:endX="65"
+                            android:endY="0">
+                            <item
+                                android:color="#FFFFFFFF"
+                                android:offset="0"/>
+                            <item
+                                android:color="#FF000000"
+                                android:offset="0.5"/>
+                        </gradient>
+                    </aapt:attr>
+                </path>
+            </group>
+        </group>
+    </group>
+</vector>

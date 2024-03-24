@@ -1,20 +1,16 @@
 package ru.rutoken.tech.ui.components
 
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LargeTopAppBar
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.graphics.vector.ImageVector
 import ru.rutoken.tech.ui.utils.Modifiers
 
 @Composable
 fun ScreenTopAppBar(
     screenName: String,
-    trailingIcon: ImageVector? = null,
+    trailingIcon: (@Composable () -> Unit)? = null,
     onTrailingIconClick: () -> Unit = {}
 ) {
     LargeTopAppBar(
@@ -29,12 +25,7 @@ fun ScreenTopAppBar(
             IconButton(
                 onClick = { /* TODO */ },
                 modifier = Modifiers.appBarIconSize
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Menu,
-                    contentDescription = "Navigation Icon"
-                )
-            }
+            ) { AppIcons.Menu() }
         },
         actions = {
             IconButton(
@@ -43,10 +34,7 @@ fun ScreenTopAppBar(
                 modifier = Modifiers.appBarIconSize
             ) {
                 if (trailingIcon != null) {
-                    Icon(
-                        imageVector = trailingIcon,
-                        contentDescription = "Trailing Icon"
-                    )
+                    trailingIcon()
                 }
             }
         }

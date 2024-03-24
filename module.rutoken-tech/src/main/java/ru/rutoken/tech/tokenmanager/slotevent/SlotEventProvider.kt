@@ -1,6 +1,7 @@
 package ru.rutoken.tech.tokenmanager.slotevent
 
 import androidx.annotation.AnyThread
+import androidx.annotation.WorkerThread
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
 import ru.rutoken.pkcs11wrapper.constant.standard.Pkcs11Flag.CKF_TOKEN_PRESENT
@@ -76,6 +77,6 @@ class SlotEventProvider(private val pkcs11Module: Pkcs11Module) {
 
     @AnyThread
     interface Listener {
-        fun onSlotEvent(event: SlotEvent)
+        suspend fun onSlotEvent(event: SlotEvent)
     }
 }

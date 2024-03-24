@@ -1,12 +1,6 @@
 package ru.rutoken.tech.ui.ca
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.consumeWindowInsets
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -26,7 +20,7 @@ import ru.rutoken.tech.ui.utils.PreviewLight
 import ru.rutoken.tech.ui.utils.figmaPadding
 
 @Composable
-fun CaStartScreen() {
+fun CaStartScreen(onClickConnectToken: () -> Unit) {
     Scaffold(
         topBar = {
             ScreenTopAppBar(screenName = stringResource(id = R.string.tab_certificate_authority))
@@ -62,7 +56,7 @@ fun CaStartScreen() {
             Spacer(modifier = Modifier.height(16.dp))
 
             FilledTonalButton(
-                onClick = { /* TODO */ },
+                onClick = onClickConnectToken,
                 modifier = Modifier.height(40.dp)
             ) {
                 Text(
@@ -79,6 +73,6 @@ fun CaStartScreen() {
 @Composable
 private fun CaStartScreenPreview() {
     RutokenTechTheme {
-        CaStartScreen()
+        CaStartScreen(onClickConnectToken = {})
     }
 }

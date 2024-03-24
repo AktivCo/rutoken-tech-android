@@ -19,8 +19,9 @@ kotlin = "1.9.22"
 ksp = "1.9.22-1.0.17" # ksp version must be aligned with kotlin version
 kstatemachine = "0.24.1"
 lifecycle-runtime-ktx = "2.7.0"
+navigation-compose = "2.7.7"
 pkcs11jna = "4.0.0"
-pkcs11wrapper = "4.0.0"
+pkcs11wrapper = "4.1.0"
 room = "2.6.1"
 rtpcscbridge = "1.1.1"
 
@@ -28,6 +29,7 @@ rtpcscbridge = "1.1.1"
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "activity-compose" }
 androidx-core-ktx = { module = "androidx.core:core-ktx", version.ref = "core-ktx" }
 androidx-lifecycle-runtime-ktx = { module = "androidx.lifecycle:lifecycle-runtime-ktx", version.ref = "lifecycle-runtime-ktx" }
+androidx-navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigation-compose" }
 androidx-test-ext-junit = { module = "androidx.test.ext:junit", version.ref = "androidx-test-ext-junit" }
 androidx-test-runner = { module = "androidx.test:runner", version.ref = "androidx-test-runner" }
 androidx-test-uiAutomator = { module = "androidx.test.uiautomator:uiautomator", version.ref = "androidx-test-uiautomator" }

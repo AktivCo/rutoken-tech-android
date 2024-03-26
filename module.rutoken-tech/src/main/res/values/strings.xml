@@ -23,11 +23,42 @@
     <string name="generate_key_pair">Сгенерировать ключевую пару</string>
     <string name="generate_certificate">Выпустить тестовый сертификат</string>
 
-    <!--Related to CA key pair generation dialog-->
+    <!--Related to CA key pair generation bottom sheet-->
     <string name="key_pair_title">Ключевая пара</string>
     <string name="key_pair_id">ID</string>
     <string name="key_pair_algorithm">Алгоритм</string>
     <string name="gost256_algorithm">ГОСТ Р 34.10-2012 256-бит</string>
+
+    <!--Related to CA test certificate generation bottom sheet-->
+    <string name="test_certificate_title">Тестовый сертификат</string>
+    <string name="select_key_pair">Выберите ключевую пару</string>
+    <string name="enter_owner">Введите ФИО владельца</string>
+    <string-array name="certificate_attributes_titles">
+        <item>Электронная почта</item>
+        <item>Организация</item>
+        <item>ОГРН</item>
+        <item>Подразделение</item>
+        <item>Должность</item>
+        <item>СНИЛС</item>
+        <item>ИНН юридического лица</item>
+        <item>Страна</item>
+        <item>Регион</item>
+        <item>Населенный пункт</item>
+        <item>Адрес</item>
+    </string-array>
+    <string-array name="certificate_attributes_values">
+        <item>ivanova_ekaterina@rutoken.ru</item>
+        <item>АО \"Актив Софт\"</item>
+        <item>1037700094541</item>
+        <item>Аналитика</item>
+        <item>Руководитель отдела</item>
+        <item>123-456-789 00</item>
+        <item>7729361030</item>
+        <item>Россия</item>
+        <item>Москва</item>
+        <item>г. Москва</item>
+        <item>Шарикоподшипниковская ул, д. 1</item>
+    </string-array>
 
     <!--Related to simple dialogs-->
     <string name="key_pair_generated">Ключевая пара сгенерирована</string>

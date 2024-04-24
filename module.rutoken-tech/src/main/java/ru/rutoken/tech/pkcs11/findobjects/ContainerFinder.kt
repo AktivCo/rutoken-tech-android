@@ -55,7 +55,7 @@ private fun Pkcs11Session.findGost256Containers(): List<Container> {
         if (x509CertificateHolder.subjectPublicKeyInfo.algorithm.algorithm != id_tc26_gost_3410_12_256)
             continue
 
-        val ckaId = certificate.getIdAttributeValue(this).byteArrayValue
+        val ckaId = runCatching { certificate.getIdAttributeValue(this).byteArrayValue }.getOrNull() ?: continue
         val gost256KeyContainer = gost256KeyContainers.find { it.ckaId.contentEquals(ckaId) }
 
         if (gost256KeyContainer != null) {
@@ -76,7 +76,8 @@ private fun Pkcs11Session.findGost256KeyPairs(): MutableList<Gost256KeyContainer
     val publicKeys = objectManager.findObjectsAtOnce(Pkcs11Gost256PublicKeyObject::class.java)
 
     for (publicKey in publicKeys) {
-        val ckaId = publicKey.getIdAttributeValue(this).byteArrayValue
+        val ckaId = runCatching { publicKey.getIdAttributeValue(this).byteArrayValue }.getOrNull() ?: continue
+
         val template = listOf(Pkcs11ByteArrayAttribute(Pkcs11AttributeType.CKA_ID, ckaId))
 
         val privateKey = try {

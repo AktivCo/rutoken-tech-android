@@ -3,6 +3,7 @@ package ru.rutoken.tech.tokenmanager
 import kotlinx.coroutines.*
 import ru.rutoken.pkcs11wrapper.main.Pkcs11Module
 import ru.rutoken.pkcs11wrapper.main.Pkcs11Token
+import ru.rutoken.pkcs11wrapper.rutoken.main.RtPkcs11Token
 import ru.rutoken.tech.pkcs11.Pkcs11Launcher
 import ru.rutoken.tech.pkcs11.getSerialNumber
 import ru.rutoken.tech.pkcs11.getTokenModel
@@ -15,11 +16,11 @@ import ru.rutoken.tech.utils.loge
 import java.util.Collections
 import java.util.concurrent.atomic.AtomicReference
 
-data class Pkcs11TokenData(val pkcs11Token: Pkcs11Token, val model: TokenModel)
+data class RtPkcs11TokenData(val token: RtPkcs11Token, val model: TokenModel)
 
 class TokenManager : SlotEventProvider.Listener, Pkcs11Launcher.Listener {
-    private val tokens = Collections.synchronizedMap<SerialHexString, Pkcs11TokenData>(mutableMapOf())
-    private val waitTokenDeferred: AtomicReference<CompletableDeferred<Pkcs11TokenData>> = AtomicReference()
+    private val tokens = Collections.synchronizedMap<SerialHexString, RtPkcs11TokenData>(mutableMapOf())
+    private val waitTokenDeferred: AtomicReference<CompletableDeferred<RtPkcs11TokenData>> = AtomicReference()
 
     private lateinit var eventJob: Job
 
@@ -27,7 +28,7 @@ class TokenManager : SlotEventProvider.Listener, Pkcs11Launcher.Listener {
         eventJob = scope.launch {
             withContext(Dispatchers.IO) {
                 pkcs11Module.getSlotList(true).forEach {
-                    addTokenIfSupported(it.token)
+                    addTokenIfSupported(it.token as RtPkcs11Token)
                 }
             }
 
@@ -44,12 +45,12 @@ class TokenManager : SlotEventProvider.Listener, Pkcs11Launcher.Listener {
 
     override suspend fun onSlotEvent(event: SlotEvent) {
         if (event.slotInfo.isTokenPresent)
-            addTokenIfSupported(event.slot.token)
+            addTokenIfSupported(event.slot.token as RtPkcs11Token)
         else
             removeToken(event.slot.token)
     }
 
-    fun getFirstTokenAsync(): Deferred<Pkcs11TokenData> {
+    fun getFirstTokenAsync(): Deferred<RtPkcs11TokenData> {
         synchronized(tokens) {
             return when (tokens.size) {
                 0 -> {
@@ -62,13 +63,13 @@ class TokenManager : SlotEventProvider.Listener, Pkcs11Launcher.Listener {
         }
     }
 
-    fun getTokenBySerialNumber(serialNumber: SerialHexString): Pkcs11TokenData? = tokens[serialNumber]
+    fun getTokenBySerialNumber(serialNumber: SerialHexString): RtPkcs11TokenData? = tokens[serialNumber]
 
-    private suspend fun addTokenIfSupported(token: Pkcs11Token) {
+    private suspend fun addTokenIfSupported(token: RtPkcs11Token) {
         try {
             val tokenModel = token.getTokenModel()
             if (!tokenModel.isSupported) return
-            val tokenData = Pkcs11TokenData(token, tokenModel)
+            val tokenData = RtPkcs11TokenData(token, tokenModel)
             tokens[token.getSerialNumber()] = tokenData
             waitTokenDeferred.getAndSet(null)?.complete(tokenData)
         } catch (e: Exception) {
@@ -77,6 +78,6 @@ class TokenManager : SlotEventProvider.Listener, Pkcs11Launcher.Listener {
     }
 
     private fun removeToken(token: Pkcs11Token) {
-        tokens.values.removeIf { it.pkcs11Token == token }
+        tokens.values.removeIf { it.token == token }
     }
 }

@@ -43,8 +43,8 @@ private fun ErrorAlertDialogPreview() {
     RutokenTechTheme {
         Surface(modifier = Modifier.fillMaxSize()) {
             ErrorAlertDialog(
-                title = stringResource(id = R.string.pin_blocked_title),
-                text = stringResource(id = R.string.pin_blocked_text),
+                title = stringResource(id = R.string.pin_locked_title),
+                text = stringResource(id = R.string.pin_locked_text),
                 onDismissOrConfirm = { /* Nothing to do */ }
             )
         }

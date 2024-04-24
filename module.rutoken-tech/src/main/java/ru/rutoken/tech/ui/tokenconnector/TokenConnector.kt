@@ -10,8 +10,9 @@ import kotlinx.coroutines.withContext
 import ru.rutoken.pkcs11wrapper.main.Pkcs11Token
 import ru.rutoken.tech.pkcs11.getSerialNumber
 import ru.rutoken.tech.session.SerialHexString
+import ru.rutoken.tech.tokenmanager.RtPkcs11TokenData
 import ru.rutoken.tech.tokenmanager.TokenManager
-import ru.rutoken.tech.utils.BusinessRuleCase.WRONG_RUTOKEN
+import ru.rutoken.tech.utils.BusinessRuleCase
 import ru.rutoken.tech.utils.BusinessRuleException
 
 class TokenConnector {
@@ -30,9 +31,9 @@ class TokenConnector {
      * @throws [kotlinx.coroutines.CancellationException] if the [onDismissConnectTokenDialog] method is called before the
      * token is connected.
      */
-    suspend fun findFirstToken(tokenManager: TokenManager): Pkcs11Token {
+    suspend fun findFirstToken(tokenManager: TokenManager): RtPkcs11TokenData {
         return withContext(findTokenJob) {
-            tokenManager.waitForToken()
+            tokenManager.waitForTokenData()
         }
     }
 
@@ -47,21 +48,21 @@ class TokenConnector {
      */
     suspend fun findTokenBySerialNumber(tokenManager: TokenManager, tokenSerial: SerialHexString): Pkcs11Token {
         return withContext(findTokenJob) {
-            tokenManager.getTokenBySerialNumber(tokenSerial)?.let { return@withContext it.pkcs11Token }
+            tokenManager.getTokenBySerialNumber(tokenSerial)?.let { return@withContext it.token }
 
-            val token = tokenManager.waitForToken()
+            val token = tokenManager.waitForTokenData().token
             return@withContext if (token.getSerialNumber() == tokenSerial) {
                 token
             } else {
-                throw BusinessRuleException(WRONG_RUTOKEN)
+                throw BusinessRuleException(BusinessRuleCase.WrongRutoken)
             }
         }
     }
 
-    private suspend fun TokenManager.waitForToken(): Pkcs11Token {
+    private suspend fun TokenManager.waitForTokenData(): RtPkcs11TokenData {
         try {
             _showConnectTokenDialog.postValue(true)
-            return getFirstTokenAsync().await().pkcs11Token
+            return getFirstTokenAsync().await()
         } finally {
             _showConnectTokenDialog.postValue(false)
         }

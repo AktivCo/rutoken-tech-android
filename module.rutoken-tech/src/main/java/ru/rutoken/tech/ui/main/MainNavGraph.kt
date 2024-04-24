@@ -7,9 +7,7 @@ import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
-import org.koin.androidx.compose.koinViewModel
 import ru.rutoken.tech.ui.ca.CaDestination
-import ru.rutoken.tech.ui.ca.CaLoginViewModel
 import ru.rutoken.tech.ui.ca.addCaDestinations
 
 interface Destination {
@@ -26,7 +24,6 @@ sealed class AppSectionDestination(override val route: String) : Destination {
 
 @Composable
 fun MainNavHost(navHostController: NavHostController) {
-    val caLoginViewModel: CaLoginViewModel = koinViewModel<CaLoginViewModel>()
     NavHost(
         navController = navHostController,
         startDestination = AppSectionDestination.Ca.route // TODO: make Bank route as start destination in 1.1
@@ -35,7 +32,7 @@ fun MainNavHost(navHostController: NavHostController) {
             route = AppSectionDestination.Ca.route,
             startDestination = CaDestination.Start.route
         ) {
-            addCaDestinations(navHostController, caLoginViewModel)
+            addCaDestinations(navHostController)
         }
     }
 }

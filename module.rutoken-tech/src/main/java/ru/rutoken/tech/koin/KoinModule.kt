@@ -31,7 +31,7 @@ val koinModule = module {
     single { TokenManager() }
     single { RutokenTechSessionHolder() }
 
-    viewModel { CaLoginViewModel(get(), get()) }
+    viewModel { CaLoginViewModel(androidContext(), get(), get()) }
     viewModel { CaTokenInfoViewModel(androidContext(), get()) }
     viewModel { GenerateKeyPairViewModel(get(), get()) }
     viewModel { EnterPinViewModel() }

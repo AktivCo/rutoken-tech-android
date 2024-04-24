@@ -2,8 +2,7 @@ package ru.rutoken.tech.ui.utils
 
 import androidx.annotation.StringRes
 import ru.rutoken.tech.R
-import ru.rutoken.tech.utils.BusinessRuleCase.TOKEN_REMOVED
-import ru.rutoken.tech.utils.BusinessRuleCase.WRONG_RUTOKEN
+import ru.rutoken.tech.utils.BusinessRuleCase.*
 import ru.rutoken.tech.utils.BusinessRuleException
 
 private val UNKNOWN_ERROR_DIALOG_DATA =
@@ -26,15 +25,22 @@ val DialogState.errorDialogData get() = data as? ErrorDialogData ?: UNKNOWN_ERRO
 fun Throwable.toErrorDialogData(): ErrorDialogData {
     return when (this) {
         is BusinessRuleException -> when (case) {
-            WRONG_RUTOKEN -> ErrorDialogData(
+            WrongRutoken -> ErrorDialogData(
                 title = R.string.wrong_token_title,
                 text = R.string.wrong_token_text,
             )
 
-            TOKEN_REMOVED -> ErrorDialogData(
+            TokenRemoved -> ErrorDialogData(
                 title = R.string.connection_lost_title,
                 text = R.string.connection_lost_text,
             )
+
+            PinLocked -> ErrorDialogData(
+                title = R.string.pin_locked_title,
+                text = R.string.pin_locked_text
+            )
+
+            is IncorrectPin -> TODO()
         }
 
         else -> UNKNOWN_ERROR_DIALOG_DATA

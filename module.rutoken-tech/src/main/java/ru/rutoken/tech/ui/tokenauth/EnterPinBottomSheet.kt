@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.relocation.BringIntoViewRequester
 import androidx.compose.foundation.relocation.bringIntoViewRequester
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
@@ -34,8 +35,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
@@ -77,6 +81,18 @@ fun EnterPinBottomSheet(
         val focusRequester = remember { FocusRequester() }
 
         val isPinError = !pinErrorText.isNullOrEmpty()
+        val focusManager = LocalFocusManager.current
+        val keyboardController = LocalSoftwareKeyboardController.current
+        val hideKeyboardAction = {
+            keyboardController?.hide()
+            if (VERSION.SDK_INT >= VERSION_CODES.TIRAMISU || VERSION.SDK_INT < VERSION_CODES.R)
+                focusManager.clearFocus(true) // Focus clearing breaks sheet resize on Android 11-12
+        }
+
+        val onClickAction = {
+            hideKeyboardAction()
+            onButtonClicked(pinValue)
+        }
 
         OutlinedTextField(
             value = pinValue,
@@ -84,14 +100,18 @@ fun EnterPinBottomSheet(
                 pinValue = it
                 onPinValueChanged(it)
             },
-            modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp).focusRequester(focusRequester),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp)
+                .focusRequester(focusRequester),
             textStyle = MaterialTheme.typography.bodyLarge,
             label = { Text(text = stringResource(id = R.string.pin_code)) },
             placeholder = { Text(text = stringResource(id = R.string.pin_code)) },
             supportingText = { Text(if (isPinError) pinErrorText!! else "") },
             isError = isPinError,
             visualTransformation = PasswordVisualTransformation(),
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password, imeAction = ImeAction.Done),
+            keyboardActions = KeyboardActions(onDone = { hideKeyboardAction() }),
             singleLine = true,
             shape = RoundedCornerShape(12.dp),
         )
@@ -99,9 +119,7 @@ fun EnterPinBottomSheet(
         Spacer(Modifier.height(16.dp))
 
         if (VERSION.SDK_INT >= VERSION_CODES.TIRAMISU || VERSION.SDK_INT < VERSION_CODES.R) {
-            PrimaryButtonBox(stringResource(id = R.string.proceed), buttonEnabled) {
-                onButtonClicked(pinValue)
-            }
+            PrimaryButtonBox(stringResource(id = R.string.proceed), buttonEnabled, onClick = onClickAction)
         } else { // fixing keyboard overlapping for Android 11, 12 and 12L
             val scope = rememberCoroutineScope()
             val view = LocalView.current
@@ -116,9 +134,7 @@ fun EnterPinBottomSheet(
             }
 
             Box(Modifier.bringIntoViewRequester(bringIntoViewRequester)) {
-                PrimaryButtonBox(stringResource(id = R.string.proceed), buttonEnabled) {
-                    onButtonClicked(pinValue)
-                }
+                PrimaryButtonBox(stringResource(id = R.string.proceed), buttonEnabled, onClick = onClickAction)
             }
         }
 

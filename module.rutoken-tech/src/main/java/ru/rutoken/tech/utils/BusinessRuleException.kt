@@ -3,16 +3,18 @@ package ru.rutoken.tech.utils
 class BusinessRuleException : Exception {
     val case: BusinessRuleCase
 
-    constructor(case: BusinessRuleCase) : super(case.name) {
+    constructor(case: BusinessRuleCase) : super() {
         this.case = case
     }
 
-    constructor(case: BusinessRuleCase, e: Throwable) : super(case.name, e) {
+    constructor(case: BusinessRuleCase, e: Throwable) : super(e) {
         this.case = case
     }
 }
 
-enum class BusinessRuleCase {
-    WRONG_RUTOKEN,
-    TOKEN_REMOVED
+sealed class BusinessRuleCase {
+    data object WrongRutoken : BusinessRuleCase()
+    data object TokenRemoved : BusinessRuleCase()
+    data object PinLocked : BusinessRuleCase()
+    class IncorrectPin(val retryLeft: Long) : BusinessRuleCase()
 }

@@ -9,6 +9,8 @@ import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.navigation.compose.rememberNavController
+import com.google.accompanist.navigation.material.ModalBottomSheetLayout
+import com.google.accompanist.navigation.material.rememberBottomSheetNavigator
 import org.koin.android.ext.android.get
 import ru.rutoken.tech.pkcs11.Pkcs11Launcher
 import ru.rutoken.tech.ui.theme.RutokenTechTheme
@@ -21,8 +23,11 @@ class MainActivity : ComponentActivity() {
         expandAppColorsToSystemBars()
         setContent {
             RutokenTechTheme {
-                val navController = rememberNavController()
-                MainNavHost(navHostController = navController)
+                val bottomSheetNavigator = rememberBottomSheetNavigator()
+                val navController = rememberNavController(bottomSheetNavigator)
+                ModalBottomSheetLayout(bottomSheetNavigator) {
+                    MainNavHost(navHostController = navController)
+                }
             }
         }
     }

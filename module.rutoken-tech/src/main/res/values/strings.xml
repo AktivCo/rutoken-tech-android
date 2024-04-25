@@ -45,6 +45,8 @@
     <string name="no_such_key_pair_text">Выберите другую ключевую пару</string>
     <string name="pin_locked_title">PIN-код Рутокена заблокирован</string>
     <string name="pin_locked_text">Разблокируйте его в Панели Управления Рутокен либо\nобратитесь к администратору</string>
+    <string name="pin_changed_title">PIN-код Рутокена\nбыл изменен</string>
+    <string name="pin_changed_text">Необходимо заново подключить Рутокен в\u00A0разделе «Удостоверяющий центр»</string>
 
     <!--Related to connect token dialog-->
     <string name="connect_token_title">Подключите\nРутокен</string>

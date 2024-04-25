@@ -24,6 +24,8 @@ import ru.rutoken.tech.ui.utils.DialogData
 import ru.rutoken.tech.ui.utils.DialogState
 import ru.rutoken.tech.ui.utils.callPkcs11Operation
 import ru.rutoken.tech.ui.utils.toErrorDialogData
+import ru.rutoken.tech.utils.BusinessRuleCase
+import ru.rutoken.tech.utils.BusinessRuleException
 import ru.rutoken.tech.utils.logd
 import ru.rutoken.tech.utils.loge
 
@@ -34,16 +36,21 @@ class GenerateKeyPairViewModel(
     val tokenConnector = TokenConnector()
 
     private val _showProgress = MutableLiveData<Boolean>()
-    val showProgress: LiveData<Boolean> = _showProgress
+    val showProgress: LiveData<Boolean> get() = _showProgress
 
     private val _successDialogState = MutableLiveData<DialogState>()
-    val successDialogState: LiveData<DialogState> = _successDialogState
+    val successDialogState: LiveData<DialogState> get() = _successDialogState
 
     private val _errorDialogState = MutableLiveData<DialogState>()
-    val errorDialogState: LiveData<DialogState> = _errorDialogState
+    val errorDialogState: LiveData<DialogState> get() = _errorDialogState
 
     private val _keyPairId = MutableLiveData("")
-    val keyPairId: LiveData<CkaIdString> = _keyPairId
+    val keyPairId: LiveData<CkaIdString> get() = _keyPairId
+
+    private val _shouldLogout = MutableLiveData(false)
+    val shouldLogout: LiveData<Boolean> get() = _shouldLogout
+
+    private var hasPinChanged = false
 
     fun generateKeyPairId() {
         viewModelScope.launch {
@@ -75,6 +82,9 @@ class GenerateKeyPairViewModel(
                     logd(e) { "Connect token dialog was dismissed" }
                 } catch (e: Exception) {
                     loge<GenerateKeyPairViewModel>(e) { "Key pair generation failed" }
+                    if (e is BusinessRuleException && e.case is BusinessRuleCase.IncorrectPin)
+                        hasPinChanged = true
+
                     _errorDialogState.postValue(DialogState(showDialog = true, data = e.toErrorDialogData()))
                 }
             }
@@ -87,6 +97,7 @@ class GenerateKeyPairViewModel(
 
     fun dismissErrorDialog() {
         _errorDialogState.value = DialogState(showDialog = false)
+        if (hasPinChanged) _shouldLogout.postValue(true)
     }
 
     private fun createGostKeyPair(

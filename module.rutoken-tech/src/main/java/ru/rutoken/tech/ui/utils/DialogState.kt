@@ -40,7 +40,10 @@ fun Throwable.toErrorDialogData(): ErrorDialogData {
                 text = R.string.pin_locked_text
             )
 
-            is IncorrectPin -> TODO()
+            is IncorrectPin -> ErrorDialogData(
+                title = R.string.pin_changed_title,
+                text = R.string.pin_changed_text
+            )
         }
 
         else -> UNKNOWN_ERROR_DIALOG_DATA

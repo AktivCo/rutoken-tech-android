@@ -9,16 +9,13 @@ import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.SheetState
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
-import org.koin.androidx.compose.koinViewModel
 import ru.rutoken.tech.R
 import ru.rutoken.tech.pkcs11.createobjects.GostKeyPairParams
 import ru.rutoken.tech.ui.components.BottomSheetTitle
@@ -38,33 +35,24 @@ import ru.rutoken.tech.ui.utils.errorDialogData
 import ru.rutoken.tech.ui.utils.expandedSheetState
 import ru.rutoken.tech.ui.utils.figmaPaddingValues
 
-/**
- * TODO: Convert this to navigation node
- */
 @Composable
-fun GenerateKeyPairBottomSheetRoute() {
-    val viewModel = koinViewModel<GenerateKeyPairViewModel>()
-    var showBottomSheet by remember { mutableStateOf(false) }
-    GenerateKeyPairBottomSheet(
-        viewModel = viewModel,
-        showBottomSheet = showBottomSheet,
-        onDismiss = { showBottomSheet = false }
-    )
-
-    // TODO: Call this when need to show GenerateKeyPairBottomSheet
-    viewModel.generateKeyPairId()
-    showBottomSheet = true
-}
-
-@Composable
-private fun GenerateKeyPairBottomSheet(
-    viewModel: GenerateKeyPairViewModel,
-    showBottomSheet: Boolean,
-    onDismiss: () -> Unit
-) {
+fun GenerateKeyPairScreen(viewModel: GenerateKeyPairViewModel, onNavigateBack: () -> Unit, onLogout: () -> Unit) {
+    val keyPairId by viewModel.keyPairId.observeAsState("")
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val scope = rememberCoroutineScope()
-    val keyPairId by viewModel.keyPairId.observeAsState("")
+
+    LaunchedEffect(Unit) {
+        viewModel.generateKeyPairId()
+    }
+
+    if (keyPairId.isNotEmpty()) {
+        GenerateKeyPairBottomSheet(
+            keyPairId = keyPairId,
+            sheetState = sheetState,
+            onDismiss = onNavigateBack,
+            onGenerationButtonClicked = { viewModel.generateGostKeyPair(keyPairId, GostKeyPairParams.GOST_2012_256) }
+        )
+    }
 
     ConnectTokenDialog(viewModel)
     ProgressIndicatorDialog(viewModel)
@@ -73,21 +61,15 @@ private fun GenerateKeyPairBottomSheet(
         onDismissOrConfirm = {
             scope.launch { sheetState.hide() }.invokeOnCompletion {
                 if (!sheetState.isVisible) {
-                    onDismiss()
+                    onNavigateBack()
                 }
             }
         }
     )
     ErrorDialog(viewModel)
 
-    if (keyPairId.isNotEmpty() && showBottomSheet) {
-        GenerateKeyPairBottomSheet(
-            keyPairId = keyPairId,
-            sheetState = sheetState,
-            onDismiss = onDismiss,
-            onGenerationButtonClicked = { viewModel.generateGostKeyPair(keyPairId, GostKeyPairParams.GOST_2012_256) }
-        )
-    }
+    val shouldLogout by viewModel.shouldLogout.observeAsState(false)
+    if (shouldLogout) onLogout()
 }
 
 @Composable
@@ -98,7 +80,7 @@ fun GenerateKeyPairBottomSheet(
     onGenerationButtonClicked: () -> Unit
 ) {
     ModalBottomSheet(
-        onDismissRequest = { onDismiss() },
+        onDismissRequest = onDismiss,
         sheetState = sheetState,
         containerColor = MaterialTheme.colorScheme.surfaceContainerLow,
         windowInsets = WindowInsets.systemBars.only(WindowInsetsSides.Horizontal),
@@ -166,7 +148,7 @@ private fun ErrorDialog(viewModel: GenerateKeyPairViewModel) {
         ErrorAlertDialog(
             title = stringResource(id = dialogState.errorDialogData.title),
             text = stringResource(id = dialogState.errorDialogData.text),
-            onDismissOrConfirm = { viewModel.dismissErrorDialog() }
+            onDismissOrConfirm = viewModel::dismissErrorDialog
         )
     }
 }

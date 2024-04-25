@@ -25,4 +25,31 @@ object AppIcons {
             contentDescription = "Menu Icon"
         )
     }
+
+    @Composable
+    fun MenuTitleLogo() {
+        Icon(
+            painter = painterResource(id = R.drawable.menu_logo),
+            contentDescription = "Menu Title Logo",
+            tint = MaterialTheme.colorScheme.tertiary
+        )
+    }
+
+    @Composable
+    fun CaMenuItem() {
+        Icon(
+            painter = painterResource(id = R.drawable.ic_ca_menu_item),
+            contentDescription = "CA Menu Icon",
+            tint = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+    }
+
+    @Composable
+    fun AboutMenuItem() {
+        Icon(
+            painter = painterResource(id = R.drawable.ic_about_menu_item),
+            contentDescription = "About Menu Icon",
+            tint = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+    }
 }

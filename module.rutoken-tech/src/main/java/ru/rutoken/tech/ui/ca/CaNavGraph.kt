@@ -1,11 +1,13 @@
 package ru.rutoken.tech.ui.ca
 
+import androidx.compose.runtime.LaunchedEffect
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import com.google.accompanist.navigation.material.bottomSheet
 import org.koin.androidx.compose.koinViewModel
 import ru.rutoken.tech.ui.ca.generateobjects.keypair.GenerateKeyPairScreen
 import ru.rutoken.tech.ui.ca.generateobjects.keypair.GenerateKeyPairViewModel
+import ru.rutoken.tech.session.RutokenTechSessionHolder
 import ru.rutoken.tech.ui.ca.tokeninfo.CaTokenInfoScreen
 import ru.rutoken.tech.ui.ca.tokeninfo.CaTokenInfoViewModel
 import ru.rutoken.tech.ui.main.Destination
@@ -23,10 +25,18 @@ sealed class CaDestination(override val route: String) : Destination {
     data object KeyPairGeneration : CaDestination("ca/keyPairGeneration")
 }
 
-fun NavGraphBuilder.addCaDestinations(navController: NavController) {
+fun NavGraphBuilder.addCaDestinations(
+    navController: NavController,
+    sessionHolder: RutokenTechSessionHolder,
+    openDrawer: () -> Unit
+) {
     composable(CaDestination.Start) {
+        LaunchedEffect(Unit) {
+            sessionHolder.resetSession() // Clear session on CA start screen every time it is opened
+        }
         CaStartScreen(
-            onClickConnectToken = { navController.navigate(CaDestination.TokenAuth.route) { launchSingleTop = true } }
+            onClickConnectToken = { navController.navigate(CaDestination.TokenAuth.route) { launchSingleTop = true } },
+            openDrawer = openDrawer
         )
     }
 
@@ -44,7 +54,8 @@ fun NavGraphBuilder.addCaDestinations(navController: NavController) {
             viewModel = koinViewModel<CaTokenInfoViewModel>(),
             onNavigateToGenerateKeyPair = { navController.navigate(CaDestination.KeyPairGeneration.route) },
             onNavigateToGenerateCertificate = { /* TODO: navigate to bottom sheet dialog */ },
-            onLogout = { navController.popBackStack()/* TODO: logout (clear session) */ }
+            onLogout = { navController.popBackStack() },
+            openDrawer = openDrawer
         )
     }
 

@@ -10,6 +10,7 @@ import ru.rutoken.tech.ui.utils.Modifiers
 @Composable
 fun ScreenTopAppBar(
     screenName: String,
+    openDrawer: () -> Unit,
     trailingIcon: (@Composable () -> Unit)? = null,
     onTrailingIconClick: () -> Unit = {}
 ) {
@@ -23,7 +24,7 @@ fun ScreenTopAppBar(
         },
         navigationIcon = {
             IconButton(
-                onClick = { /* TODO */ },
+                onClick = { openDrawer() },
                 modifier = Modifiers.appBarIconSize
             ) { AppIcons.Menu() }
         },

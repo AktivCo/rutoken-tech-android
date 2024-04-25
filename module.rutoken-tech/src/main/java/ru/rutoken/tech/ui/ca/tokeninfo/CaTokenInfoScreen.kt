@@ -1,14 +1,13 @@
 package ru.rutoken.tech.ui.ca.tokeninfo
 
 import androidx.annotation.StringRes
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.LocalOverscrollConfiguration
-import androidx.compose.foundation.background
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.*
+import androidx.compose.material3.FilledTonalButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
@@ -36,7 +35,8 @@ fun CaTokenInfoScreen(
     viewModel: CaTokenInfoViewModel,
     onNavigateToGenerateKeyPair: () -> Unit,
     onNavigateToGenerateCertificate: () -> Unit,
-    onLogout: () -> Unit
+    onLogout: () -> Unit,
+    openDrawer: () -> Unit
 ) {
     val tokenInfoUiState by viewModel.uiState.observeAsState()
 
@@ -45,7 +45,8 @@ fun CaTokenInfoScreen(
             uiState = uiState,
             onNavigateToGenerateKeyPair = onNavigateToGenerateKeyPair,
             onNavigateToGenerateCertificate = onNavigateToGenerateCertificate,
-            onLogout = onLogout
+            onLogout = onLogout,
+            openDrawer = openDrawer
         )
     }
 }
@@ -55,12 +56,14 @@ private fun TokenInfoScreen(
     uiState: CaTokenInfoUiState,
     onNavigateToGenerateKeyPair: () -> Unit,
     onNavigateToGenerateCertificate: () -> Unit,
-    onLogout: () -> Unit
+    onLogout: () -> Unit,
+    openDrawer: () -> Unit
 ) {
     Scaffold(
         topBar = {
             ScreenTopAppBar(
                 screenName = stringResource(id = R.string.tab_certificate_authority),
+                openDrawer = openDrawer,
                 trailingIcon = { AppIcons.Logout() },
                 onTrailingIconClick = onLogout
             )
@@ -199,7 +202,8 @@ private fun TokenInfoScreenPreview(uiState: CaTokenInfoUiState) {
             uiState = uiState,
             onNavigateToGenerateKeyPair = {},
             onNavigateToGenerateCertificate = {},
-            onLogout = {}
+            onLogout = {},
+            openDrawer = {}
         )
     }
 }

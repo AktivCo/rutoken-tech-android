@@ -20,10 +20,13 @@ import ru.rutoken.tech.ui.utils.PreviewLight
 import ru.rutoken.tech.ui.utils.figmaPadding
 
 @Composable
-fun CaStartScreen(onClickConnectToken: () -> Unit) {
+fun CaStartScreen(onClickConnectToken: () -> Unit, openDrawer: () -> Unit) {
     Scaffold(
         topBar = {
-            ScreenTopAppBar(screenName = stringResource(id = R.string.tab_certificate_authority))
+            ScreenTopAppBar(
+                screenName = stringResource(id = R.string.tab_certificate_authority),
+                openDrawer = openDrawer
+            )
         }
     ) { innerPadding ->
         Column(
@@ -73,6 +76,6 @@ fun CaStartScreen(onClickConnectToken: () -> Unit) {
 @Composable
 private fun CaStartScreenPreview() {
     RutokenTechTheme {
-        CaStartScreen(onClickConnectToken = {})
+        CaStartScreen(onClickConnectToken = {}, openDrawer = {})
     }
 }

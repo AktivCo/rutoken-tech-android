@@ -10,6 +10,11 @@
 
     <!--Tab names-->
     <string name="tab_certificate_authority">Удостоверяющий центр</string>
+    <string name="tab_about">О приложении</string>
+
+    <!--Related to menu-->
+    <string name="menu_title">Навигация</string>
+    <string name="ca_menu_item">УЦ</string>
 
     <!--Related to CA start screen-->
     <string name="connect_rutoken">Подключите Рутокен</string>

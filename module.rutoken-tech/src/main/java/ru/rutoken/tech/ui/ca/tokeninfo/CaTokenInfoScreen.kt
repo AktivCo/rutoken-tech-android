@@ -2,11 +2,15 @@ package ru.rutoken.tech.ui.ca.tokeninfo
 
 import androidx.annotation.StringRes
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.LocalOverscrollConfiguration
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
@@ -62,18 +66,23 @@ private fun TokenInfoScreen(
             )
         }
     ) { innerPadding ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .figmaPadding(0.dp, 16.dp, 16.dp, 16.dp)
-                .padding(innerPadding)
-                .consumeWindowInsets(innerPadding),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(16.dp, Alignment.Top)
+        CompositionLocalProvider(
+            LocalOverscrollConfiguration provides null
         ) {
-            TokenImage(uiState.tokenType)
-            TokenInfo(uiState)
-            Actions(onNavigateToGenerateKeyPair, onNavigateToGenerateCertificate)
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .figmaPadding(0.dp, 16.dp, 16.dp, 16.dp)
+                    .padding(innerPadding)
+                    .consumeWindowInsets(innerPadding)
+                    .verticalScroll(rememberScrollState()),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(16.dp, Alignment.Top)
+            ) {
+                TokenImage(uiState.tokenType)
+                TokenInfo(uiState)
+                Actions(onNavigateToGenerateKeyPair, onNavigateToGenerateCertificate)
+            }
         }
     }
 }

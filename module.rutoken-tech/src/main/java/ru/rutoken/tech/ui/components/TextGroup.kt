@@ -6,8 +6,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
@@ -41,14 +39,14 @@ fun TextGroup(
     items: List<TextGroupItem>,
     backgroundColor: Color = MaterialTheme.colorScheme.surfaceContainerHigh
 ) {
-    LazyColumn(
+    Column(
         modifier = Modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(12.dp))
             .background(backgroundColor)
             .padding(16.dp),
     ) {
-        itemsIndexed(items) { index, item ->
+        items.forEachIndexed { index, item ->
             TextGroupItem(item)
             if (index != items.lastIndex)
                 HorizontalDivider(Modifier.padding(vertical = 16.dp))

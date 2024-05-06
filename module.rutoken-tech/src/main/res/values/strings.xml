@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!--TODO: Replace all "\n" in file with the unicode character &#x2028; when https://scm.aktivco.ru/rutoken/dev/android-projects/rutoken-tech-android/-/issues/32 will be resolved-->
-    <string name="app_name">Рутокен Технологии</string>
+    <string name="app_name_launcher">РуТех</string>
 
     <!--Common strings-->
     <string name="generate">Сгенерировать</string>
@@ -15,6 +15,7 @@
     <!--Related to menu-->
     <string name="menu_title">Навигация</string>
     <string name="ca_menu_item">УЦ</string>
+    <string name="about_app_menu_item">О приложении</string>
 
     <!--Related to CA start screen-->
     <string name="connect_rutoken">Подключите Рутокен</string>
@@ -96,4 +97,14 @@
     <string name="pin_code">PIN-код</string>
     <string name="proceed">Продолжить</string>
     <string name="invalid_pin_supporting">Неверный PIN-код. Осталось попыток: %d</string>
+
+    <!--Related to About App screen-->
+    <string name="app_name">Рутокен Технологии</string>
+    <string name="aktiv_company">Компания «Актив»</string>
+    <string name="build_version">Версия сборки</string>
+    <string name="commit_id">Commit ID</string>
+    <string name="technical_support">Техническая поддержка</string>
+    <string name="technical_support_number">+7 (495) 925-77-90</string>
+    <string name="license_agreement">Лицензионное соглашение Рутокен</string>
+    <string name="privacy_policy">Политика конфиденциальности</string>
 </resources>

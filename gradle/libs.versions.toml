@@ -1,6 +1,7 @@
 [versions]
 accompanist-navigation-material = "0.35.0-alpha"
 activity-compose = "1.8.2"
+androidx-browser = "1.8.0"
 androidx-test-ext-junit = "1.1.5"
 androidx-test-runner = "1.5.2"
 androidx-test-uiautomator = "2.3.0"
@@ -30,6 +31,7 @@ rtpcscbridge = "1.2.0"
 [libraries]
 accompanist-navigation-material = { module = "com.google.accompanist:accompanist-navigation-material", version.ref = "accompanist-navigation-material" }
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "activity-compose" }
+androidx-browser = { module = "androidx.browser:browser", version.ref = "androidx-browser" }
 androidx-core-ktx = { module = "androidx.core:core-ktx", version.ref = "core-ktx" }
 androidx-lifecycle-runtime-ktx = { module = "androidx.lifecycle:lifecycle-runtime-ktx", version.ref = "lifecycle-runtime-ktx" }
 androidx-navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigation-compose" }

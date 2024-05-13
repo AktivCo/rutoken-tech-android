@@ -108,6 +108,8 @@ android {
     packaging {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
+            excludes += "META-INF/versions/9/OSGI-INF/MANIFEST.MF"
+            excludes += "META-INF/versions/21/OSGI-INF/MANIFEST.MF"
         }
     }
 }
@@ -120,15 +122,11 @@ dependencies {
     implementation(libs.androidx.navigation.compose)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
-    // TODO: Replace with an external dependency after adding all GOST R 34.10 2012 key parameters curves in the Bouncy
-    //  Castle release. See https://scm.aktivco.ru/rutoken/dev/android-projects/rutoken-tech-android/-/issues/30.
-    api(
-        files(
-            "libs/bcpkix-jdk18on-1.75.jar",
-            "libs/bcprov-jdk18on-1.75.jar",
-            "libs/bcutil-jdk18on-1.75.jar"
-        )
-    )
+    releaseImplementation(libs.bouncycastle.bcpkix)
+    debugImplementation(libs.bundles.bouncycastle.debug) {
+        exclude(group = "org.bouncycastle", module = "bcprov-jdk18on")
+        exclude(group = "org.bouncycastle", module = "bcutil-jdk18on")
+    }
     implementation(platform(libs.compose.bom))
     implementation(libs.bundles.compose)
     implementation(libs.jna) { artifact { type = "aar" } }

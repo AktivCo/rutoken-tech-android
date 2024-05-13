@@ -15,6 +15,10 @@ android {
     testOptions.targetSdk = 34
     lint.targetSdk = 34
 
+    defaultConfig {
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+    }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
@@ -37,6 +41,13 @@ android {
             dependsOn(copyJniLibsTask)
         }
     }
+
+    packaging {
+        resources {
+            excludes += "META-INF/versions/9/OSGI-INF/MANIFEST.MF"
+            excludes += "META-INF/versions/21/OSGI-INF/MANIFEST.MF"
+        }
+    }
 }
 
 dependencies {
@@ -50,6 +61,10 @@ dependencies {
     androidTestImplementation(libs.rutoken.pkcs11jna) { isTransitive = false }
     androidTestImplementation(libs.rutoken.pkcs11wrapper) { isTransitive = false }
     androidTestImplementation(libs.rutoken.rtpcscbridge)
+    androidTestImplementation(libs.bundles.bouncycastle.debug) {
+        exclude(group = "org.bouncycastle", module = "bcprov-jdk18on")
+        exclude(group = "org.bouncycastle", module = "bcutil-jdk18on")
+    }
 }
 
 val architectures = listOf(

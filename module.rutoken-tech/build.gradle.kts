@@ -141,6 +141,9 @@ dependencies {
 
     ksp(libs.room.compiler)
 
+    testImplementation(libs.junit)
+    testImplementation(libs.kotest.assertions.core)
+
     androidTestImplementation(libs.androidx.test.ext.junit)
     androidTestImplementation(platform(libs.compose.bom))
     androidTestImplementation(libs.compose.ui.test.junit4)
@@ -205,4 +208,3 @@ fun getCommitHash(): String {
     }
     return stdout.toString().trim()
 }
-

@@ -5,7 +5,6 @@ import android.os.Build.VERSION_CODES
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.asPaddingValues
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -36,11 +35,7 @@ fun Modifier.statusBarsPaddingHeight(): Modifier {
 
 @Composable
 fun Modifier.navigationBarPaddingHeight(): Modifier {
-    return if (VERSION.SDK_INT < VERSION_CODES.R) {
-        this.navigationBarPaddingWorkaround()
-    } else {
-        this.windowInsetsPadding(WindowInsets.systemBars.only(WindowInsetsSides.Bottom))
-    }
+    return this.windowInsetsPadding(WindowInsets.systemBars.only(WindowInsetsSides.Bottom))
 }
 
 /**
@@ -50,11 +45,3 @@ fun Modifier.navigationBarPaddingHeight(): Modifier {
 @Workaround
 private fun Modifier.statusBarsPaddingWorkaround(): Modifier =
     this.padding(WindowInsets.systemBarsIgnoringVisibility.asPaddingValues().calculateTopPadding())
-
-/**
- * Adds correct navigation bar padding on API 29 and older
- */
-@Composable
-@Workaround
-private fun Modifier.navigationBarPaddingWorkaround(): Modifier =
-    this.height(WindowInsets.systemBarsIgnoringVisibility.asPaddingValues().calculateBottomPadding())

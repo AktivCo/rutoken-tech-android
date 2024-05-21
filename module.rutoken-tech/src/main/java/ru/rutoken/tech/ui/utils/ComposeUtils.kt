@@ -17,7 +17,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.navigation.NavHostController
 import androidx.navigation.NavOptionsBuilder
-import ru.rutoken.tech.utils.Workaround
 
 fun figmaPaddingValues(top: Dp, right: Dp, bottom: Dp, left: Dp) = PaddingValues(left, top, right, bottom)
 
@@ -42,20 +41,9 @@ fun expandedSheetState(skipPartiallyExpanded: Boolean = true) = SheetState(
 
 @Composable
 fun bottomSheetWindowInsets(): WindowInsets {
-    return if (VERSION.SDK_INT < VERSION_CODES.R) {
-        workaroundInsets()
-    } else {
-        WindowInsets.systemBars.only(WindowInsetsSides.Horizontal)
-    }
+    return WindowInsets.systemBars.only(WindowInsetsSides.Horizontal)
 }
 
 fun NavOptionsBuilder.clearNavGraph(navController: NavHostController) {
     popUpTo(navController.graph.id) { inclusive = true }
 }
-
-/**
- * Gets WindowInsets that fixes keyboard overlapping on API 29 and older
- */
-@Composable
-@Workaround
-private fun workaroundInsets(): WindowInsets = WindowInsets.Companion.ime

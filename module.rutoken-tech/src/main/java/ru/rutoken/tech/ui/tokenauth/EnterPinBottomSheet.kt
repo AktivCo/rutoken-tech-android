@@ -34,7 +34,6 @@ import ru.rutoken.tech.ui.components.BottomSheetTitle
 import ru.rutoken.tech.ui.components.NavigationBarSpacer
 import ru.rutoken.tech.ui.components.PrimaryButtonBox
 import ru.rutoken.tech.ui.theme.RutokenTechTheme
-import ru.rutoken.tech.ui.utils.ImeFocusHelper
 import ru.rutoken.tech.ui.utils.PreviewDark
 import ru.rutoken.tech.ui.utils.PreviewLight
 import ru.rutoken.tech.ui.utils.bottomSheetWindowInsets
@@ -50,13 +49,11 @@ fun EnterPinBottomSheet(
     sheetState: SheetState,
     onDismissRequest: () -> Unit
 ) {
-    val windowInsets = bottomSheetWindowInsets()
-
     ModalBottomSheet(
         onDismissRequest = onDismissRequest,
         sheetState = sheetState,
         containerColor = MaterialTheme.colorScheme.surfaceContainerLow,
-        windowInsets = windowInsets
+        contentWindowInsets = { bottomSheetWindowInsets() }
     ) {
         BottomSheetTitle(stringResource(R.string.enter_pin))
 
@@ -98,9 +95,7 @@ fun EnterPinBottomSheet(
 
         Spacer(Modifier.height(16.dp))
 
-        ImeFocusHelper {
-            PrimaryButtonBox(stringResource(id = R.string.proceed), buttonEnabled, onClick = onClickAction)
-        }
+        PrimaryButtonBox(stringResource(id = R.string.proceed), buttonEnabled, onClick = onClickAction)
 
         NavigationBarSpacer()
 

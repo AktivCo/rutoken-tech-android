@@ -58,7 +58,6 @@ import ru.rutoken.tech.ui.components.TextGroup
 import ru.rutoken.tech.ui.components.TextGroupItem
 import ru.rutoken.tech.ui.theme.RutokenTechTheme
 import ru.rutoken.tech.ui.utils.DialogState
-import ru.rutoken.tech.ui.utils.ImeFocusHelper
 import ru.rutoken.tech.ui.utils.PreviewDark
 import ru.rutoken.tech.ui.utils.PreviewLight
 import ru.rutoken.tech.ui.utils.bottomSheetWindowInsets
@@ -112,7 +111,6 @@ fun GenerateCertificateBottomSheet(
     keyPairs: List<CkaIdString>,
     onGenerationButtonClicked: (CkaIdString, String) -> Unit
 ) {
-    val windowInsets = bottomSheetWindowInsets()
     val dragHandle: @Composable (() -> Unit) = {
         if (sheetState.targetValue != Expanded) {
             DragHandle()
@@ -126,7 +124,7 @@ fun GenerateCertificateBottomSheet(
         onDismissRequest = onDismissRequest,
         sheetState = sheetState,
         containerColor = MaterialTheme.colorScheme.surfaceContainerLow,
-        windowInsets = windowInsets,
+        contentWindowInsets = { bottomSheetWindowInsets() },
         dragHandle = dragHandle,
         shape = shape,
     ) {
@@ -224,18 +222,16 @@ private fun KeyPairSelectionDropdownMenu(
 
 @Composable
 private fun OwnerTextField(value: String, onValueChange: (String) -> Unit, hideKeyboardAction: () -> Unit) {
-    ImeFocusHelper {
-        OutlinedTextField(
-            value = value,
-            onValueChange = { onValueChange(it) },
-            modifier = Modifier.fillMaxWidth(),
-            label = { Text(text = stringResource(id = R.string.enter_owner)) },
-            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
-            keyboardActions = KeyboardActions(onDone = { hideKeyboardAction() }),
-            singleLine = true,
-            shape = RoundedCornerShape(size = 12.dp)
-        )
-    }
+    OutlinedTextField(
+        value = value,
+        onValueChange = { onValueChange(it) },
+        modifier = Modifier.fillMaxWidth(),
+        label = { Text(text = stringResource(id = R.string.enter_owner)) },
+        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+        keyboardActions = KeyboardActions(onDone = { hideKeyboardAction() }),
+        singleLine = true,
+        shape = RoundedCornerShape(size = 12.dp)
+    )
 }
 
 @Composable

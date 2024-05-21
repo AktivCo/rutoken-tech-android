@@ -31,6 +31,7 @@ import ru.rutoken.tech.ui.theme.RutokenTechTheme
 import ru.rutoken.tech.ui.utils.DialogState
 import ru.rutoken.tech.ui.utils.PreviewDark
 import ru.rutoken.tech.ui.utils.PreviewLight
+import ru.rutoken.tech.ui.utils.bottomSheetWindowInsets
 import ru.rutoken.tech.ui.utils.errorDialogData
 import ru.rutoken.tech.ui.utils.expandedSheetState
 import ru.rutoken.tech.ui.utils.figmaPaddingValues
@@ -83,7 +84,7 @@ fun GenerateKeyPairBottomSheet(
         onDismissRequest = onDismiss,
         sheetState = sheetState,
         containerColor = MaterialTheme.colorScheme.surfaceContainerLow,
-        windowInsets = WindowInsets.systemBars.only(WindowInsetsSides.Horizontal),
+        contentWindowInsets = { bottomSheetWindowInsets() },
     ) {
         BottomSheetTitle(stringResource(id = R.string.key_pair_title))
 

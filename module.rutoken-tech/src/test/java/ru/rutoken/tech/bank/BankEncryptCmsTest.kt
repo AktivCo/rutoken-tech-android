@@ -1,16 +1,13 @@
-package ru.ruotken.tech.bank
+package ru.rutoken.tech.bank
 
 import io.kotest.assertions.throwables.shouldNotThrowAny
-import org.bouncycastle.asn1.rosstandart.RosstandartObjectIdentifiers
 import org.bouncycastle.cert.X509CertificateHolder
 import org.bouncycastle.cms.CMSAlgorithm.GOST28147_GCFB
 import org.bouncycastle.jce.provider.BouncyCastleProvider
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
-import ru.rutoken.tech.bank.BANK_CERTIFICATE_GOST
 import ru.rutoken.tech.bouncycastle.BouncyCastleCmsOperations
-import ru.rutoken.tech.bouncycastle.Gost2012KeyFactorySpi
 import java.security.Security
 import java.util.Base64
 
@@ -19,7 +16,6 @@ class BankEncryptCmsTest {
 
     @Before
     fun setUpSecurityProvider() {
-        bcProvider.addKeyInfoConverter(RosstandartObjectIdentifiers.id_tc26_gost_3410_12_256, Gost2012KeyFactorySpi())
         // Remove system Bouncy Castle provider
         Security.removeProvider(bcProvider.name)
         Security.insertProviderAt(bcProvider, 1)

@@ -1,6 +1,9 @@
 package ru.rutoken.tech.ui.main
 
 import androidx.compose.animation.AnimatedContentScope
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.runtime.Composable
 import androidx.navigation.*
 import androidx.navigation.NavGraph.Companion.findStartDestination
@@ -32,7 +35,11 @@ fun MainNavHost(navHostController: NavHostController, openDrawer: () -> Unit) {
 
     NavHost(
         navController = navHostController,
-        startDestination = AppSectionDestination.Ca.route // TODO: make Bank route as start destination in 1.1
+        startDestination = AppSectionDestination.Ca.route, // TODO: make Bank route as start destination in 1.1
+        enterTransition = { slideInHorizontally(animationSpec = tween(500), initialOffsetX = { it }) },
+        exitTransition = { slideOutHorizontally(animationSpec = tween(500), targetOffsetX = { -it }) },
+        popEnterTransition = { slideInHorizontally(animationSpec = tween(500), initialOffsetX = { -it }) },
+        popExitTransition = { slideOutHorizontally(animationSpec = tween(500), targetOffsetX = { it }) }
     ) {
         navigation(
             route = AppSectionDestination.Ca.route,

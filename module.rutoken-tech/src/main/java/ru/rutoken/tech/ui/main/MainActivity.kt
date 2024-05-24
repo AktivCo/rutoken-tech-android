@@ -13,6 +13,7 @@ import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ModalDrawerSheet
 import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.rememberDrawerState
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.navigation.compose.currentBackStackEntryAsState
@@ -35,48 +36,53 @@ class MainActivity : ComponentActivity() {
         expandAppColorsToSystemBars()
         setContent {
             RutokenTechTheme {
-                val bottomSheetNavigator = rememberBottomSheetNavigator()
-                val navController = rememberNavController(bottomSheetNavigator)
+                RootContent()
+            }
+        }
+    }
 
-                val navBackStackEntry by navController.currentBackStackEntryAsState()
-                val currentDestination = navBackStackEntry?.destination?.route
-                    ?: CaDestination.Start.route // TODO: change to Bank start screen
+    @Composable
+    private fun RootContent() {
+        val bottomSheetNavigator = rememberBottomSheetNavigator()
+        val navController = rememberNavController(bottomSheetNavigator)
 
-                val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
-                val scope = rememberCoroutineScope()
-                val openDrawer = { scope.launch { drawerState.open() } }
-                val closeDrawer = { scope.launch { drawerState.close() } }
+        val navBackStackEntry by navController.currentBackStackEntryAsState()
+        val currentDestination = navBackStackEntry?.destination?.route
+            ?: CaDestination.Start.route // TODO: change to Bank start screen
 
-                if (drawerState.isOpen) {
-                    BackHandler { closeDrawer() }
-                }
+        val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
+        val scope = rememberCoroutineScope()
+        val openDrawer = { scope.launch { drawerState.open() } }
+        val closeDrawer = { scope.launch { drawerState.close() } }
 
-                ModalNavigationDrawer(
-                    drawerState = drawerState,
-                    drawerContent = {
-                        ModalDrawerSheet(drawerState) {
-                            MainDrawerContent(
-                                currentDestination = currentDestination,
-                                onCloseDrawer = { closeDrawer() },
-                                onNavigateToCa = {
-                                    navController.navigate(CaDestination.Start.route) { clearNavGraph(navController) }
-                                },
-                                onNavigateToAbout = {
-                                    navController.navigate(AboutDestination.About.route) {
-                                        clearNavGraph(navController)
-                                    }
-                                }
-                            )
+        if (drawerState.isOpen) {
+            BackHandler { closeDrawer() }
+        }
+
+        ModalNavigationDrawer(
+            drawerState = drawerState,
+            drawerContent = {
+                ModalDrawerSheet(drawerState) {
+                    MainDrawerContent(
+                        currentDestination = currentDestination,
+                        onCloseDrawer = { closeDrawer() },
+                        onNavigateToCa = {
+                            navController.navigate(CaDestination.Start.route) { clearNavGraph(navController) }
+                        },
+                        onNavigateToAbout = {
+                            navController.navigate(AboutDestination.About.route) {
+                                clearNavGraph(navController)
+                            }
                         }
-                    },
-                ) {
-                    ModalBottomSheetLayout(bottomSheetNavigator) {
-                        MainNavHost(
-                            navHostController = navController,
-                            openDrawer = { openDrawer() }
-                        )
-                    }
+                    )
                 }
+            },
+        ) {
+            ModalBottomSheetLayout(bottomSheetNavigator) {
+                MainNavHost(
+                    navHostController = navController,
+                    openDrawer = { openDrawer() }
+                )
             }
         }
     }

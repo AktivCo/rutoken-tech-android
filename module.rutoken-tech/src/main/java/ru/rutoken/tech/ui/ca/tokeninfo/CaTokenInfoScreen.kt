@@ -65,15 +65,13 @@ fun CaTokenInfoScreen(
 
     NoKeyPairsOnTokenDialog(viewModel)
 
-    tokenInfoUiState?.let { uiState ->
-        TokenInfoScreen(
-            uiState = uiState,
-            onNavigateToGenerateKeyPair = onNavigateToGenerateKeyPair,
-            onNavigateToGenerateCertificate = viewModel::onNavigateToGenerateCertificate,
-            onLogout = onLogout,
-            openDrawer = openDrawer
-        )
-    }
+    TokenInfoScreen(
+        uiState = tokenInfoUiState!!,
+        onNavigateToGenerateKeyPair = onNavigateToGenerateKeyPair,
+        onNavigateToGenerateCertificate = viewModel::onNavigateToGenerateCertificate,
+        onLogout = onLogout,
+        openDrawer = openDrawer
+    )
 }
 
 @Composable

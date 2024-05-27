@@ -43,8 +43,9 @@ class GenerateCertificateViewModel(
     private val _errorDialogState = MutableLiveData<DialogState>()
     val errorDialogState: LiveData<DialogState> = _errorDialogState
 
+    // CaRutokenTechSession MUST exist and keyPairs MUST NOT be empty by the time this ViewModel is instantiated
     private val _keyPairs =
-        MutableLiveData(runCatching { sessionHolder.requireCaSession().keyPairs }.getOrDefault(emptyList()))
+        MutableLiveData<List<CkaIdString>>(sessionHolder.requireCaSession().keyPairs)
     val keyPairs: LiveData<List<CkaIdString>> get() = _keyPairs
 
     private val _shouldLogout = MutableLiveData(false)

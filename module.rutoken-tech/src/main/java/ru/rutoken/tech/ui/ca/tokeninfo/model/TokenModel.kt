@@ -1,9 +1,25 @@
+/*
+ * Copyright (c) 2024, Aktiv-Soft JSC.
+ * See the LICENSE file at the top-level directory of this distribution.
+ * All Rights Reserved.
+ */
+
 package ru.rutoken.tech.ui.ca.tokeninfo.model
 
 import android.content.Context
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import ru.rutoken.pkcs11jna.RtPkcs11Constants.*
+import ru.rutoken.pkcs11jna.RtPkcs11Constants.INTERFACE_TYPE_ISO
+import ru.rutoken.pkcs11jna.RtPkcs11Constants.INTERFACE_TYPE_NFC_TYPE_A
+import ru.rutoken.pkcs11jna.RtPkcs11Constants.INTERFACE_TYPE_NFC_TYPE_B
+import ru.rutoken.pkcs11jna.RtPkcs11Constants.INTERFACE_TYPE_USB
+import ru.rutoken.pkcs11jna.RtPkcs11Constants.TOKEN_FLAGS_HAS_BUTTON
+import ru.rutoken.pkcs11jna.RtPkcs11Constants.TOKEN_FLAGS_HAS_FLASH_DRIVE
+import ru.rutoken.pkcs11jna.RtPkcs11Constants.TOKEN_TYPE_RUTOKEN
+import ru.rutoken.pkcs11jna.RtPkcs11Constants.TOKEN_TYPE_RUTOKEN_ECP
+import ru.rutoken.pkcs11jna.RtPkcs11Constants.TOKEN_TYPE_RUTOKEN_ECPDUAL_USB
+import ru.rutoken.pkcs11jna.RtPkcs11Constants.TOKEN_TYPE_RUTOKEN_ECP_SC
+import ru.rutoken.pkcs11jna.RtPkcs11Constants.TOKEN_TYPE_RUTOKEN_LITE
 import ru.rutoken.pkcs11wrapper.attribute.Pkcs11StringAttribute
 import ru.rutoken.pkcs11wrapper.attribute.longvalue.Pkcs11HardwareFeatureTypeAttribute
 import ru.rutoken.pkcs11wrapper.attribute.longvalue.Pkcs11ObjectClassAttribute
@@ -21,9 +37,18 @@ import ru.rutoken.tech.ui.ca.tokeninfo.model.smartcard.Ecp3SmartCard.MarketingMo
 import ru.rutoken.tech.ui.ca.tokeninfo.model.usb.Ecp2Usb
 import ru.rutoken.tech.ui.ca.tokeninfo.model.usb.Ecp2Usb.FlashMarketingModel.ECP2_FLASH_4500
 import ru.rutoken.tech.ui.ca.tokeninfo.model.usb.Ecp2Usb.FlashMarketingModel.ECP2_FLASH_4900
-import ru.rutoken.tech.ui.ca.tokeninfo.model.usb.Ecp2Usb.MarketingModel.*
+import ru.rutoken.tech.ui.ca.tokeninfo.model.usb.Ecp2Usb.MarketingModel.ECP2_USB_2000
+import ru.rutoken.tech.ui.ca.tokeninfo.model.usb.Ecp2Usb.MarketingModel.ECP2_USB_2100
+import ru.rutoken.tech.ui.ca.tokeninfo.model.usb.Ecp2Usb.MarketingModel.ECP2_USB_2200
+import ru.rutoken.tech.ui.ca.tokeninfo.model.usb.Ecp2Usb.MarketingModel.ECP2_USB_3000
+import ru.rutoken.tech.ui.ca.tokeninfo.model.usb.Ecp2Usb.MarketingModel.ECP2_USB_4000
+import ru.rutoken.tech.ui.ca.tokeninfo.model.usb.Ecp2Usb.MarketingModel.ECP2_USB_4400
 import ru.rutoken.tech.ui.ca.tokeninfo.model.usb.Ecp3Usb
-import ru.rutoken.tech.ui.ca.tokeninfo.model.usb.Ecp3Usb.MarketingModel.*
+import ru.rutoken.tech.ui.ca.tokeninfo.model.usb.Ecp3Usb.MarketingModel.ECP3_USB_3100
+import ru.rutoken.tech.ui.ca.tokeninfo.model.usb.Ecp3Usb.MarketingModel.ECP3_USB_3120
+import ru.rutoken.tech.ui.ca.tokeninfo.model.usb.Ecp3Usb.MarketingModel.ECP3_USB_3200
+import ru.rutoken.tech.ui.ca.tokeninfo.model.usb.Ecp3Usb.MarketingModel.ECP3_USB_3220
+import ru.rutoken.tech.ui.ca.tokeninfo.model.usb.Ecp3Usb.MarketingModel.ECP3_USB_3250
 import ru.rutoken.tech.ui.ca.tokeninfo.model.usb.Ecp3UsbDual
 
 /**

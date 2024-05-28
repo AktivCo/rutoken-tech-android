@@ -1,3 +1,9 @@
+/*
+ * Copyright (c) 2024, Aktiv-Soft JSC.
+ * See the LICENSE file at the top-level directory of this distribution.
+ * All Rights Reserved.
+ */
+
 package ru.rutoken.tech.pkcs11.findobjects
 
 import org.bouncycastle.asn1.rosstandart.RosstandartObjectIdentifiers.id_tc26_gost_3410_12_256

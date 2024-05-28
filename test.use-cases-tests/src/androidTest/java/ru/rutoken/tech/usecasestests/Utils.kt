@@ -1,3 +1,9 @@
+/*
+ * Copyright (c) 2024, Aktiv-Soft JSC.
+ * See the LICENSE file at the top-level directory of this distribution.
+ * All Rights Reserved.
+ */
+
 package ru.rutoken.tech.usecasestests
 
 import androidx.test.platform.app.InstrumentationRegistry
@@ -9,7 +15,6 @@ import ru.rutoken.tech.pkcs11.createobjects.GostKeyPairParams
 import ru.rutoken.tech.pkcs11.createobjects.generateCkaId
 import ru.rutoken.tech.pkcs11.createobjects.makeGostPrivateKeyTemplate
 import ru.rutoken.tech.pkcs11.createobjects.makeGostPublicKeyTemplate
-import ru.rutoken.tech.ui.ca.generateobjects.certificate.createDN
 import ru.rutoken.tech.usecasestests.rule.GenerateKeyPairRule
 import ru.rutoken.tech.usecasestests.rule.SessionRule
 

@@ -1,7 +1,18 @@
+/*
+ * Copyright (c) 2024, Aktiv-Soft JSC.
+ * See the LICENSE file at the top-level directory of this distribution.
+ * All Rights Reserved.
+ */
+
 package ru.rutoken.tech.database.user
 
 import androidx.lifecycle.LiveData
-import androidx.room.*
+import androidx.room.Dao
+import androidx.room.Delete
+import androidx.room.Insert
+import androidx.room.OnConflictStrategy
+import androidx.room.Query
+import androidx.room.Transaction
 
 @Dao
 interface UserDao {

@@ -1,15 +1,18 @@
+/*
+ * Copyright (c) 2024, Aktiv-Soft JSC.
+ * See the LICENSE file at the top-level directory of this distribution.
+ * All Rights Reserved.
+ */
+
 package ru.rutoken.tech.database
 
 import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import io.kotest.assertions.withClue
-import io.kotest.matchers.equals.shouldBeEqual
-import io.kotest.matchers.ints.shouldBeExactly
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.test.runTest
 import org.junit.After
-import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith

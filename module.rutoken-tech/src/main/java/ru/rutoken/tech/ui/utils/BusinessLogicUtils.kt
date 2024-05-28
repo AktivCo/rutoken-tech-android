@@ -1,3 +1,9 @@
+/*
+ * Copyright (c) 2024, Aktiv-Soft JSC.
+ * See the LICENSE file at the top-level directory of this distribution.
+ * All Rights Reserved.
+ */
+
 package ru.rutoken.tech.ui.utils
 
 import androidx.lifecycle.MutableLiveData
@@ -9,7 +15,9 @@ import ru.rutoken.pkcs11wrapper.constant.standard.Pkcs11ReturnValue.CKR_PIN_LOCK
 import ru.rutoken.pkcs11wrapper.main.Pkcs11Exception
 import ru.rutoken.tech.session.SerialHexString
 import ru.rutoken.tech.tokenmanager.TokenManager
-import ru.rutoken.tech.utils.BusinessRuleCase.*
+import ru.rutoken.tech.utils.BusinessRuleCase.IncorrectPin
+import ru.rutoken.tech.utils.BusinessRuleCase.PinLocked
+import ru.rutoken.tech.utils.BusinessRuleCase.TokenRemoved
 import ru.rutoken.tech.utils.BusinessRuleException
 
 suspend fun callPkcs11Operation(

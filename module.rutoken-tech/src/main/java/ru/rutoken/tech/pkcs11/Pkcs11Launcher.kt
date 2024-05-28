@@ -1,3 +1,9 @@
+/*
+ * Copyright (c) 2024, Aktiv-Soft JSC.
+ * See the LICENSE file at the top-level directory of this distribution.
+ * All Rights Reserved.
+ */
+
 package ru.rutoken.tech.pkcs11
 
 import android.app.Activity
@@ -5,9 +11,22 @@ import android.util.Log
 import androidx.annotation.MainThread
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.channels.Channel
-import ru.nsk.kstatemachine.*
+import kotlinx.coroutines.isActive
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import ru.nsk.kstatemachine.Event
+import ru.nsk.kstatemachine.StateMachine
+import ru.nsk.kstatemachine.createStdLibStateMachine
+import ru.nsk.kstatemachine.initialState
+import ru.nsk.kstatemachine.invoke
+import ru.nsk.kstatemachine.onTriggered
+import ru.nsk.kstatemachine.processEventBlocking
+import ru.nsk.kstatemachine.state
+import ru.nsk.kstatemachine.transition
 import ru.rutoken.pkcs11wrapper.datatype.Pkcs11InitializeArgs
 import ru.rutoken.pkcs11wrapper.main.Pkcs11Module
 import java.util.concurrent.CopyOnWriteArraySet

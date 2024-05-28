@@ -1,9 +1,18 @@
+/*
+ * Copyright (c) 2024, Aktiv-Soft JSC.
+ * See the LICENSE file at the top-level directory of this distribution.
+ * All Rights Reserved.
+ */
+
 package ru.rutoken.tech.tokenmanager.slotevent
 
 import androidx.annotation.AnyThread
-import androidx.annotation.WorkerThread
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.isActive
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import ru.rutoken.pkcs11wrapper.constant.standard.Pkcs11Flag.CKF_TOKEN_PRESENT
 import ru.rutoken.pkcs11wrapper.datatype.Pkcs11SlotInfo
 import ru.rutoken.pkcs11wrapper.lowlevel.datatype.CkSlotInfo

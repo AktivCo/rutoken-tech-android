@@ -1,6 +1,18 @@
+/*
+ * Copyright (c) 2024, Aktiv-Soft JSC.
+ * See the LICENSE file at the top-level directory of this distribution.
+ * All Rights Reserved.
+ */
+
 package ru.rutoken.tech.tokenmanager
 
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import ru.rutoken.pkcs11wrapper.main.Pkcs11Module
 import ru.rutoken.pkcs11wrapper.main.Pkcs11Token
 import ru.rutoken.pkcs11wrapper.rutoken.main.RtPkcs11Token

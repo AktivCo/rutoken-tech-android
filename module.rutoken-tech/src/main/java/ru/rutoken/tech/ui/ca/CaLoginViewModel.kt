@@ -1,3 +1,9 @@
+/*
+ * Copyright (c) 2024, Aktiv-Soft JSC.
+ * See the LICENSE file at the top-level directory of this distribution.
+ * All Rights Reserved.
+ */
+
 package ru.rutoken.tech.ui.ca
 
 import android.content.Context
@@ -21,7 +27,8 @@ import ru.rutoken.tech.ui.tokenconnector.TokenConnector
 import ru.rutoken.tech.ui.utils.DialogState
 import ru.rutoken.tech.ui.utils.callPkcs11Operation
 import ru.rutoken.tech.ui.utils.toErrorDialogData
-import ru.rutoken.tech.utils.BusinessRuleCase.*
+import ru.rutoken.tech.utils.BusinessRuleCase.IncorrectPin
+import ru.rutoken.tech.utils.BusinessRuleCase.PinLocked
 import ru.rutoken.tech.utils.BusinessRuleException
 import ru.rutoken.tech.utils.logd
 import ru.rutoken.tech.utils.loge

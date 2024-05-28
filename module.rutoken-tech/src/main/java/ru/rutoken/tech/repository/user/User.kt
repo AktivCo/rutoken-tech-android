@@ -1,3 +1,9 @@
+/*
+ * Copyright (c) 2024, Aktiv-Soft JSC.
+ * See the LICENSE file at the top-level directory of this distribution.
+ * All Rights Reserved.
+ */
+
 package ru.rutoken.tech.repository.user
 
 import org.bouncycastle.asn1.ASN1ObjectIdentifier
@@ -5,7 +11,7 @@ import org.bouncycastle.asn1.x500.style.BCStyle
 import org.bouncycastle.cert.X509CertificateHolder
 import ru.rutoken.tech.database.user.UserEntity
 import java.text.SimpleDateFormat
-import java.util.*
+import java.util.Locale
 
 data class User(
     val userEntity: UserEntity,

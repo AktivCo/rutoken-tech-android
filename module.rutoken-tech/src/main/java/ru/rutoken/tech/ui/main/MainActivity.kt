@@ -16,6 +16,7 @@ import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.google.accompanist.navigation.material.ModalBottomSheetLayout
@@ -30,10 +31,12 @@ import ru.rutoken.tech.ui.utils.clearNavGraph
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
+        installSplashScreen()
         super.onCreate(savedInstanceState)
-        lifecycle.addObserver(get<Pkcs11Launcher>())
 
         expandAppColorsToSystemBars()
+        lifecycle.addObserver(get<Pkcs11Launcher>())
+
         setContent {
             RutokenTechTheme {
                 RootContent()

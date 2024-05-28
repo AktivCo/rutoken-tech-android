@@ -1,4 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <style name="Theme.RutokenTech" parent="android:Theme.Material.Light.NoActionBar" />
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Allows us to override night specific attributes in the
+         values-night folder. -->
+    <style name="Theme.RutokenTech.NightAdjusted" parent="android:Theme.Material.Light.NoActionBar"/>
+
+    <!-- The final theme we use -->
+    <style name="Theme.RutokenTech" parent="Theme.RutokenTech.NightAdjusted">
+        <item name="android:windowBackground">@color/activity_background</item>
+    </style>
+
+    <style name="Theme.RutokenTech.SplashSystemBars" parent="Theme.SplashScreen">
+        <item name="android:windowLightStatusBar" tools:targetApi="25">true</item>
+        <item name="android:windowLightNavigationBar" tools:targetApi="27">true</item>
+    </style>
+
+    <style name="Theme.RutokenTech.Splash" parent="Theme.RutokenTech.SplashSystemBars">
+        <item name="android:windowBackground">@color/activity_background</item>
+        <item name="postSplashScreenTheme">@style/Theme.RutokenTech</item>
+    </style>
 </resources>

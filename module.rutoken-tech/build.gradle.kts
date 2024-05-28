@@ -121,6 +121,7 @@ dependencies {
     implementation(libs.androidx.browser)
     implementation(libs.androidx.navigation.compose)
     implementation(libs.androidx.core.ktx)
+    implementation(libs.androidx.core.splashscreen)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     releaseImplementation(libs.bouncycastle.bcpkix)
     debugImplementation(libs.bundles.bouncycastle.debug) {

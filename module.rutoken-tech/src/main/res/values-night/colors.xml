@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<resources>
+    <!--    surfaceDark-->
+    <color name="activity_background">#FF0E1416</color>
+</resources>

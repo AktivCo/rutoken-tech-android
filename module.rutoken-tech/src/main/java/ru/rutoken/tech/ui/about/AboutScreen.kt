@@ -102,8 +102,16 @@ private fun AppData() {
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(4.dp)
         ) {
-            Text(stringResource(id = R.string.app_name), style = MaterialTheme.typography.titleLarge)
-            Text(stringResource(id = R.string.aktiv_company), style = MaterialTheme.typography.bodyLarge)
+            Text(
+                stringResource(id = R.string.app_name),
+                color = MaterialTheme.colorScheme.onSurface,
+                style = MaterialTheme.typography.titleLarge
+            )
+            Text(
+                stringResource(id = R.string.aktiv_company),
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                style = MaterialTheme.typography.bodyLarge
+            )
         }
     }
 }

@@ -95,7 +95,6 @@ fun RutokenTechTheme(
 ) {
     MaterialTheme(
         colorScheme = if (darkTheme) darkScheme else lightScheme,
-        typography = Typography,
         content = content
     )
 }

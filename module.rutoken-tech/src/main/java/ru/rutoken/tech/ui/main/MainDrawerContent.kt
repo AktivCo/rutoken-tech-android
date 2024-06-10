@@ -10,21 +10,21 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalDrawerSheet
 import androidx.compose.material3.ModalNavigationDrawer
-import androidx.compose.material3.NavigationDrawerItem
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight.Companion.W500
 import androidx.compose.ui.unit.dp
 import ru.rutoken.tech.R
 import ru.rutoken.tech.ui.ca.CaDestination
 import ru.rutoken.tech.ui.components.AppIcons
+import ru.rutoken.tech.ui.components.NavDrawerItem
 import ru.rutoken.tech.ui.theme.RutokenTechTheme
 import ru.rutoken.tech.ui.utils.PreviewDark
 import ru.rutoken.tech.ui.utils.PreviewLight
@@ -54,35 +54,36 @@ fun MainDrawerContent(
         ) {
             Text(
                 text = stringResource(id = R.string.menu_title),
+                fontWeight = W500,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 style = MaterialTheme.typography.titleSmall
             )
         }
 
-        NavigationDrawerItem(
-            label = { Text(text = stringResource(id = R.string.ca_menu_item)) },
-            icon = { AppIcons.CaMenuItem() },
-            selected = currentDestination.contains(AppSectionDestination.Ca.route),
+        val isCaSelected = currentDestination.contains(AppSectionDestination.Ca.route)
+        NavDrawerItem(
+            label = stringResource(id = R.string.ca_menu_item),
+            selected = isCaSelected,
+            icon = { AppIcons.CaMenuItem(isCaSelected) },
             onClick = {
-                if (!currentDestination.contains(AppSectionDestination.Ca.route)) {
+                if (!isCaSelected) {
                     onCloseDrawer()
                     onNavigateToCa()
                 }
-            },
-            shape = RoundedCornerShape(100.dp),
+            }
         )
 
-        NavigationDrawerItem(
-            label = { Text(text = stringResource(id = R.string.tab_about)) },
-            icon = { AppIcons.AboutMenuItem() },
-            selected = currentDestination.contains(AppSectionDestination.About.route),
+        val isAboutSelected = currentDestination.contains(AppSectionDestination.About.route)
+        NavDrawerItem(
+            label = stringResource(id = R.string.tab_about),
+            selected = isAboutSelected,
+            icon = { AppIcons.AboutMenuItem(isAboutSelected) },
             onClick = {
-                if (!currentDestination.contains(AppSectionDestination.About.route)) {
+                if (!isAboutSelected) {
                     onCloseDrawer()
                     onNavigateToAbout()
                 }
-            },
-            shape = RoundedCornerShape(100.dp),
+            }
         )
     }
 }

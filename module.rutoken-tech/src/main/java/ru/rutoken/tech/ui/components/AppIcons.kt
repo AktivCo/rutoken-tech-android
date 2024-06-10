@@ -42,18 +42,22 @@ object AppIcons {
     }
 
     @Composable
-    fun CaMenuItem() {
+    fun CaMenuItem(selected: Boolean) {
         Icon(
-            painter = painterResource(id = R.drawable.ic_ca_menu_item),
+            painter = painterResource(
+                id = if (selected) R.drawable.ic_ca_menu_item_selected else R.drawable.ic_ca_menu_item
+            ),
             contentDescription = "CA Menu Icon",
             tint = MaterialTheme.colorScheme.onSurfaceVariant
         )
     }
 
     @Composable
-    fun AboutMenuItem() {
+    fun AboutMenuItem(selected: Boolean) {
         Icon(
-            painter = painterResource(id = R.drawable.ic_about_menu_item),
+            painter = painterResource(
+                id = if (selected) R.drawable.ic_about_menu_item_selected else R.drawable.ic_about_menu_item
+            ),
             contentDescription = "About Menu Icon",
             tint = MaterialTheme.colorScheme.onSurfaceVariant
         )

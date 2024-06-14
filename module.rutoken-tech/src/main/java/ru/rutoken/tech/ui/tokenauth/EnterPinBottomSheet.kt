@@ -89,7 +89,6 @@ fun EnterPinBottomSheet(
                 .focusRequester(focusRequester),
             textStyle = MaterialTheme.typography.bodyLarge,
             label = { Text(text = stringResource(id = R.string.pin_code)) },
-            placeholder = { Text(text = stringResource(id = R.string.pin_code)) },
             supportingText = { Text(if (isPinError) pinErrorText!! else "") },
             isError = isPinError,
             visualTransformation = PasswordVisualTransformation(),

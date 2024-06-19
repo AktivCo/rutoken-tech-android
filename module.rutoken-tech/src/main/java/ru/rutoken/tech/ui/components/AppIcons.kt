@@ -25,6 +25,15 @@ object AppIcons {
     }
 
     @Composable
+    fun Delete() {
+        Icon(
+            painter = painterResource(id = R.drawable.ic_delete),
+            contentDescription = "Delete icon",
+            tint = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+    }
+
+    @Composable
     fun Menu() {
         Icon(
             imageVector = Icons.Default.Menu,

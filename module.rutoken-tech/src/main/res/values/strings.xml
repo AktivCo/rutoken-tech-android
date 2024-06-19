@@ -11,6 +11,7 @@
     <!--Tab names-->
     <string name="tab_certificate_authority">Удостоверяющий центр</string>
     <string name="tab_about">О приложении</string>
+    <string name="tab_bank">Банк</string>
 
     <!--Related to menu-->
     <string name="menu_title">Навигация</string>
@@ -66,6 +67,15 @@
         <item>г. Москва</item>
         <item>Шарикоподшипниковская ул, д. 1</item>
     </string-array>
+
+    <!--Related to Bank start screen-->
+    <string name="no_added_users">Нет добавленных пользователей</string>
+    <string name="add_user">Добавить пользователя</string>
+    <string name="position">Должность</string>
+    <string name="certificate_expires">Сертификат истекает</string>
+    <string name="certificate_is_expired">Срок действия сертификата истек</string>
+    <string name="certificate_not_yet_valid">Сертификат начнет действовать %s</string>
+    <string name="organization">Организация</string>
 
     <!--Related to simple dialogs-->
     <string name="key_pair_generated">Ключевая пара сгенерирована</string>

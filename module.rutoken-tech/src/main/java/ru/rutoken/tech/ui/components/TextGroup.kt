@@ -19,6 +19,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
@@ -33,17 +34,19 @@ data class TextGroupItem(val title: String, val value: String? = null)
 fun TextGroupBox(
     items: List<TextGroupItem>,
     padding: PaddingValues = PaddingValues(16.dp),
-    backgroundColor: Color = MaterialTheme.colorScheme.surfaceContainerHigh
+    backgroundColor: Color = MaterialTheme.colorScheme.surfaceContainerHigh,
+    alphaTint: Float = 1f
 ) {
     Box(Modifier.padding(padding)) {
-        TextGroup(items, backgroundColor)
+        TextGroup(items, backgroundColor, alphaTint)
     }
 }
 
 @Composable
 fun TextGroup(
     items: List<TextGroupItem>,
-    backgroundColor: Color = MaterialTheme.colorScheme.surfaceContainerHigh
+    backgroundColor: Color = MaterialTheme.colorScheme.surfaceContainerHigh,
+    alphaTint: Float = 1f
 ) {
     Column(
         modifier = Modifier
@@ -53,7 +56,7 @@ fun TextGroup(
             .padding(16.dp),
     ) {
         items.forEachIndexed { index, item ->
-            TextGroupItem(item)
+            TextGroupItem(item, alphaTint)
             if (index != items.lastIndex)
                 HorizontalDivider(Modifier.padding(vertical = 16.dp))
         }
@@ -61,17 +64,20 @@ fun TextGroup(
 }
 
 @Composable
-fun TextGroupItem(item: TextGroupItem) {
+fun TextGroupItem(item: TextGroupItem, alphaTint: Float = 1f) {
+    val alphaModifier = Modifier.alpha(alphaTint)
     Column {
         Text(
             text = item.title,
             color = MaterialTheme.colorScheme.onSurface,
-            style = MaterialTheme.typography.bodyLarge
+            style = MaterialTheme.typography.bodyLarge,
+            modifier = alphaModifier
         )
         if (item.value != null) {
             Text(
                 text = item.value,
-                style = bodyMediumOnSurfaceVariant
+                style = bodyMediumOnSurfaceVariant,
+                modifier = alphaModifier
             )
         }
     }
@@ -89,6 +95,7 @@ private fun TextGroupPreview() {
                         TextGroupItem(title = "Title 1", value = "Value 1"),
                         TextGroupItem(title = "Title 2", value = "Value 2")
                     ),
+                    alphaTint = 0.5f
                 )
 
                 TextGroupBox(

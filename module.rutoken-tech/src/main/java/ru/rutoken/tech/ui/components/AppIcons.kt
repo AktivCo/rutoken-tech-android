@@ -57,7 +57,7 @@ object AppIcons {
                 id = if (selected) R.drawable.ic_ca_menu_item_selected else R.drawable.ic_ca_menu_item
             ),
             contentDescription = "CA Menu Icon",
-            tint = MaterialTheme.colorScheme.onSurfaceVariant
+            tint = getDrawerIconTint(selected = selected)
         )
     }
 
@@ -68,7 +68,11 @@ object AppIcons {
                 id = if (selected) R.drawable.ic_about_menu_item_selected else R.drawable.ic_about_menu_item
             ),
             contentDescription = "About Menu Icon",
-            tint = MaterialTheme.colorScheme.onSurfaceVariant
+            tint = getDrawerIconTint(selected = selected)
         )
     }
+
+    @Composable
+    private fun getDrawerIconTint(selected: Boolean) =
+        if (selected) MaterialTheme.colorScheme.onSecondaryContainer else MaterialTheme.colorScheme.onSurfaceVariant
 }

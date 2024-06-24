@@ -15,6 +15,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import ru.rutoken.pkcs11wrapper.constant.standard.Pkcs11UserType.CKU_USER
+import ru.rutoken.pkcs11wrapper.datatype.Pkcs11Date
 import ru.rutoken.pkcs11wrapper.main.Pkcs11Token
 import ru.rutoken.tech.R
 import ru.rutoken.tech.pkcs11.createobjects.GostKeyPair
@@ -34,6 +35,8 @@ import ru.rutoken.tech.utils.BusinessRuleCase
 import ru.rutoken.tech.utils.BusinessRuleException
 import ru.rutoken.tech.utils.logd
 import ru.rutoken.tech.utils.loge
+import java.time.Period
+import java.time.ZonedDateTime
 
 class GenerateKeyPairViewModel(
     private val tokenManager: TokenManager,
@@ -70,12 +73,21 @@ class GenerateKeyPairViewModel(
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
                 try {
+                    val keyPairValidityNotBefore = ZonedDateTime.now()
+                    val keyPairValidityNotAfter = keyPairValidityNotBefore + Period.ofYears(3)
+
                     val caSession = sessionHolder.requireCaSession()
                     val tokenSerial = caSession.tokenSerial
                     val token = tokenConnector.findTokenBySerialNumber(tokenManager, tokenSerial)
 
                     callPkcs11Operation(_showProgress, tokenManager, tokenSerial) {
-                        createGostKeyPair(token, caSession.tokenUserPin, ckaId, keyPairParams)
+                        createGostKeyPair(
+                            token,
+                            caSession.tokenUserPin,
+                            ckaId, keyPairParams,
+                            keyPairValidityNotBefore,
+                            keyPairValidityNotAfter
+                        )
                         caSession.keyPairs.add(0, ckaId)
                         _successDialogState.postValue(
                             DialogState(
@@ -110,11 +122,18 @@ class GenerateKeyPairViewModel(
         token: Pkcs11Token,
         userPin: String,
         ckaId: CkaIdString,
-        keyPairParams: GostKeyPairParams
+        keyPairParams: GostKeyPairParams,
+        keyPairValidityNotBefore: ZonedDateTime,
+        keyPairValidityNotAfter: ZonedDateTime
     ): GostKeyPair {
         return token.openSession(true).use { session ->
             session.login(CKU_USER, userPin).use {
-                session.createGostKeyPair(keyPairParams, ckaId.toByteArray())
+                session.createGostKeyPair(
+                    keyPairParams,
+                    ckaId.toByteArray(),
+                    Pkcs11Date(keyPairValidityNotBefore.toLocalDate()),
+                    Pkcs11Date(keyPairValidityNotAfter.toLocalDate())
+                )
             }
         }
     }

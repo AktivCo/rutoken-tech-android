@@ -13,12 +13,14 @@ import ru.rutoken.pkcs11wrapper.constant.standard.Pkcs11AttributeType.CKA_CERTIF
 import ru.rutoken.pkcs11wrapper.constant.standard.Pkcs11AttributeType.CKA_CERTIFICATE_TYPE
 import ru.rutoken.pkcs11wrapper.constant.standard.Pkcs11AttributeType.CKA_CLASS
 import ru.rutoken.pkcs11wrapper.constant.standard.Pkcs11AttributeType.CKA_DERIVE
+import ru.rutoken.pkcs11wrapper.constant.standard.Pkcs11AttributeType.CKA_END_DATE
 import ru.rutoken.pkcs11wrapper.constant.standard.Pkcs11AttributeType.CKA_GOSTR3410_PARAMS
 import ru.rutoken.pkcs11wrapper.constant.standard.Pkcs11AttributeType.CKA_GOSTR3411_PARAMS
 import ru.rutoken.pkcs11wrapper.constant.standard.Pkcs11AttributeType.CKA_ID
 import ru.rutoken.pkcs11wrapper.constant.standard.Pkcs11AttributeType.CKA_KEY_TYPE
 import ru.rutoken.pkcs11wrapper.constant.standard.Pkcs11AttributeType.CKA_PRIVATE
 import ru.rutoken.pkcs11wrapper.constant.standard.Pkcs11AttributeType.CKA_SIGN
+import ru.rutoken.pkcs11wrapper.constant.standard.Pkcs11AttributeType.CKA_START_DATE
 import ru.rutoken.pkcs11wrapper.constant.standard.Pkcs11AttributeType.CKA_TOKEN
 import ru.rutoken.pkcs11wrapper.constant.standard.Pkcs11AttributeType.CKA_VALUE
 import ru.rutoken.pkcs11wrapper.constant.standard.Pkcs11AttributeType.CKA_VERIFY
@@ -27,6 +29,7 @@ import ru.rutoken.pkcs11wrapper.constant.standard.Pkcs11CertificateType.CKC_X_50
 import ru.rutoken.pkcs11wrapper.constant.standard.Pkcs11ObjectClass.CKO_CERTIFICATE
 import ru.rutoken.pkcs11wrapper.constant.standard.Pkcs11ObjectClass.CKO_PRIVATE_KEY
 import ru.rutoken.pkcs11wrapper.constant.standard.Pkcs11ObjectClass.CKO_PUBLIC_KEY
+import ru.rutoken.pkcs11wrapper.datatype.Pkcs11Date
 import ru.rutoken.pkcs11wrapper.datatype.Pkcs11KeyPair
 import ru.rutoken.pkcs11wrapper.main.Pkcs11Session
 import ru.rutoken.pkcs11wrapper.main.Pkcs11Token
@@ -67,7 +70,12 @@ fun RtPkcs11Session.createGostCertificate(
 /**
  * Method supposes that the user is logged in.
  */
-fun Pkcs11Session.createGostKeyPair(keyPairParams: GostKeyPairParams, ckaId: ByteArray): GostKeyPair {
+fun Pkcs11Session.createGostKeyPair(
+    keyPairParams: GostKeyPairParams,
+    ckaId: ByteArray,
+    privateKeyValidityNotBefore: Pkcs11Date,
+    privateKeyValidityNotAfter: Pkcs11Date
+): GostKeyPair {
     if (!token.isMechanismSupported(keyPairParams.mechanismType))
         throw IllegalStateException("${keyPairParams.mechanismType} not supported by token")
 
@@ -76,7 +84,9 @@ fun Pkcs11Session.createGostKeyPair(keyPairParams: GostKeyPairParams, ckaId: Byt
         Pkcs11GostPrivateKeyObject::class.java,
         Pkcs11Mechanism.make(keyPairParams.mechanismType),
         attributeFactory.makeGostPublicKeyTemplate(keyPairParams, ckaId),
-        attributeFactory.makeGostPrivateKeyTemplate(keyPairParams, ckaId)
+        attributeFactory.makeGostPrivateKeyTemplate(
+            keyPairParams, ckaId, privateKeyValidityNotBefore, privateKeyValidityNotAfter
+        )
     )
 }
 
@@ -113,7 +123,9 @@ fun IPkcs11AttributeFactory.makeGostPublicKeyTemplate(
 
 fun IPkcs11AttributeFactory.makeGostPrivateKeyTemplate(
     keyPairParams: GostKeyPairParams,
-    ckaId: ByteArray
+    ckaId: ByteArray,
+    keyValidityNotBefore: Pkcs11Date,
+    keyValidityNotAfter: Pkcs11Date
 ): List<Pkcs11Attribute> {
     return listOf(
         makeAttribute(CKA_CLASS, CKO_PRIVATE_KEY),
@@ -124,7 +136,9 @@ fun IPkcs11AttributeFactory.makeGostPrivateKeyTemplate(
         makeAttribute(CKA_GOSTR3411_PARAMS, keyPairParams.paramset3411),
         makeAttribute(CKA_TOKEN, true),
         makeAttribute(CKA_SIGN, true),
-        makeAttribute(CKA_DERIVE, true)
+        makeAttribute(CKA_DERIVE, true),
+        makeAttribute(CKA_START_DATE, keyValidityNotBefore),
+        makeAttribute(CKA_END_DATE, keyValidityNotAfter)
     )
 }
 

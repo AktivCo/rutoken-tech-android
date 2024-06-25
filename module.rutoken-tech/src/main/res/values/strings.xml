@@ -76,6 +76,7 @@
     <string name="certificate_is_expired">Срок действия сертификата истек</string>
     <string name="certificate_not_yet_valid">Сертификат начнет действовать %s</string>
     <string name="organization">Организация</string>
+    <string name="not_set">Не задано</string>
 
     <!--Related to adding new user scenario-->
     <string name="certificate_already_used">Пользователь с таким сертификатом\nуже добавлен</string>

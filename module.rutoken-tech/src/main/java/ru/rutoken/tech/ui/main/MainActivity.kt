@@ -31,6 +31,7 @@ import kotlinx.coroutines.launch
 import org.koin.android.ext.android.get
 import ru.rutoken.tech.pkcs11.Pkcs11Launcher
 import ru.rutoken.tech.ui.about.AboutDestination
+import ru.rutoken.tech.ui.bank.BankDestination
 import ru.rutoken.tech.ui.ca.CaDestination
 import ru.rutoken.tech.ui.theme.RutokenTechTheme
 import ru.rutoken.tech.ui.utils.clearNavGraph
@@ -75,6 +76,9 @@ class MainActivity : ComponentActivity() {
                     MainDrawerContent(
                         currentDestination = currentDestination,
                         onCloseDrawer = { closeDrawer() },
+                        onNavigateToBank = {
+                            navController.navigate(BankDestination.Start.route) { clearNavGraph(navController) }
+                        },
                         onNavigateToCa = {
                             navController.navigate(CaDestination.Start.route) { clearNavGraph(navController) }
                         },

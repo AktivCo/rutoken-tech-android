@@ -51,6 +51,17 @@ object AppIcons {
     }
 
     @Composable
+    fun BankMenuItem(selected: Boolean) {
+        Icon(
+            painter = painterResource(
+                id = if (selected) R.drawable.ic_bank_menu_item_selected else R.drawable.ic_bank_menu_item
+            ),
+            contentDescription = "Bank Menu Icon",
+            tint = getDrawerIconTint(selected = selected)
+        )
+    }
+
+    @Composable
     fun CaMenuItem(selected: Boolean) {
         Icon(
             painter = painterResource(

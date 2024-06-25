@@ -11,7 +11,7 @@ import ru.rutoken.tech.session.CkaIdString
 class BankUser(
     val id: Int,
     val name: String,
-    val position: String,
+    val position: String?,
     val certificateExpirationDate: String,
     val errorText: String? = null
 )

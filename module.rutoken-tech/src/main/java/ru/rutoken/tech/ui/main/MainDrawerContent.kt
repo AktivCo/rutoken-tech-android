@@ -22,7 +22,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight.Companion.W500
 import androidx.compose.ui.unit.dp
 import ru.rutoken.tech.R
-import ru.rutoken.tech.ui.ca.CaDestination
+import ru.rutoken.tech.ui.bank.BankDestination
 import ru.rutoken.tech.ui.components.AppIcons
 import ru.rutoken.tech.ui.components.NavDrawerItem
 import ru.rutoken.tech.ui.theme.RutokenTechTheme
@@ -33,6 +33,7 @@ import ru.rutoken.tech.ui.utils.PreviewLight
 fun MainDrawerContent(
     currentDestination: String,
     onCloseDrawer: () -> Unit,
+    onNavigateToBank: () -> Unit,
     onNavigateToCa: () -> Unit,
     onNavigateToAbout: () -> Unit
 ) {
@@ -59,6 +60,19 @@ fun MainDrawerContent(
                 style = MaterialTheme.typography.titleSmall
             )
         }
+
+        val isBankSelected = currentDestination.contains(AppSectionDestination.Bank.route)
+        NavDrawerItem(
+            label = stringResource(id = R.string.tab_bank),
+            selected = isBankSelected,
+            icon = { AppIcons.BankMenuItem(isBankSelected) },
+            onClick = {
+                if (!isBankSelected) {
+                    onCloseDrawer()
+                    onNavigateToBank()
+                }
+            }
+        )
 
         val isCaSelected = currentDestination.contains(AppSectionDestination.Ca.route)
         NavDrawerItem(
@@ -100,8 +114,9 @@ private fun MainDrawerContentPreview() {
             drawerContent = {
                 ModalDrawerSheet(drawerState) {
                     MainDrawerContent(
-                        currentDestination = CaDestination.Start.route,
-                        onCloseDrawer = { },
+                        currentDestination = BankDestination.Start.route,
+                        onCloseDrawer = {},
+                        onNavigateToBank = {},
                         onNavigateToCa = {},
                         onNavigateToAbout = {}
                     )

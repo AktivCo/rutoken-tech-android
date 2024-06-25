@@ -10,15 +10,15 @@ import org.bouncycastle.asn1.ASN1ObjectIdentifier
 import org.bouncycastle.asn1.x500.style.BCStyle
 import org.bouncycastle.cert.X509CertificateHolder
 import ru.rutoken.tech.database.user.UserEntity
-import java.text.SimpleDateFormat
-import java.util.Locale
+import java.util.Date
 
 data class User(
     val userEntity: UserEntity,
     val fullName: String,
     val position: String?,
     val organization: String?,
-    val certificateExpires: String,
+    val certificateNotBefore: Date,
+    val certificateNotAfter: Date,
     val inn: String?,
     val innle: String?,
     val ogrn: String?,
@@ -50,7 +50,8 @@ fun makeUser(
         fullName = if (hasFullName) "$surname $givenName" else cn!!,
         position = certificate.getIssuerRdnValue(BCStyle.T),
         organization = certificate.getIssuerRdnValue(BCStyle.O),
-        certificateExpires = SimpleDateFormat("d MMMM yyyy", Locale.getDefault()).format(certificate.notAfter),
+        certificateNotBefore = certificate.notBefore,
+        certificateNotAfter = certificate.notAfter,
         inn = certificate.getIssuerRdnValue(ASN1ObjectIdentifier(INN_OID)),
         innle = certificate.getIssuerRdnValue(ASN1ObjectIdentifier(INNLE_OID)),
         ogrn = certificate.getIssuerRdnValue(ASN1ObjectIdentifier(OGRN_OID)),

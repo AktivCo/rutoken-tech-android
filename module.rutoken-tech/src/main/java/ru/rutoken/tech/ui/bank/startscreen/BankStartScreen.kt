@@ -18,6 +18,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
@@ -44,6 +45,10 @@ fun BankStartScreen(
     openDrawer: () -> Unit
 ) {
     val users by viewModel.users.observeAsState(emptyList())
+
+    LaunchedEffect(Unit) {
+        viewModel.loadUsers()
+    }
 
     BankStartScreen(
         users = users,
@@ -111,7 +116,7 @@ private fun UserList(modifier: Modifier, users: List<BankUser>, onUserClicked: (
                 users.forEach {
                     CertificateCard(
                         name = it.name,
-                        position = it.position,
+                        position = it.position ?: stringResource(R.string.not_set),
                         certificateExpirationDate = it.certificateExpirationDate,
                         errorText = it.errorText,
                         onClick = { onUserClicked(it.id) }

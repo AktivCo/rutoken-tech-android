@@ -24,6 +24,8 @@ import org.koin.compose.koinInject
 import ru.rutoken.tech.session.RutokenTechSessionHolder
 import ru.rutoken.tech.ui.about.AboutDestination
 import ru.rutoken.tech.ui.about.addAboutDestinations
+import ru.rutoken.tech.ui.bank.BankDestination
+import ru.rutoken.tech.ui.bank.addBankDestinations
 import ru.rutoken.tech.ui.ca.CaDestination
 import ru.rutoken.tech.ui.ca.addCaDestinations
 
@@ -35,6 +37,7 @@ interface Destination {
  * Destinations for application sections.
  */
 sealed class AppSectionDestination(override val route: String) : Destination {
+    data object Bank : AppSectionDestination("bank")
     data object Ca : AppSectionDestination("ca")
     data object About : AppSectionDestination("about")
 }
@@ -45,12 +48,19 @@ fun MainNavHost(navHostController: NavHostController, openDrawer: () -> Unit) {
 
     NavHost(
         navController = navHostController,
-        startDestination = AppSectionDestination.Ca.route, // TODO: make Bank route as start destination in 1.1
+        startDestination = AppSectionDestination.Bank.route,
         enterTransition = { slideInHorizontally(animationSpec = tween(500), initialOffsetX = { it }) },
         exitTransition = { slideOutHorizontally(animationSpec = tween(500), targetOffsetX = { -it }) },
         popEnterTransition = { slideInHorizontally(animationSpec = tween(500), initialOffsetX = { -it }) },
         popExitTransition = { slideOutHorizontally(animationSpec = tween(500), targetOffsetX = { it }) }
     ) {
+        navigation(
+            route = AppSectionDestination.Bank.route,
+            startDestination = BankDestination.Start.route
+        ) {
+            addBankDestinations(session, openDrawer)
+        }
+
         navigation(
             route = AppSectionDestination.Ca.route,
             startDestination = CaDestination.Start.route

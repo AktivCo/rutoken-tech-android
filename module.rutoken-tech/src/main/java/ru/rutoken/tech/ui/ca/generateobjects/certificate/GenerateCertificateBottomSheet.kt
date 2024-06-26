@@ -53,6 +53,7 @@ import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 import ru.rutoken.tech.R
 import ru.rutoken.tech.session.CkaIdString
+import ru.rutoken.tech.ui.components.BottomSheetDragHandle
 import ru.rutoken.tech.ui.components.BottomSheetTitle
 import ru.rutoken.tech.ui.components.ConnectTokenDialog
 import ru.rutoken.tech.ui.components.ErrorAlertDialog
@@ -62,6 +63,7 @@ import ru.rutoken.tech.ui.components.ProgressIndicatorDialog
 import ru.rutoken.tech.ui.components.SimpleAlertDialog
 import ru.rutoken.tech.ui.components.TextGroup
 import ru.rutoken.tech.ui.components.TextGroupItem
+import ru.rutoken.tech.ui.components.bottomSheetCornerShape
 import ru.rutoken.tech.ui.theme.RutokenTechTheme
 import ru.rutoken.tech.ui.utils.DialogState
 import ru.rutoken.tech.ui.utils.PreviewDark
@@ -117,22 +119,13 @@ fun GenerateCertificateBottomSheet(
     keyPairs: List<CkaIdString>,
     onGenerationButtonClicked: (CkaIdString, String) -> Unit
 ) {
-    val dragHandle: @Composable (() -> Unit) = {
-        if (sheetState.targetValue != Expanded) {
-            DragHandle()
-        } else {
-            Spacer(Modifier.statusBarsPaddingHeight())
-        }
-    }
-    val shape = if (sheetState.targetValue != Expanded) ExpandedShape else HiddenShape
-
     ModalBottomSheet(
         onDismissRequest = onDismissRequest,
         sheetState = sheetState,
         containerColor = MaterialTheme.colorScheme.surfaceContainerLow,
         contentWindowInsets = { bottomSheetWindowInsets() },
-        dragHandle = dragHandle,
-        shape = shape,
+        dragHandle = { BottomSheetDragHandle(sheetState = sheetState) },
+        shape = bottomSheetCornerShape(sheetState = sheetState),
     ) {
         var selectedKeyPair by remember { mutableStateOf(keyPairs.first()) }
         var owner by remember { mutableStateOf("") }

@@ -9,10 +9,14 @@ package ru.rutoken.tech.ui.components
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.BottomSheetDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SheetState
+import androidx.compose.material3.SheetValue
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -25,6 +29,7 @@ import ru.rutoken.tech.R
 import ru.rutoken.tech.ui.theme.RutokenTechTheme
 import ru.rutoken.tech.ui.utils.PreviewDark
 import ru.rutoken.tech.ui.utils.PreviewLight
+import ru.rutoken.tech.ui.utils.statusBarsPaddingHeight
 
 data class ButtonContent(val text: String, val onClick: () -> Unit)
 
@@ -55,6 +60,22 @@ fun BottomSheetTitle(title: String, buttonContent: ButtonContent? = null) {
 
     }
 }
+
+@Composable
+fun BottomSheetDragHandle(sheetState: SheetState) {
+    if (sheetState.targetValue != SheetValue.Expanded) {
+        BottomSheetDefaults.DragHandle()
+    } else {
+        Spacer(Modifier.statusBarsPaddingHeight())
+    }
+}
+
+@Composable
+fun bottomSheetCornerShape(sheetState: SheetState) =
+    if (sheetState.targetValue != SheetValue.Expanded)
+        BottomSheetDefaults.ExpandedShape
+    else
+        BottomSheetDefaults.HiddenShape
 
 @PreviewLight
 @PreviewDark

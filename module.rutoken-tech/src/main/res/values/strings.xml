@@ -77,6 +77,12 @@
     <string name="certificate_not_yet_valid">Сертификат начнет действовать %s</string>
     <string name="organization">Организация</string>
 
+    <!--Related to adding new user scenario-->
+    <string name="certificate_already_used">Пользователь с таким сертификатом\nуже добавлен</string>
+    <string name="rutoken_has_no_certificates">На Рутокене нет сертификатов</string>
+    <string name="use_ca_to_create_certificate">Создайте сертификат в разделе УЦ</string>
+    <string name="choose_certificate">Выберите сертификат</string>
+
     <!--Related to simple dialogs-->
     <string name="key_pair_generated">Ключевая пара сгенерирована</string>
     <string name="no_key_pairs_without_certificates">На Рутокене нет ключевых пар без\u00A0сертификата</string>

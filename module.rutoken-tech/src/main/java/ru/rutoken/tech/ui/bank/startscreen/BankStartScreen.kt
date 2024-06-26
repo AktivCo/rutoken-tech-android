@@ -25,6 +25,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import ru.rutoken.tech.R
+import ru.rutoken.tech.ui.bank.BankUser
 import ru.rutoken.tech.ui.bank.CertificateCard
 import ru.rutoken.tech.ui.components.AppIcons
 import ru.rutoken.tech.ui.components.PrimaryButtonBox

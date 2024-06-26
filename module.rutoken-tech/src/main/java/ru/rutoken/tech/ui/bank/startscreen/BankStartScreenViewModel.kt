@@ -9,14 +9,7 @@ package ru.rutoken.tech.ui.bank.startscreen
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-
-data class BankUser(
-    val id: Int,
-    val name: String,
-    val position: String,
-    val certificateExpirationDate: String,
-    val errorText: String? = null
-)
+import ru.rutoken.tech.ui.bank.BankUser
 
 class BankStartScreenViewModel : ViewModel() {
     private val _users = MutableLiveData<List<BankUser>>()

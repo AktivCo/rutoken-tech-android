@@ -35,12 +35,8 @@ fun ScreenTopAppBar(
             ) { AppIcons.Menu() }
         },
         actions = {
-            IconButton(
-                onClick = onTrailingIconClick,
-                enabled = trailingIcon != null,
-                modifier = Modifiers.appBarIconSize
-            ) {
-                if (trailingIcon != null) {
+            if (trailingIcon != null) {
+                IconButton(onClick = onTrailingIconClick, modifier = Modifiers.appBarIconSize) {
                     trailingIcon()
                 }
             }

@@ -11,7 +11,8 @@ import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import com.google.accompanist.navigation.material.bottomSheet
 import org.koin.androidx.compose.koinViewModel
-import ru.rutoken.tech.session.RutokenTechSessionHolder
+import ru.rutoken.tech.session.AppSessionHolder
+import ru.rutoken.tech.session.AppSessionType
 import ru.rutoken.tech.ui.ca.generateobjects.certificate.GenerateCertificateScreen
 import ru.rutoken.tech.ui.ca.generateobjects.certificate.GenerateCertificateViewModel
 import ru.rutoken.tech.ui.ca.generateobjects.keypair.GenerateKeyPairScreen
@@ -21,6 +22,7 @@ import ru.rutoken.tech.ui.ca.tokeninfo.CaTokenInfoViewModel
 import ru.rutoken.tech.ui.main.Destination
 import ru.rutoken.tech.ui.main.composable
 import ru.rutoken.tech.ui.tokenauth.EnterPinViewModel
+import ru.rutoken.tech.ui.tokenauth.LoginViewModel
 import ru.rutoken.tech.ui.tokenauth.TokenAuthScreen
 
 /**
@@ -36,7 +38,7 @@ sealed class CaDestination(override val route: String) : Destination {
 
 fun NavGraphBuilder.addCaDestinations(
     navController: NavController,
-    sessionHolder: RutokenTechSessionHolder,
+    sessionHolder: AppSessionHolder,
     openDrawer: () -> Unit
 ) {
     composable(CaDestination.Start) {
@@ -52,8 +54,9 @@ fun NavGraphBuilder.addCaDestinations(
     bottomSheet(CaDestination.TokenAuth.route) {
         TokenAuthScreen(
             enterPinViewModel = koinViewModel<EnterPinViewModel>(),
-            caLoginViewModel = koinViewModel<CaLoginViewModel>(),
-            onNavigateToTokenInfo = { navController.navigate(CaDestination.TokenInfo.route) },
+            loginViewModel = koinViewModel<LoginViewModel>(),
+            appSessionType = AppSessionType.CA_SESSION,
+            onAuthDone = { navController.navigate(CaDestination.TokenInfo.route) },
             onNavigateBack = navController::popBackStack
         )
     }

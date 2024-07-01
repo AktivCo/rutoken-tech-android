@@ -12,8 +12,8 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import ru.rutoken.tech.R
-import ru.rutoken.tech.session.CaRutokenTechSession
-import ru.rutoken.tech.session.RutokenTechSessionHolder
+import ru.rutoken.tech.session.AppSessionHolder
+import ru.rutoken.tech.session.CaAppSession
 import ru.rutoken.tech.session.requireCaSession
 import ru.rutoken.tech.ui.ca.tokeninfo.model.VendorDefinedTokenModel
 import ru.rutoken.tech.ui.ca.tokeninfo.model.smartcard.SmartCard
@@ -34,12 +34,12 @@ enum class TokenType {
 
 class CaTokenInfoViewModel(
     private val applicationContext: Context,
-    private val sessionHolder: RutokenTechSessionHolder
+    private val sessionHolder: AppSessionHolder
 ) : ViewModel() {
-    // CaRutokenTechSession instance MUST exist by the time this ViewModel is instantiated
-    private val caRutokenTechSession: CaRutokenTechSession get() = sessionHolder.requireCaSession()
+    // CaAppSession instance MUST exist by the time this ViewModel is instantiated
+    private val caAppSession: CaAppSession get() = sessionHolder.requireCaSession()
 
-    private val _uiState = MutableLiveData(caRutokenTechSession.toUiState())
+    private val _uiState = MutableLiveData(caAppSession.toUiState())
     val uiState: LiveData<CaTokenInfoUiState> get() = _uiState
 
     private val _navigateToCertGenerationEvent = MutableLiveData<Boolean>()
@@ -50,7 +50,7 @@ class CaTokenInfoViewModel(
 
     @MainThread
     fun onNavigateToGenerateCertificate() {
-        if (caRutokenTechSession.keyPairs.isNotEmpty()) {
+        if (caAppSession.keyPairs.isNotEmpty()) {
             _navigateToCertGenerationEvent.value = true
         } else {
             _noKeyPairsOnTokenDialogState.value =
@@ -68,7 +68,7 @@ class CaTokenInfoViewModel(
         _noKeyPairsOnTokenDialogState.value = DialogState()
     }
 
-    private fun CaRutokenTechSession.toUiState(): CaTokenInfoUiState {
+    private fun CaAppSession.toUiState(): CaTokenInfoUiState {
         val tokenType = when (tokenModel) {
             is VendorDefinedTokenModel.SmartCard, is SmartCard -> TokenType.IsoNfc
             is VendorDefinedTokenModel.UsbDual, is Ecp3UsbDual -> TokenType.UsbNfcDual

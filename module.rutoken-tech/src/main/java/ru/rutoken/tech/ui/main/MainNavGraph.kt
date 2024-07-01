@@ -21,7 +21,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
 import org.koin.compose.koinInject
-import ru.rutoken.tech.session.RutokenTechSessionHolder
+import ru.rutoken.tech.session.AppSessionHolder
 import ru.rutoken.tech.ui.about.AboutDestination
 import ru.rutoken.tech.ui.about.addAboutDestinations
 import ru.rutoken.tech.ui.bank.BankDestination
@@ -44,7 +44,7 @@ sealed class AppSectionDestination(override val route: String) : Destination {
 
 @Composable
 fun MainNavHost(navHostController: NavHostController, openDrawer: () -> Unit) {
-    val session: RutokenTechSessionHolder = koinInject()
+    val session: AppSessionHolder = koinInject()
 
     NavHost(
         navController = navHostController,
@@ -58,7 +58,7 @@ fun MainNavHost(navHostController: NavHostController, openDrawer: () -> Unit) {
             route = AppSectionDestination.Bank.route,
             startDestination = BankDestination.Start.route
         ) {
-            addBankDestinations(session, openDrawer)
+            addBankDestinations(navHostController, session, openDrawer)
         }
 
         navigation(

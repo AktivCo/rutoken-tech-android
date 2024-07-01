@@ -6,17 +6,29 @@
 
 package ru.rutoken.tech.session
 
+import ru.rutoken.tech.ui.bank.BankCertificate
 import ru.rutoken.tech.ui.ca.tokeninfo.model.TokenModel
 
 typealias SerialHexString = String
 typealias CkaIdString = String
 
-abstract class RutokenTechSession
+enum class AppSessionType {
+    CA_SESSION,
+    BANK_USER_ADDING_SESSION
+}
 
-data class CaRutokenTechSession(
+abstract class AppSession
+
+data class CaAppSession(
     val tokenUserPin: String,
     val tokenSerial: SerialHexString,
     val tokenModel: TokenModel,
     val tokenLabel: String,
     val keyPairs: MutableList<CkaIdString>
-) : RutokenTechSession()
+) : AppSession()
+
+data class BankUserAddingAppSession(
+    val tokenUserPin: String,
+    val tokenSerial: SerialHexString,
+    val certificates: List<BankCertificate>
+) : AppSession()

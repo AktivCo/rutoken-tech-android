@@ -22,8 +22,8 @@ import ru.rutoken.tech.pkcs11.createobjects.GostKeyPair
 import ru.rutoken.tech.pkcs11.createobjects.GostKeyPairParams
 import ru.rutoken.tech.pkcs11.createobjects.createGostKeyPair
 import ru.rutoken.tech.pkcs11.createobjects.generateCkaId
+import ru.rutoken.tech.session.AppSessionHolder
 import ru.rutoken.tech.session.CkaIdString
-import ru.rutoken.tech.session.RutokenTechSessionHolder
 import ru.rutoken.tech.session.requireCaSession
 import ru.rutoken.tech.tokenmanager.TokenManager
 import ru.rutoken.tech.ui.tokenconnector.TokenConnector
@@ -40,7 +40,7 @@ import java.time.ZonedDateTime
 
 class GenerateKeyPairViewModel(
     private val tokenManager: TokenManager,
-    private val sessionHolder: RutokenTechSessionHolder
+    private val sessionHolder: AppSessionHolder
 ) : ViewModel() {
     val tokenConnector = TokenConnector()
 

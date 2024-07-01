@@ -18,7 +18,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.res.stringResource
 import kotlinx.coroutines.launch
-import ru.rutoken.tech.ui.ca.CaLoginViewModel
+import ru.rutoken.tech.session.AppSessionType
 import ru.rutoken.tech.ui.components.ConnectTokenDialog
 import ru.rutoken.tech.ui.components.ErrorAlertDialog
 import ru.rutoken.tech.ui.components.ProgressIndicatorDialog
@@ -28,8 +28,9 @@ import ru.rutoken.tech.ui.utils.errorDialogData
 @Composable
 fun TokenAuthScreen(
     enterPinViewModel: EnterPinViewModel,
-    caLoginViewModel: CaLoginViewModel,
-    onNavigateToTokenInfo: () -> Unit,
+    loginViewModel: LoginViewModel,
+    appSessionType: AppSessionType,
+    onAuthDone: () -> Unit,
     onNavigateBack: () -> Unit
 ) {
     val enterPinSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
@@ -41,21 +42,21 @@ fun TokenAuthScreen(
             viewModel = enterPinViewModel,
             sheetState = enterPinSheetState,
             onNavigateBack = onNavigateBack,
-            onButtonClick = { caLoginViewModel.login(it, enterPinViewModel::setPinErrorValue) }
+            onButtonClick = { loginViewModel.login(appSessionType, it, enterPinViewModel::setPinErrorValue) }
         )
     }
 
-    ConnectTokenDialog(caLoginViewModel)
-    ProgressIndicatorDialog(caLoginViewModel)
-    ErrorAlertDialog(caLoginViewModel)
+    ConnectTokenDialog(loginViewModel)
+    ProgressIndicatorDialog(loginViewModel)
+    ErrorAlertDialog(loginViewModel)
 
-    val isAuthDone by caLoginViewModel.authDoneEvent.observeAsState(false)
+    val isAuthDone by loginViewModel.authDoneEvent.observeAsState(false)
 
     LaunchedEffect(isAuthDone) {
         if (isAuthDone) {
             scope.launch { enterPinSheetState.hide() }.invokeOnCompletion {
                 showEnterPinBottomSheet = false
-                onNavigateToTokenInfo()
+                onAuthDone()
             }
         }
     }
@@ -82,7 +83,7 @@ private fun EnterPinBottomSheet(
 }
 
 @Composable
-private fun ConnectTokenDialog(viewModel: CaLoginViewModel) {
+private fun ConnectTokenDialog(viewModel: LoginViewModel) {
     val showDialog by viewModel.tokenConnector.showConnectTokenDialog.observeAsState(false)
 
     if (showDialog) {
@@ -91,7 +92,7 @@ private fun ConnectTokenDialog(viewModel: CaLoginViewModel) {
 }
 
 @Composable
-private fun ProgressIndicatorDialog(viewModel: CaLoginViewModel) {
+private fun ProgressIndicatorDialog(viewModel: LoginViewModel) {
     val showProgress by viewModel.showProgress.observeAsState(false)
 
     if (showProgress) {
@@ -100,7 +101,7 @@ private fun ProgressIndicatorDialog(viewModel: CaLoginViewModel) {
 }
 
 @Composable
-private fun ErrorAlertDialog(viewModel: CaLoginViewModel) {
+private fun ErrorAlertDialog(viewModel: LoginViewModel) {
     val dialogState by viewModel.errorDialogState.observeAsState(DialogState())
 
     if (dialogState.showDialog) {

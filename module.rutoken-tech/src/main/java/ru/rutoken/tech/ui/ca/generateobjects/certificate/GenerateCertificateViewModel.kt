@@ -20,8 +20,8 @@ import ru.rutoken.pkcs11wrapper.rutoken.main.RtPkcs11Token
 import ru.rutoken.tech.R
 import ru.rutoken.tech.pkcs11.createobjects.createGostCertificate
 import ru.rutoken.tech.pkcs11.findobjects.findGost256KeyPairByCkaId
+import ru.rutoken.tech.session.AppSessionHolder
 import ru.rutoken.tech.session.CkaIdString
-import ru.rutoken.tech.session.RutokenTechSessionHolder
 import ru.rutoken.tech.session.requireCaSession
 import ru.rutoken.tech.tokenmanager.TokenManager
 import ru.rutoken.tech.ui.tokenconnector.TokenConnector
@@ -36,7 +36,7 @@ import ru.rutoken.tech.utils.loge
 
 class GenerateCertificateViewModel(
     private val tokenManager: TokenManager,
-    private val sessionHolder: RutokenTechSessionHolder
+    private val sessionHolder: AppSessionHolder
 ) : ViewModel() {
     val tokenConnector = TokenConnector()
 
@@ -49,9 +49,8 @@ class GenerateCertificateViewModel(
     private val _errorDialogState = MutableLiveData<DialogState>()
     val errorDialogState: LiveData<DialogState> = _errorDialogState
 
-    // CaRutokenTechSession MUST exist and keyPairs MUST NOT be empty by the time this ViewModel is instantiated
-    private val _keyPairs =
-        MutableLiveData<List<CkaIdString>>(sessionHolder.requireCaSession().keyPairs)
+    // CaAppSession MUST exist and keyPairs MUST NOT be empty by the time this ViewModel is instantiated
+    private val _keyPairs = MutableLiveData<List<CkaIdString>>(sessionHolder.requireCaSession().keyPairs)
     val keyPairs: LiveData<List<CkaIdString>> get() = _keyPairs
 
     private val _shouldLogout = MutableLiveData(false)

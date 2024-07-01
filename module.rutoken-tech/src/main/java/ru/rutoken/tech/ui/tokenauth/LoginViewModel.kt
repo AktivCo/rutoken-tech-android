@@ -4,7 +4,7 @@
  * All Rights Reserved.
  */
 
-package ru.rutoken.tech.ui.ca
+package ru.rutoken.tech.ui.tokenauth
 
 import android.content.Context
 import androidx.annotation.MainThread
@@ -18,9 +18,12 @@ import ru.rutoken.pkcs11wrapper.constant.standard.Pkcs11UserType
 import ru.rutoken.tech.R
 import ru.rutoken.tech.pkcs11.findobjects.findGost256KeyContainers
 import ru.rutoken.tech.pkcs11.serialNumberTrimmed
-import ru.rutoken.tech.session.CaRutokenTechSession
+import ru.rutoken.tech.session.AppSession
+import ru.rutoken.tech.session.AppSessionHolder
+import ru.rutoken.tech.session.AppSessionType
+import ru.rutoken.tech.session.BankUserAddingAppSession
+import ru.rutoken.tech.session.CaAppSession
 import ru.rutoken.tech.session.CkaIdString
-import ru.rutoken.tech.session.RutokenTechSessionHolder
 import ru.rutoken.tech.tokenmanager.RtPkcs11TokenData
 import ru.rutoken.tech.tokenmanager.TokenManager
 import ru.rutoken.tech.ui.tokenconnector.TokenConnector
@@ -33,10 +36,10 @@ import ru.rutoken.tech.utils.BusinessRuleException
 import ru.rutoken.tech.utils.logd
 import ru.rutoken.tech.utils.loge
 
-class CaLoginViewModel(
+class LoginViewModel(
     private val applicationContext: Context,
     private val tokenManager: TokenManager,
-    private val sessionHolder: RutokenTechSessionHolder
+    private val sessionHolder: AppSessionHolder
 ) : ViewModel() {
     val tokenConnector = TokenConnector()
 
@@ -54,7 +57,7 @@ class CaLoginViewModel(
         _errorDialogState.value = DialogState()
     }
 
-    fun login(tokenUserPin: String, invalidPinBlock: (String) -> Unit) {
+    fun login(appSessionType: AppSessionType, tokenUserPin: String, invalidPinBlock: (String) -> Unit) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 val tokenData = with(tokenManager.getFirstTokenAsync()) {
@@ -63,7 +66,7 @@ class CaLoginViewModel(
 
                 _showProgress.postValue(true)
 
-                doLogin(tokenUserPin, tokenData)
+                doLogin(appSessionType, tokenUserPin, tokenData)
                     .onFailure { handleLoginFailure(it, invalidPinBlock) }
                     .onSuccess { _authDoneEvent.postValue(true) }
             } finally {
@@ -72,42 +75,60 @@ class CaLoginViewModel(
         }
     }
 
-    private suspend fun doLogin(tokenUserPin: String, tokenData: RtPkcs11TokenData): Result<CaRutokenTechSession> {
+    private suspend fun doLogin(
+        appSessionType: AppSessionType,
+        tokenUserPin: String,
+        tokenData: RtPkcs11TokenData
+    ): Result<AppSession> {
         return runCatching {
-            createRutokenTechSession(tokenUserPin, tokenData).also { newSession ->
+            createAppSession(appSessionType, tokenUserPin, tokenData).also { newSession ->
                 sessionHolder.setSession(newSession)
-                logd<CaLoginViewModel> { "New CA session created, found ${newSession.keyPairs.size} key pairs" }
             }
         }
     }
 
-    private suspend fun createRutokenTechSession(
+    private suspend fun createAppSession(
+        appSessionType: AppSessionType,
         tokenUserPin: String,
         tokenData: RtPkcs11TokenData
-    ): CaRutokenTechSession {
+    ): AppSession {
         val tokenInfo = tokenData.token.tokenInfo
-        var keyPairs: MutableList<CkaIdString> = mutableListOf()
 
-        callPkcs11Operation(_showProgress, tokenManager, tokenInfo.serialNumberTrimmed) {
-            tokenData.token.openSession(false).use { session ->
-                session.login(Pkcs11UserType.CKU_USER, tokenUserPin).use {
-                    keyPairs = session.findGost256KeyContainers().map { it.ckaId.toString(Charsets.UTF_8) }
-                        .toMutableList()
+        return when (appSessionType) {
+            AppSessionType.CA_SESSION -> {
+                var keyPairs: MutableList<CkaIdString> = mutableListOf()
+
+                callPkcs11Operation(_showProgress, tokenManager, tokenInfo.serialNumberTrimmed) {
+                    tokenData.token.openSession(false).use { session ->
+                        session.login(Pkcs11UserType.CKU_USER, tokenUserPin).use {
+                            keyPairs = session.findGost256KeyContainers().map { it.ckaId.toString(Charsets.UTF_8) }
+                                .toMutableList()
+                        }
+                    }
                 }
+                logd<LoginViewModel> { "New CA session created, found ${keyPairs.size} key pairs" }
+                CaAppSession(
+                    tokenUserPin = tokenUserPin,
+                    tokenSerial = tokenInfo.serialNumberTrimmed,
+                    tokenModel = tokenData.model,
+                    tokenLabel = tokenInfo.label,
+                    keyPairs = keyPairs
+                )
+            }
+
+            AppSessionType.BANK_USER_ADDING_SESSION -> {
+                logd<LoginViewModel> { "New Bank User Adding session created" }
+                BankUserAddingAppSession(
+                    tokenUserPin = tokenUserPin,
+                    tokenSerial = tokenInfo.serialNumberTrimmed,
+                    certificates = emptyList()
+                )
             }
         }
-
-        return CaRutokenTechSession(
-            tokenUserPin = tokenUserPin,
-            tokenSerial = tokenInfo.serialNumberTrimmed,
-            tokenModel = tokenData.model,
-            tokenLabel = tokenInfo.label,
-            keyPairs = keyPairs
-        )
     }
 
     private fun handleLoginFailure(exception: Throwable, invalidPinBlock: (String) -> Unit) {
-        loge<CaLoginViewModel>(exception) { "Login has ended with exception: ${exception.message}" }
+        loge<LoginViewModel>(exception) { "Login has ended with exception: ${exception.message}" }
         val defaultErrorHandle = {
             _errorDialogState.postValue(DialogState(showDialog = true, data = exception.toErrorDialogData()))
         }
@@ -118,12 +139,14 @@ class CaLoginViewModel(
                     invalidPinBlock(
                         applicationContext.getString(R.string.invalid_pin_supporting, exception.case.retryLeft)
                     )
+
                 is PinLocked -> {
                     invalidPinBlock(
                         applicationContext.getString(R.string.invalid_pin_supporting, 0)
                     )
                     defaultErrorHandle()
                 }
+
                 else -> defaultErrorHandle()
             }
         } else {

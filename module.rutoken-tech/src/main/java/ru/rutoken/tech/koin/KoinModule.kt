@@ -19,14 +19,14 @@ import ru.rutoken.tech.repository.document.DocumentRepository
 import ru.rutoken.tech.repository.document.DocumentRepositoryImpl
 import ru.rutoken.tech.repository.user.UserRepository
 import ru.rutoken.tech.repository.user.UserRepositoryImpl
-import ru.rutoken.tech.session.RutokenTechSessionHolder
+import ru.rutoken.tech.session.AppSessionHolder
 import ru.rutoken.tech.tokenmanager.TokenManager
 import ru.rutoken.tech.ui.bank.startscreen.BankStartScreenViewModel
-import ru.rutoken.tech.ui.ca.CaLoginViewModel
 import ru.rutoken.tech.ui.ca.generateobjects.certificate.GenerateCertificateViewModel
 import ru.rutoken.tech.ui.ca.generateobjects.keypair.GenerateKeyPairViewModel
 import ru.rutoken.tech.ui.ca.tokeninfo.CaTokenInfoViewModel
 import ru.rutoken.tech.ui.tokenauth.EnterPinViewModel
+import ru.rutoken.tech.ui.tokenauth.LoginViewModel
 
 val koinModule = module {
     single { RtPkcs11Module() } bind Pkcs11Module::class
@@ -37,9 +37,9 @@ val koinModule = module {
     single<UserRepository> { UserRepositoryImpl(get()) }
     single<DocumentRepository> { DocumentRepositoryImpl(get()) }
     single { TokenManager() }
-    single { RutokenTechSessionHolder() }
+    single { AppSessionHolder() }
 
-    viewModel { CaLoginViewModel(androidContext(), get(), get()) }
+    viewModel { LoginViewModel(androidContext(), get(), get()) }
     viewModel { CaTokenInfoViewModel(androidContext(), get()) }
     viewModel { GenerateKeyPairViewModel(get(), get()) }
     viewModel { EnterPinViewModel() }

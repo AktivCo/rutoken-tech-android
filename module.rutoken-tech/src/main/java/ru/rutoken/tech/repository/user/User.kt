@@ -10,6 +10,9 @@ import org.bouncycastle.asn1.ASN1ObjectIdentifier
 import org.bouncycastle.asn1.x500.style.BCStyle
 import org.bouncycastle.cert.X509CertificateHolder
 import ru.rutoken.tech.database.user.UserEntity
+import ru.rutoken.tech.utils.checkSubjectRdns
+import ru.rutoken.tech.utils.getFullName
+import ru.rutoken.tech.utils.getIssuerRdnValue
 import java.util.Date
 
 data class User(
@@ -34,20 +37,10 @@ private const val OGRNIP_OID = "1.2.643.100.5"
 fun makeUser(
     userEntity: UserEntity
 ): User {
-    val certificate = X509CertificateHolder(userEntity.certificateDerValue)
-
-    check(certificate.subject.rdNs.all { !it.isMultiValued }) { "Multiple RDN values with the same type" }
-
-    val cn = certificate.getIssuerRdnValue(BCStyle.CN)
-    val surname = certificate.getIssuerRdnValue(BCStyle.SURNAME)
-    val givenName = certificate.getIssuerRdnValue(BCStyle.GIVENNAME)
-
-    val hasFullName = surname != null && givenName != null
-    check(hasFullName || cn != null) { "Suitable RDNs are not found" }
-
+    val certificate = X509CertificateHolder(userEntity.certificateDerValue).also { it.checkSubjectRdns() }
     return User(
         userEntity = userEntity,
-        fullName = if (hasFullName) "$surname $givenName" else cn!!,
+        fullName = certificate.getFullName(),
         position = certificate.getIssuerRdnValue(BCStyle.T),
         organization = certificate.getIssuerRdnValue(BCStyle.O),
         certificateNotBefore = certificate.notBefore,
@@ -58,9 +51,4 @@ fun makeUser(
         ogrnip = certificate.getIssuerRdnValue(ASN1ObjectIdentifier(OGRNIP_OID)),
         algorithmId = certificate.subjectPublicKeyInfo.algorithm.algorithm.id
     )
-}
-
-private fun X509CertificateHolder.getIssuerRdnValue(type: ASN1ObjectIdentifier): String? {
-    val rdn = subject.rdNs.find { it.first.type == type }
-    return rdn?.first?.value?.toString()
 }

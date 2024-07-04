@@ -6,6 +6,7 @@
 
 package ru.rutoken.tech.ui.utils
 
+import android.content.Context
 import androidx.lifecycle.MutableLiveData
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withTimeoutOrNull
@@ -13,12 +14,15 @@ import ru.rutoken.pkcs11wrapper.constant.standard.Pkcs11ReturnValue.CKR_PIN_INCO
 import ru.rutoken.pkcs11wrapper.constant.standard.Pkcs11ReturnValue.CKR_PIN_LEN_RANGE
 import ru.rutoken.pkcs11wrapper.constant.standard.Pkcs11ReturnValue.CKR_PIN_LOCKED
 import ru.rutoken.pkcs11wrapper.main.Pkcs11Exception
+import ru.rutoken.tech.R
 import ru.rutoken.tech.session.SerialHexString
 import ru.rutoken.tech.tokenmanager.TokenManager
 import ru.rutoken.tech.utils.BusinessRuleCase.IncorrectPin
 import ru.rutoken.tech.utils.BusinessRuleCase.PinLocked
 import ru.rutoken.tech.utils.BusinessRuleCase.TokenRemoved
 import ru.rutoken.tech.utils.BusinessRuleException
+import ru.rutoken.tech.utils.toDateString
+import java.util.Date
 
 suspend fun callPkcs11Operation(
     showProgress: MutableLiveData<Boolean>,
@@ -64,9 +68,20 @@ private suspend fun Pkcs11Exception.asBusinessRuleExceptionOrNull(
         CKR_PIN_INCORRECT, CKR_PIN_LEN_RANGE -> {
             if (retryCountLeft!! != 0L) IncorrectPin(retryCountLeft) else PinLocked
         }
+
         CKR_PIN_LOCKED -> PinLocked
         else -> null
     }
 
     return if (businessRuleCase != null) BusinessRuleException(businessRuleCase, this) else null
+}
+
+fun Context.getCertificateErrorText(certificateNotBefore: Date, certificateNotAfter: Date): String? {
+    val currentDate = Date()
+    return if (currentDate.after(certificateNotAfter))
+        getString(R.string.certificate_is_expired)
+    else if (certificateNotBefore.after(currentDate))
+        getString(R.string.certificate_not_yet_valid, certificateNotBefore.toDateString())
+    else
+        null
 }

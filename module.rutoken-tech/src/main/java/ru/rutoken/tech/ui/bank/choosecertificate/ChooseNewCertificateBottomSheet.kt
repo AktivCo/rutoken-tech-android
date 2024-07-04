@@ -4,7 +4,7 @@
  * All Rights Reserved.
  */
 
-package ru.rutoken.tech.ui.bank
+package ru.rutoken.tech.ui.bank.choosecertificate
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -17,13 +17,18 @@ import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.SheetState
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.launch
 import ru.rutoken.tech.R
+import ru.rutoken.tech.ui.bank.BankCertificate
+import ru.rutoken.tech.ui.bank.CertificateCard
 import ru.rutoken.tech.ui.components.BottomSheetDragHandle
 import ru.rutoken.tech.ui.components.BottomSheetTitle
+import ru.rutoken.tech.ui.components.ErrorAlertDialog
 import ru.rutoken.tech.ui.components.NavigationBarSpacer
 import ru.rutoken.tech.ui.components.bottomSheetCornerShape
 import ru.rutoken.tech.ui.theme.RutokenTechTheme
@@ -34,18 +39,33 @@ import ru.rutoken.tech.ui.utils.expandedSheetState
 
 @Composable
 fun ChooseNewCertificateScreen(
+    viewModel: ChooseNewCertificateViewModel,
     certificates: List<BankCertificate>,
     onCertificateClicked: (Int) -> Unit,
     onNavigateBack: () -> Unit
 ) {
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    val scope = rememberCoroutineScope()
 
-    ChooseNewCertificateBottomSheet(
-        certificates = certificates,
-        sheetState = sheetState,
-        onCertificateClicked = onCertificateClicked,
-        onDismissRequest = onNavigateBack
-    )
+    if (certificates.isEmpty()) {
+        ErrorAlertDialog(
+            title = stringResource(id = R.string.rutoken_has_no_certificates),
+            text = stringResource(id = R.string.use_ca_to_create_certificate),
+            onDismissOrConfirm = onNavigateBack
+        )
+    } else {
+        ChooseNewCertificateBottomSheet(
+            certificates = certificates,
+            sheetState = sheetState,
+            onCertificateClicked = { certificateIndex ->
+                scope.launch { sheetState.hide() }.invokeOnCompletion {
+                    viewModel.addUser(certificateIndex)
+                    onCertificateClicked(certificateIndex)
+                }
+            },
+            onDismissRequest = onNavigateBack
+        )
+    }
 }
 
 @Composable
@@ -75,10 +95,10 @@ private fun ChooseNewCertificateBottomSheet(
             certificates.forEachIndexed { index, certificate ->
                 CertificateCard(
                     name = certificate.name,
-                    position = certificate.position,
+                    position = certificate.position ?: stringResource(R.string.not_set),
                     certificateExpirationDate = certificate.certificateExpirationDate,
-                    organization = certificate.organization,
-                    algorithm = certificate.algorithm,
+                    organization = certificate.organization ?: stringResource(R.string.not_set),
+                    algorithm = stringResource(certificate.algorithm),
                     errorText = certificate.errorText,
                     onClick = { onCertificateClicked(index) }
                 )
@@ -94,14 +114,15 @@ private fun ChooseNewCertificateBottomSheet(
 private fun ChooseNewCertifficateBottomSheetPreview() {
     RutokenTechTheme {
         val name = "Иванов Михаил Романович"
-        val algorithm = "ГОСТ Р 34.10-2012 256"
+        val algorithm = R.string.gost256_algorithm
         val error = "Срок действия сертификата ещё не наступил"
         val derBytes = byteArrayOf(0, 0, 0, 0)
+        val ckaIdBytes = byteArrayOf(1, 2, 3)
         val certificates = listOf(
-            BankCertificate("id", derBytes, name, "Дизайнер", "07.03.2024", "Рутокен", algorithm),
-            BankCertificate("id", derBytes, name, "Дизайнер", "07.03.2024", "Рутокен", algorithm, error),
-            BankCertificate("id", derBytes, name, "Дизайнер", "07.03.2024", "Рутокен", algorithm),
-            BankCertificate("id", derBytes, name, "Дизайнер", "07.03.2024", "Рутокен", algorithm, error)
+            BankCertificate(ckaIdBytes, derBytes, name, "Дизайнер", "07.03.2024", "Рутокен", algorithm),
+            BankCertificate(ckaIdBytes, derBytes, name, "Дизайнер", "07.03.2024", "Рутокен", algorithm, error),
+            BankCertificate(ckaIdBytes, derBytes, name, "Дизайнер", "07.03.2024", "Рутокен", algorithm),
+            BankCertificate(ckaIdBytes, derBytes, name, "Дизайнер", "07.03.2024", "Рутокен", algorithm, error)
 
         )
         ChooseNewCertificateBottomSheet(

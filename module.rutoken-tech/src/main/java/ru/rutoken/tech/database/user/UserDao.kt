@@ -19,6 +19,9 @@ interface UserDao {
     @Query("SELECT * FROM users WHERE id = :userId")
     suspend fun getUser(userId: Int): UserEntity
 
+    @Query("SELECT * FROM users WHERE certificate_der_value = :certificateDerValue")
+    suspend fun findUser(certificateDerValue: ByteArray): UserEntity?
+
     @Query("SELECT * FROM users")
     suspend fun getUsers(): List<UserEntity>
 

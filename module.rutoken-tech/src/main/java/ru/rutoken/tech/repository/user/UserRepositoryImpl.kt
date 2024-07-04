@@ -17,6 +17,11 @@ class UserRepositoryImpl(database: Database) : UserRepository {
 
     override suspend fun getUser(userId: Int) = makeUser(userDao.getUser(userId))
 
+    override suspend fun findUser(certificateDerValue: ByteArray): User? {
+        val foundUser = userDao.findUser(certificateDerValue)
+        return if (foundUser == null) null else makeUser(foundUser)
+    }
+
     override suspend fun getUsers() = userDao.getUsers().map { makeUser(it) }
 
     @MainThread

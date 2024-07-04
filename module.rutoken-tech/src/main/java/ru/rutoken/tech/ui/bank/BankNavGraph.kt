@@ -13,6 +13,9 @@ import com.google.accompanist.navigation.material.bottomSheet
 import org.koin.androidx.compose.koinViewModel
 import ru.rutoken.tech.session.AppSessionHolder
 import ru.rutoken.tech.session.AppSessionType
+import ru.rutoken.tech.session.requireBankUserAddingSession
+import ru.rutoken.tech.ui.bank.choosecertificate.ChooseNewCertificateScreen
+import ru.rutoken.tech.ui.bank.choosecertificate.ChooseNewCertificateViewModel
 import ru.rutoken.tech.ui.bank.startscreen.BankStartScreen
 import ru.rutoken.tech.ui.bank.startscreen.BankStartScreenViewModel
 import ru.rutoken.tech.ui.main.Destination
@@ -27,6 +30,7 @@ import ru.rutoken.tech.ui.tokenauth.TokenAuthScreen
 sealed class BankDestination(override val route: String) : Destination {
     data object Start : BankDestination("bank/start")
     data object TokenAuth : BankDestination("bank/tokenAuth")
+    data object Certificates : BankDestination("bank/certificates")
 }
 
 fun NavGraphBuilder.addBankDestinations(
@@ -53,8 +57,17 @@ fun NavGraphBuilder.addBankDestinations(
             enterPinViewModel = koinViewModel<EnterPinViewModel>(),
             loginViewModel = koinViewModel<LoginViewModel>(),
             appSessionType = AppSessionType.BANK_USER_ADDING_SESSION,
-            onAuthDone = { navController.navigate(BankDestination.Start.route) /*TODO: navigate to certificates bottom sheet */ },
+            onAuthDone = { navController.navigate(BankDestination.Certificates.route) },
             onNavigateBack = navController::popBackStack
+        )
+    }
+
+    bottomSheet(BankDestination.Certificates.route) {
+        ChooseNewCertificateScreen(
+            viewModel = koinViewModel<ChooseNewCertificateViewModel>(),
+            certificates = sessionHolder.requireBankUserAddingSession().certificates,
+            onCertificateClicked = { navController.navigate(BankDestination.Start.route) /*TODO: navigate to documents screen*/ },
+            onNavigateBack = { navController.popBackStack(BankDestination.Start.route, false) }
         )
     }
 }

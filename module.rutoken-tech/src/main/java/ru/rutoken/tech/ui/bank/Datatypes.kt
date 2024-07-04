@@ -6,7 +6,7 @@
 
 package ru.rutoken.tech.ui.bank
 
-import ru.rutoken.tech.session.CkaIdString
+import androidx.annotation.StringRes
 
 class BankUser(
     val id: Int,
@@ -17,12 +17,12 @@ class BankUser(
 )
 
 class BankCertificate(
-    val ckaIdString: CkaIdString,
+    val ckaId: ByteArray,
     val bytes: ByteArray,
     val name: String,
-    val position: String,
+    val position: String?,
     val certificateExpirationDate: String,
-    val organization: String,
-    val algorithm: String,
+    val organization: String?,
+    @StringRes val algorithm: Int,
     val errorText: String? = null
 )

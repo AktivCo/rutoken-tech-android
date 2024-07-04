@@ -6,8 +6,31 @@
 
 package ru.rutoken.tech.utils
 
+import org.bouncycastle.asn1.ASN1ObjectIdentifier
+import org.bouncycastle.asn1.x500.style.BCStyle
+import org.bouncycastle.cert.X509CertificateHolder
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
-fun Date.toDateString() = SimpleDateFormat("dd.MM.yyyy", Locale.getDefault()).format(this)
+fun Date.toDateString(): String = SimpleDateFormat("dd.MM.yyyy", Locale.getDefault()).format(this)
+
+fun X509CertificateHolder.checkSubjectRdns() {
+    check(subject.rdNs.all { !it.isMultiValued }) { "Multiple RDN values with the same type" }
+}
+
+fun X509CertificateHolder.getFullName(): String {
+    val cn = getIssuerRdnValue(BCStyle.CN)
+    val surname = getIssuerRdnValue(BCStyle.SURNAME)
+    val givenName = getIssuerRdnValue(BCStyle.GIVENNAME)
+
+    val hasFullName = surname != null && givenName != null
+    check(hasFullName || cn != null) { "Suitable RDNs are not found" }
+
+    return if (hasFullName) "$surname $givenName" else cn!!
+}
+
+fun X509CertificateHolder.getIssuerRdnValue(type: ASN1ObjectIdentifier): String? {
+    val rdn = subject.rdNs.find { it.first.type == type }
+    return rdn?.first?.value?.toString()
+}

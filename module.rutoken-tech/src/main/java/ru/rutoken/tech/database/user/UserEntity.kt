@@ -15,8 +15,7 @@ import ru.rutoken.tech.database.AUTOGENERATE
 @Entity(
     tableName = "users",
     indices = [
-        Index(value = ["certificate_der_value"], unique = true),
-        Index(value = ["token_serial_number"], unique = true)
+        Index(value = ["certificate_der_value"], unique = true)
     ]
 )
 data class UserEntity(

@@ -35,7 +35,7 @@
     <string name="key_pair_title">Ключевая пара</string>
     <string name="key_pair_id">ID</string>
     <string name="key_pair_algorithm">Алгоритм</string>
-    <string name="gost256_algorithm">ГОСТ Р 34.10-2012 256-бит</string>
+    <string name="gost256_algorithm">ГОСТ Р 34.10-2012 256 бит</string>
 
     <!--Related to CA test certificate generation bottom sheet-->
     <string name="test_certificate_title">Тестовый сертификат</string>

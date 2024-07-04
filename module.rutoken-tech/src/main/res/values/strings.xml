@@ -77,6 +77,8 @@
     <string name="certificate_not_yet_valid">Сертификат начнет действовать %s</string>
     <string name="organization">Организация</string>
     <string name="not_set">Не задано</string>
+    <string name="delete_all_users">Удалить всех пользователей?</string>
+    <string name="delete">Удалить</string>
 
     <!--Related to adding new user scenario-->
     <string name="certificate_already_used">Пользователь с таким сертификатом\nуже добавлен</string>

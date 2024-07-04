@@ -14,5 +14,5 @@ interface UserRepository {
     suspend fun getUsers(): List<User>
     fun getUsersAsync(): LiveData<List<User>>
     suspend fun addUser(user: User)
-    suspend fun removeUser(user: User)
+    suspend fun deleteAllUsers()
 }

@@ -45,7 +45,6 @@ fun NavGraphBuilder.addBankDestinations(
 
         BankStartScreen(
             viewModel = koinViewModel<BankStartScreenViewModel>(),
-            onDeleteUsers = { /*TODO*/ },
             onUserClicked = { /*TODO*/ },
             onAddUserClicked = { navController.navigate(BankDestination.TokenAuth.route) { launchSingleTop = true } },
             openDrawer = openDrawer

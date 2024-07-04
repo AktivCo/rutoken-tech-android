@@ -29,6 +29,7 @@ import ru.rutoken.tech.R
 import ru.rutoken.tech.ui.bank.BankUser
 import ru.rutoken.tech.ui.bank.CertificateCard
 import ru.rutoken.tech.ui.components.AppIcons
+import ru.rutoken.tech.ui.components.ConfirmationAlertDialog
 import ru.rutoken.tech.ui.components.PrimaryButtonBox
 import ru.rutoken.tech.ui.components.ScreenTopAppBar
 import ru.rutoken.tech.ui.theme.RutokenTechTheme
@@ -39,7 +40,6 @@ import ru.rutoken.tech.ui.utils.PreviewLight
 @Composable
 fun BankStartScreen(
     viewModel: BankStartScreenViewModel,
-    onDeleteUsers: () -> Unit,
     onUserClicked: (Int) -> Unit,
     onAddUserClicked: () -> Unit,
     openDrawer: () -> Unit
@@ -50,9 +50,20 @@ fun BankStartScreen(
         viewModel.loadUsers()
     }
 
+    val showDeleteUsersDialog by viewModel.showDeleteUsersDialog.observeAsState(false)
+    if (showDeleteUsersDialog) {
+        ConfirmationAlertDialog(
+            text = stringResource(id = R.string.delete_all_users),
+            dismissText = stringResource(id = R.string.cancel),
+            confirmText = stringResource(id = R.string.delete),
+            onDismiss = viewModel::dismissDeleteUsersDialog,
+            onConfirm = viewModel::deleteAllUsers
+        )
+    }
+
     BankStartScreen(
         users = users,
-        onDeleteUsers = onDeleteUsers,
+        onDeleteUsers = viewModel::showDeleteUsersDialog,
         onUserClicked = onUserClicked,
         onAddUserClicked = onAddUserClicked,
         openDrawer = openDrawer

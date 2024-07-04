@@ -31,5 +31,5 @@ class UserRepositoryImpl(database: Database) : UserRepository {
 
     override suspend fun addUser(user: User) = userDao.addUser(user.userEntity)
 
-    override suspend fun removeUser(user: User) = userDao.deleteUser(user.userEntity)
+    override suspend fun deleteAllUsers() = userDao.deleteAllUsers()
 }

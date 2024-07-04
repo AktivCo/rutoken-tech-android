@@ -7,6 +7,7 @@
 package ru.rutoken.tech.ui.bank.startscreen
 
 import android.content.Context
+import androidx.annotation.MainThread
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -25,6 +26,9 @@ class BankStartScreenViewModel(
     private val _users = MutableLiveData<List<BankUser>>()
     val users: LiveData<List<BankUser>> get() = _users
 
+    private val _showDeleteUsersDialog = MutableLiveData(false)
+    val showDeleteUsersDialog: LiveData<Boolean> get() = _showDeleteUsersDialog
+
     fun loadUsers() {
         viewModelScope.launch(Dispatchers.IO) {
             _users.postValue(repository.getUsers().map { user ->
@@ -39,5 +43,23 @@ class BankStartScreenViewModel(
                 )
             }.toMutableList().apply { sortBy { it.errorText != null } })
         }
+    }
+
+    fun deleteAllUsers() {
+        viewModelScope.launch(Dispatchers.IO) {
+            repository.deleteAllUsers()
+            _showDeleteUsersDialog.postValue(false)
+            _users.postValue(emptyList())
+        }
+    }
+
+    @MainThread
+    fun showDeleteUsersDialog() {
+        _showDeleteUsersDialog.value = true
+    }
+
+    @MainThread
+    fun dismissDeleteUsersDialog() {
+        _showDeleteUsersDialog.value = false
     }
 }

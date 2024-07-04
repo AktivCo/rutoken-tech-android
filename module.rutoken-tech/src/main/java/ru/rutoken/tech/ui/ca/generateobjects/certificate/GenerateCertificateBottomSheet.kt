@@ -19,9 +19,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.BottomSheetDefaults.DragHandle
-import androidx.compose.material3.BottomSheetDefaults.ExpandedShape
-import androidx.compose.material3.BottomSheetDefaults.HiddenShape
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
@@ -30,7 +27,6 @@ import androidx.compose.material3.MenuAnchorType
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.SheetState
-import androidx.compose.material3.SheetValue.Expanded
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
@@ -55,12 +51,12 @@ import ru.rutoken.tech.R
 import ru.rutoken.tech.session.CkaIdString
 import ru.rutoken.tech.ui.components.BottomSheetDragHandle
 import ru.rutoken.tech.ui.components.BottomSheetTitle
-import ru.rutoken.tech.ui.components.ConnectTokenDialog
-import ru.rutoken.tech.ui.components.ErrorAlertDialog
+import ru.rutoken.tech.ui.components.alertdialog.ConnectTokenDialog
+import ru.rutoken.tech.ui.components.alertdialog.ErrorAlertDialog
 import ru.rutoken.tech.ui.components.NavigationBarSpacer
 import ru.rutoken.tech.ui.components.PrimaryButtonBox
 import ru.rutoken.tech.ui.components.ProgressIndicatorDialog
-import ru.rutoken.tech.ui.components.SimpleAlertDialog
+import ru.rutoken.tech.ui.components.alertdialog.SimpleAlertDialog
 import ru.rutoken.tech.ui.components.TextGroup
 import ru.rutoken.tech.ui.components.TextGroupItem
 import ru.rutoken.tech.ui.components.bottomSheetCornerShape
@@ -72,7 +68,6 @@ import ru.rutoken.tech.ui.utils.bottomSheetWindowInsets
 import ru.rutoken.tech.ui.utils.errorDialogData
 import ru.rutoken.tech.ui.utils.expandedSheetState
 import ru.rutoken.tech.ui.utils.getHideKeyboardAction
-import ru.rutoken.tech.ui.utils.statusBarsPaddingHeight
 
 @Composable
 fun GenerateCertificateScreen(

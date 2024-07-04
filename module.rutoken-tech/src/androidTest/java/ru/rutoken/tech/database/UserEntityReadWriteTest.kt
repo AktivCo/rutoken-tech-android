@@ -44,7 +44,12 @@ class UserEntityReadWriteTest {
 
     @Test
     fun writeUserAndReadRelatedDocumentsList() = runTest {
-        val user = UserEntity(certificateDerValue = byteArrayOf(), ckaId = byteArrayOf(), tokenSerialNumber = "")
+        val user = UserEntity(
+            certificateDerValue = byteArrayOf(),
+            ckaId = byteArrayOf(),
+            tokenSerialNumber = "",
+            encryptedPin = null
+        )
         userDao.addUser(user)
         val createdUser = userDao.getUsers().also {
             withClue("Should be 1 user") { it.size shouldBe 1 }

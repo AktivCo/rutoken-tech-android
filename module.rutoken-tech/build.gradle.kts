@@ -118,6 +118,7 @@ dependencies {
     coreLibraryDesugaring(libs.desugarJdkLibs)
 
     implementation(libs.androidx.activity.compose)
+    implementation(libs.androidx.biometric.ktx)
     implementation(libs.androidx.browser)
     implementation(libs.androidx.navigation.compose)
     implementation(libs.androidx.core.ktx)

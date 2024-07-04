@@ -21,12 +21,12 @@ import kotlinx.coroutines.launch
 import ru.rutoken.tech.R
 import ru.rutoken.tech.pkcs11.createobjects.GostKeyPairParams
 import ru.rutoken.tech.ui.components.BottomSheetTitle
-import ru.rutoken.tech.ui.components.ConnectTokenDialog
-import ru.rutoken.tech.ui.components.ErrorAlertDialog
+import ru.rutoken.tech.ui.components.alertdialog.ConnectTokenDialog
+import ru.rutoken.tech.ui.components.alertdialog.ErrorAlertDialog
 import ru.rutoken.tech.ui.components.NavigationBarSpacer
 import ru.rutoken.tech.ui.components.PrimaryButtonBox
 import ru.rutoken.tech.ui.components.ProgressIndicatorDialog
-import ru.rutoken.tech.ui.components.SimpleAlertDialog
+import ru.rutoken.tech.ui.components.alertdialog.SimpleAlertDialog
 import ru.rutoken.tech.ui.components.TextGroupBox
 import ru.rutoken.tech.ui.components.TextGroupItem
 import ru.rutoken.tech.ui.theme.RutokenTechTheme

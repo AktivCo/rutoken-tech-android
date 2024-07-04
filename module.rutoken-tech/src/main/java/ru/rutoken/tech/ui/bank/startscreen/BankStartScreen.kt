@@ -29,7 +29,7 @@ import ru.rutoken.tech.R
 import ru.rutoken.tech.ui.bank.BankUser
 import ru.rutoken.tech.ui.bank.CertificateCard
 import ru.rutoken.tech.ui.components.AppIcons
-import ru.rutoken.tech.ui.components.ConfirmationAlertDialog
+import ru.rutoken.tech.ui.components.alertdialog.ConfirmationAlertDialog
 import ru.rutoken.tech.ui.components.PrimaryButtonBox
 import ru.rutoken.tech.ui.components.ScreenTopAppBar
 import ru.rutoken.tech.ui.theme.RutokenTechTheme

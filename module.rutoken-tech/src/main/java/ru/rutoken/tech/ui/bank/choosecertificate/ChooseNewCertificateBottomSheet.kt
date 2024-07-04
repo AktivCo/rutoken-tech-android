@@ -17,35 +17,46 @@ import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.SheetState
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.fragment.app.FragmentActivity
 import kotlinx.coroutines.launch
 import ru.rutoken.tech.R
 import ru.rutoken.tech.ui.bank.BankCertificate
 import ru.rutoken.tech.ui.bank.CertificateCard
 import ru.rutoken.tech.ui.components.BottomSheetDragHandle
 import ru.rutoken.tech.ui.components.BottomSheetTitle
-import ru.rutoken.tech.ui.components.ErrorAlertDialog
 import ru.rutoken.tech.ui.components.NavigationBarSpacer
+import ru.rutoken.tech.ui.components.alertdialog.ConfirmationAlertDialog
+import ru.rutoken.tech.ui.components.alertdialog.ErrorAlertDialog
 import ru.rutoken.tech.ui.components.bottomSheetCornerShape
 import ru.rutoken.tech.ui.theme.RutokenTechTheme
+import ru.rutoken.tech.ui.utils.DialogState
 import ru.rutoken.tech.ui.utils.PreviewDark
 import ru.rutoken.tech.ui.utils.PreviewLight
 import ru.rutoken.tech.ui.utils.bottomSheetWindowInsets
+import ru.rutoken.tech.ui.utils.errorDialogData
 import ru.rutoken.tech.ui.utils.expandedSheetState
 
 @Composable
 fun ChooseNewCertificateScreen(
     viewModel: ChooseNewCertificateViewModel,
-    certificates: List<BankCertificate>,
-    onCertificateClicked: (Int) -> Unit,
+    onNavigateToDocumentsScreen: () -> Unit,
     onNavigateBack: () -> Unit
 ) {
+    var showBottomSheet by remember { mutableStateOf(true) }
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
-    val scope = rememberCoroutineScope()
+    val certificates by viewModel.certificates.observeAsState(listOf())
 
     if (certificates.isEmpty()) {
         ErrorAlertDialog(
@@ -54,17 +65,29 @@ fun ChooseNewCertificateScreen(
             onDismissOrConfirm = onNavigateBack
         )
     } else {
-        ChooseNewCertificateBottomSheet(
-            certificates = certificates,
-            sheetState = sheetState,
-            onCertificateClicked = { certificateIndex ->
-                scope.launch { sheetState.hide() }.invokeOnCompletion {
-                    viewModel.addUser(certificateIndex)
-                    onCertificateClicked(certificateIndex)
-                }
-            },
-            onDismissRequest = onNavigateBack
-        )
+        if (showBottomSheet) {
+            ChooseNewCertificateBottomSheet(
+                certificates = certificates,
+                sheetState = sheetState,
+                onCertificateClicked = viewModel::onCertificateClicked,
+                onDismissRequest = onNavigateBack
+            )
+        }
+    }
+
+    AskBiometryDialog(viewModel)
+    BiometryActivationFailedDialog(viewModel)
+
+    val userAdded by viewModel.isUserAdded.observeAsState(false)
+    val scope = rememberCoroutineScope()
+
+    LaunchedEffect(userAdded) {
+        if (userAdded) {
+            scope.launch { sheetState.hide() }.invokeOnCompletion {
+                showBottomSheet = false
+                onNavigateToDocumentsScreen()
+            }
+        }
     }
 }
 
@@ -72,7 +95,7 @@ fun ChooseNewCertificateScreen(
 private fun ChooseNewCertificateBottomSheet(
     certificates: List<BankCertificate>,
     sheetState: SheetState,
-    onCertificateClicked: (Int) -> Unit,
+    onCertificateClicked: (BankCertificate) -> Unit,
     onDismissRequest: () -> Unit
 ) {
     ModalBottomSheet(
@@ -92,7 +115,7 @@ private fun ChooseNewCertificateBottomSheet(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(16.dp, Alignment.Top)
         ) {
-            certificates.forEachIndexed { index, certificate ->
+            certificates.forEach { certificate ->
                 CertificateCard(
                     name = certificate.name,
                     position = certificate.position ?: stringResource(R.string.not_set),
@@ -100,7 +123,7 @@ private fun ChooseNewCertificateBottomSheet(
                     organization = certificate.organization ?: stringResource(R.string.not_set),
                     algorithm = stringResource(certificate.algorithm),
                     errorText = certificate.errorText,
-                    onClick = { onCertificateClicked(index) }
+                    onClick = { onCertificateClicked(certificate) }
                 )
             }
             NavigationBarSpacer()
@@ -109,9 +132,39 @@ private fun ChooseNewCertificateBottomSheet(
 }
 
 @Composable
+private fun AskBiometryDialog(viewModel: ChooseNewCertificateViewModel) {
+    val showDialog by viewModel.askBiometryDialog.observeAsState(false)
+    val activity = LocalContext.current as FragmentActivity
+
+    if (showDialog) {
+        ConfirmationAlertDialog(
+            title = stringResource(R.string.ask_biometry_title),
+            text = stringResource(R.string.ask_biometry_text),
+            dismissText = stringResource(R.string.skip),
+            confirmText = stringResource(R.string.activate),
+            onDismiss = viewModel::onDismissBiometryDialog,
+            onConfirm = { viewModel.onConfirmBiometryUsage(activity) }
+        )
+    }
+}
+
+@Composable
+private fun BiometryActivationFailedDialog(viewModel: ChooseNewCertificateViewModel) {
+    val dialogState by viewModel.biometryActivationFailedDialogState.observeAsState(DialogState())
+
+    if (dialogState.showDialog) {
+        ErrorAlertDialog(
+            title = stringResource(id = dialogState.errorDialogData.title),
+            text = stringResource(id = dialogState.errorDialogData.text),
+            onDismissOrConfirm = viewModel::onDismissBiometryActivationFailedDialog
+        )
+    }
+}
+
+@Composable
 @PreviewLight
 @PreviewDark
-private fun ChooseNewCertifficateBottomSheetPreview() {
+private fun ChooseNewCertificateBottomSheetPreview() {
     RutokenTechTheme {
         val name = "Иванов Михаил Романович"
         val algorithm = R.string.gost256_algorithm

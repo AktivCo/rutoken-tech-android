@@ -85,6 +85,12 @@
     <string name="rutoken_has_no_certificates">На Рутокене нет сертификатов</string>
     <string name="use_ca_to_create_certificate">Создайте сертификат в разделе УЦ</string>
     <string name="choose_certificate">Выберите сертификат</string>
+    <string name="ask_biometry_title">Активировать биометрию?</string>
+    <string name="ask_biometry_text">Она будет использоваться для этого пользователя вместо ввода\nPIN-кода Рутокена</string>
+    <string name="biometry_activation_failed_title">Активация биометрии не удалась</string>
+    <string name="biometry_activation_failed_text">PIN-код Рутокена не будет сохранён</string>
+    <string name="skip">Пропустить</string>
+    <string name="activate">Активировать</string>
 
     <!--Related to simple dialogs-->
     <string name="key_pair_generated">Ключевая пара сгенерирована</string>
@@ -127,4 +133,8 @@
     <string name="technical_support_number">+7 (495) 925-77-90</string>
     <string name="license_agreement">Лицензионное соглашение Рутокен</string>
     <string name="privacy_policy">Политика конфиденциальности</string>
+
+    <!--Related to biometry prompt-->
+    <string name="use_biometry_title">Подтвердите биометрию</string>
+    <string name="use_biometry_subtitle">Она заменит ввод PIN-кода Рутокена</string>
 </resources>

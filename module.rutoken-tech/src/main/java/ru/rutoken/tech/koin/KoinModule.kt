@@ -46,5 +46,5 @@ val koinModule = module {
     viewModel { EnterPinViewModel() }
     viewModel { GenerateCertificateViewModel(get(), get()) }
     viewModel { BankStartScreenViewModel(get(), get()) }
-    viewModel { ChooseNewCertificateViewModel(get(), get()) }
+    viewModel { ChooseNewCertificateViewModel(get(), get(), get()) }
 }

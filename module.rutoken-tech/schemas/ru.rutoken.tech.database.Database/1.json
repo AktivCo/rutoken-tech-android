@@ -2,11 +2,11 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "a9ac3fc2447d5f6a9167297918bece04",
+    "identityHash": "8b6814b59b62649d14077000fb193116",
     "entities": [
       {
         "tableName": "users",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `certificate_der_value` BLOB NOT NULL, `cka_id` BLOB NOT NULL, `token_serial_number` TEXT NOT NULL)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `certificate_der_value` BLOB NOT NULL, `cka_id` BLOB NOT NULL, `token_serial_number` TEXT NOT NULL, `encrypted_pin` BLOB)",
         "fields": [
           {
             "fieldPath": "id",
@@ -31,6 +31,12 @@
             "columnName": "token_serial_number",
             "affinity": "TEXT",
             "notNull": true
+          },
+          {
+            "fieldPath": "encryptedPin",
+            "columnName": "encrypted_pin",
+            "affinity": "BLOB",
+            "notNull": false
           }
         ],
         "primaryKey": {
@@ -82,7 +88,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'a9ac3fc2447d5f6a9167297918bece04')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '8b6814b59b62649d14077000fb193116')"
     ]
   }
 }

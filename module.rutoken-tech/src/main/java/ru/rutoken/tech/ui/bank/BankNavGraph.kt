@@ -13,7 +13,6 @@ import com.google.accompanist.navigation.material.bottomSheet
 import org.koin.androidx.compose.koinViewModel
 import ru.rutoken.tech.session.AppSessionHolder
 import ru.rutoken.tech.session.AppSessionType
-import ru.rutoken.tech.session.requireBankUserAddingSession
 import ru.rutoken.tech.ui.bank.choosecertificate.ChooseNewCertificateScreen
 import ru.rutoken.tech.ui.bank.choosecertificate.ChooseNewCertificateViewModel
 import ru.rutoken.tech.ui.bank.startscreen.BankStartScreen
@@ -64,8 +63,7 @@ fun NavGraphBuilder.addBankDestinations(
     bottomSheet(BankDestination.Certificates.route) {
         ChooseNewCertificateScreen(
             viewModel = koinViewModel<ChooseNewCertificateViewModel>(),
-            certificates = sessionHolder.requireBankUserAddingSession().certificates,
-            onCertificateClicked = { navController.navigate(BankDestination.Start.route) /*TODO: navigate to documents screen*/ },
+            onNavigateToDocumentsScreen = { navController.navigate(BankDestination.Start.route) /*TODO: navigate to documents screen*/ },
             onNavigateBack = { navController.popBackStack(BankDestination.Start.route, false) }
         )
     }

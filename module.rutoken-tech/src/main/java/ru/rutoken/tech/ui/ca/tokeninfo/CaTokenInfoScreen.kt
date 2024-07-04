@@ -44,7 +44,7 @@ import androidx.compose.ui.unit.dp
 import ru.rutoken.tech.R
 import ru.rutoken.tech.ui.components.AppIcons
 import ru.rutoken.tech.ui.components.ScreenTopAppBar
-import ru.rutoken.tech.ui.components.SimpleAlertDialog
+import ru.rutoken.tech.ui.components.alertdialog.SimpleAlertDialog
 import ru.rutoken.tech.ui.components.TextGroup
 import ru.rutoken.tech.ui.components.TextGroupItem
 import ru.rutoken.tech.ui.theme.RutokenTechTheme

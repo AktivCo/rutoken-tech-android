@@ -4,7 +4,7 @@
  * All Rights Reserved.
  */
 
-package ru.rutoken.tech.ui.components
+package ru.rutoken.tech.ui.components.alertdialog
 
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.width
@@ -23,7 +23,8 @@ import ru.rutoken.tech.ui.utils.PreviewDark
 import ru.rutoken.tech.ui.utils.PreviewLight
 
 @Composable
-fun SimpleAlertDialog(
+fun ErrorAlertDialog(
+    title: String,
     text: String,
     onDismissOrConfirm: () -> Unit
 ) {
@@ -35,6 +36,7 @@ fun SimpleAlertDialog(
             }
         },
         modifier = Modifier.width(312.dp),
+        title = { Text(text = title) },
         text = { Text(text = text) },
         containerColor = MaterialTheme.colorScheme.surfaceContainerHigh
     )
@@ -43,11 +45,12 @@ fun SimpleAlertDialog(
 @PreviewLight
 @PreviewDark
 @Composable
-private fun SimpleAlertDialogPreview() {
+private fun ErrorAlertDialogPreview() {
     RutokenTechTheme {
         Surface(modifier = Modifier.fillMaxSize()) {
-            SimpleAlertDialog(
-                text = stringResource(id = R.string.no_key_pairs_without_certificates),
+            ErrorAlertDialog(
+                title = stringResource(id = R.string.pin_locked_title),
+                text = stringResource(id = R.string.pin_locked_text),
                 onDismissOrConfirm = { /* Nothing to do */ }
             )
         }

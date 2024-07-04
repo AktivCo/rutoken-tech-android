@@ -19,8 +19,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.res.stringResource
 import kotlinx.coroutines.launch
 import ru.rutoken.tech.session.AppSessionType
-import ru.rutoken.tech.ui.components.ConnectTokenDialog
-import ru.rutoken.tech.ui.components.ErrorAlertDialog
+import ru.rutoken.tech.ui.components.alertdialog.ConnectTokenDialog
+import ru.rutoken.tech.ui.components.alertdialog.ErrorAlertDialog
 import ru.rutoken.tech.ui.components.ProgressIndicatorDialog
 import ru.rutoken.tech.ui.utils.DialogState
 import ru.rutoken.tech.ui.utils.errorDialogData

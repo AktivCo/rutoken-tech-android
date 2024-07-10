@@ -15,16 +15,19 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import org.bouncycastle.cert.X509CertificateHolder
 import ru.rutoken.tech.R
 import ru.rutoken.tech.bank.biometry.encryptWithBiometricPrompt
 import ru.rutoken.tech.bank.biometry.canUseBiometry
 import ru.rutoken.tech.database.user.UserEntity
-import ru.rutoken.tech.repository.user.UserRepository
-import ru.rutoken.tech.repository.user.makeUser
+import ru.rutoken.tech.repository.UserRepository
+import ru.rutoken.tech.repository.makeUser
 import ru.rutoken.tech.session.AppSessionHolder
 import ru.rutoken.tech.session.BankUserAddingAppSession
+import ru.rutoken.tech.session.BankUserLoginAppSession
 import ru.rutoken.tech.session.requireBankUserAddingSession
 import ru.rutoken.tech.ui.bank.BankCertificate
+import ru.rutoken.tech.ui.bank.payments.getInitialPaymentsStorage
 import ru.rutoken.tech.ui.utils.DialogState
 import ru.rutoken.tech.ui.utils.ErrorDialogData
 
@@ -50,6 +53,9 @@ class ChooseNewCertificateViewModel(
 
     private val _isUserAdded = MutableLiveData(false)
     val isUserAdded: LiveData<Boolean> get() = _isUserAdded
+
+    private val _showProgress = MutableLiveData<Boolean>()
+    val showProgress: LiveData<Boolean> = _showProgress
 
     @MainThread
     fun onCertificateClicked(certificate: BankCertificate) {
@@ -94,19 +100,42 @@ class ChooseNewCertificateViewModel(
 
     private fun saveUserToDatabase(encryptedPin: ByteArray? = null, cipherIv: ByteArray? = null) {
         viewModelScope.launch(Dispatchers.IO) {
-            repository.addUser(
-                makeUser(
-                    UserEntity(
-                        certificateDerValue = chosenCertificate.bytes,
-                        ckaId = chosenCertificate.ckaId,
-                        tokenSerialNumber = bankUserAddingAppSession.tokenSerial,
-                        isBiometryActive = encryptedPin != null,
-                        encryptedPin = encryptedPin,
-                        cipherIv = cipherIv
-                    )
+            _showProgress.postValue(true)
+
+            val tokenSerial = bankUserAddingAppSession.tokenSerial
+            val user = makeUser(
+                UserEntity(
+                    certificateDerValue = chosenCertificate.bytes,
+                    ckaId = chosenCertificate.ckaId,
+                    tokenSerialNumber = tokenSerial,
+                    isBiometryActive = encryptedPin != null,
+                    encryptedPin = encryptedPin,
+                    cipherIv = cipherIv
                 )
             )
-            sessionHolder.resetSession()
+            repository.addUser(user)
+
+            val paymentsStorage =
+                getInitialPaymentsStorage(applicationContext, X509CertificateHolder(chosenCertificate.bytes))
+            val pinData =
+                if (encryptedPin != null && cipherIv != null)
+                    BankUserLoginAppSession.EncryptedPinData(encryptedPin, cipherIv)
+                else
+                    null
+
+            sessionHolder.setSession(
+                BankUserLoginAppSession(
+                    userId = user.userEntity.id,
+                    tokenSerial = tokenSerial,
+                    certificateCkaId = chosenCertificate.ckaId,
+                    certificate = chosenCertificate.bytes,
+                    isBiometryActive = encryptedPin != null,
+                    encryptedPinData = pinData,
+                    payments = paymentsStorage
+                )
+            )
+
+            _showProgress.postValue(false)
             _isUserAdded.postValue(true)
         }
     }

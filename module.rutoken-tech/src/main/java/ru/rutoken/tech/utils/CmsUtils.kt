@@ -6,9 +6,12 @@
 
 package ru.rutoken.tech.utils
 
-import org.bouncycastle.asn1.cms.ContentInfo
-import org.bouncycastle.openssl.jcajce.JcaPEMWriter
-import java.io.StringWriter
+import org.bouncycastle.cert.X509CertificateHolder
+import ru.rutoken.tech.ui.bank.payments.Base64String
+import java.security.KeyFactory
+import java.security.PrivateKey
+import java.security.spec.PKCS8EncodedKeySpec
+import java.util.Base64
 
 enum class VerifyCmsResult {
     SUCCESS,
@@ -16,12 +19,14 @@ enum class VerifyCmsResult {
     CERTIFICATE_CHAIN_NOT_VERIFIED
 }
 
-fun cmsToPem(encodedCms: ByteArray): String {
-    val stringWriter = StringWriter()
-    JcaPEMWriter(stringWriter).use {
-        it.writeObject(ContentInfo.getInstance(encodedCms))
-        it.flush()
-    }
+fun ByteArray.toBase64String(): Base64String = Base64.getEncoder().encodeToString(this)
 
-    return stringWriter.toString()
+val Base64String.decoded: ByteArray get() = Base64.getDecoder().decode(this)
+
+fun base64ToPrivateKey(privateKey: Base64String, privateKeyAlgorithm: String): PrivateKey {
+    val caPrivateKeySpec = PKCS8EncodedKeySpec(privateKey.decoded)
+    val keyFactory = KeyFactory.getInstance(privateKeyAlgorithm)
+    return keyFactory.generatePrivate(caPrivateKeySpec)
 }
+
+fun base64ToX509CertificateHolder(certificate: Base64String) = X509CertificateHolder(certificate.decoded)

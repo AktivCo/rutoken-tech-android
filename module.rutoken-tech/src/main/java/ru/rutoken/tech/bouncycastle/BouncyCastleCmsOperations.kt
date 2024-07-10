@@ -15,17 +15,21 @@ import org.bouncycastle.cert.jcajce.JcaX509CertificateConverter
 import org.bouncycastle.cms.CMSAlgorithm
 import org.bouncycastle.cms.CMSEnvelopedData
 import org.bouncycastle.cms.CMSEnvelopedDataGenerator
+import org.bouncycastle.cms.CMSException
 import org.bouncycastle.cms.CMSProcessableByteArray
 import org.bouncycastle.cms.CMSSignedData
 import org.bouncycastle.cms.CMSSignedDataGenerator
 import org.bouncycastle.cms.KeyTransRecipient
 import org.bouncycastle.cms.RecipientInformationStore
 import org.bouncycastle.cms.SignerInfoGeneratorBuilder
+import org.bouncycastle.cms.jcajce.JcaSignerInfoGeneratorBuilder
 import org.bouncycastle.cms.jcajce.JcaSimpleSignerInfoVerifierBuilder
 import org.bouncycastle.cms.jcajce.JceCMSContentEncryptorBuilder
 import org.bouncycastle.cms.jcajce.JceKeyTransRecipientId
 import org.bouncycastle.cms.jcajce.JceKeyTransRecipientInfoGenerator
 import org.bouncycastle.jce.provider.BouncyCastleProvider
+import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder
+import org.bouncycastle.operator.jcajce.JcaDigestCalculatorProviderBuilder
 import org.bouncycastle.util.CollectionStore
 import org.bouncycastle.util.Selector
 import ru.rutoken.pkcs11wrapper.main.Pkcs11Session
@@ -33,7 +37,9 @@ import ru.rutoken.pkcs11wrapper.`object`.key.Pkcs11GostPrivateKeyObject
 import ru.rutoken.tech.bouncycastle.decrypt.RtGostKeyTransEnvelopedRecipient
 import ru.rutoken.tech.bouncycastle.signature.GostContentSigner
 import ru.rutoken.tech.bouncycastle.signature.makeSignatureByHashOid
+import ru.rutoken.tech.ui.bank.payments.Base64String
 import ru.rutoken.tech.utils.VerifyCmsResult
+import ru.rutoken.tech.utils.base64ToPrivateKey
 import ru.rutoken.tech.utils.loge
 import java.security.cert.CertPathBuilder
 import java.security.cert.CertPathBuilderException
@@ -58,6 +64,28 @@ object BouncyCastleCmsOperations {
             addCertificate(certificate)
             additionalCertificates.forEach { addCertificate(it) }
             addSignerInfoGenerator(SignerInfoGeneratorBuilder(signer.getDigestProvider()).build(signer, certificate))
+        }
+
+        return generator.generate(CMSProcessableByteArray(data)).getEncoded(ASN1Encoding.DER)
+    }
+
+    fun signDetachedGost256(
+        data: ByteArray,
+        privateKey: Base64String,
+        certificate: X509CertificateHolder,
+        additionalCertificates: List<X509CertificateHolder>
+    ): ByteArray {
+        val generator = CMSSignedDataGenerator().apply {
+            val contentSigner = JcaContentSignerBuilder("GOST3411WITHECGOST3410-2012-256")
+                .setProvider(BouncyCastleProvider.PROVIDER_NAME)
+                .build(base64ToPrivateKey(privateKey, "ECGOST3410-2012"))
+            addSignerInfoGenerator(
+                JcaSignerInfoGeneratorBuilder(
+                    JcaDigestCalculatorProviderBuilder().setProvider(BouncyCastleProvider.PROVIDER_NAME).build()
+                ).build(contentSigner, certificate)
+            )
+            addCertificate(certificate)
+            additionalCertificates.forEach { addCertificate(it) }
         }
 
         return generator.generate(CMSProcessableByteArray(data)).getEncoded(ASN1Encoding.DER)
@@ -94,8 +122,13 @@ object BouncyCastleCmsOperations {
                     // Validate signer's signature
                     val verifier =
                         JcaSimpleSignerInfoVerifierBuilder().setProvider(BouncyCastleProvider.PROVIDER_NAME).build(cert)
-                    if (!signer.verify(verifier))
+
+                    try {
+                        if (!signer.verify(verifier))
+                            return VerifyCmsResult.SIGNATURE_INVALID
+                    } catch (ex: CMSException) {
                         return VerifyCmsResult.SIGNATURE_INVALID
+                    }
 
                     // Validate signer's certificate chain
                     val constraints = X509CertSelector()

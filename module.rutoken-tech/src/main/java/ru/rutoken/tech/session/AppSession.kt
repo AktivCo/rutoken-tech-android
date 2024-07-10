@@ -9,6 +9,7 @@ package ru.rutoken.tech.session
 import android.content.Context
 import ru.rutoken.tech.bank.biometry.canUseBiometry
 import ru.rutoken.tech.ui.bank.BankCertificate
+import ru.rutoken.tech.ui.bank.payments.Payment
 import ru.rutoken.tech.ui.ca.tokeninfo.model.TokenModel
 
 typealias SerialHexString = String
@@ -42,7 +43,8 @@ class BankUserLoginAppSession(
     val certificateCkaId: ByteArray,
     val certificate: ByteArray,
     val isBiometryActive: Boolean,
-    var encryptedPinData: EncryptedPinData?
+    var encryptedPinData: EncryptedPinData?,
+    var payments: List<Payment>
 ) : AppSession() {
     fun hasPinToDecrypt(context: Context): Boolean {
         if (!isBiometryActive || encryptedPinData == null)

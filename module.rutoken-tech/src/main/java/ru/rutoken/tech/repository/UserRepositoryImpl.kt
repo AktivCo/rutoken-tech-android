@@ -4,7 +4,7 @@
  * All Rights Reserved.
  */
 
-package ru.rutoken.tech.repository.user
+package ru.rutoken.tech.repository
 
 import androidx.annotation.AnyThread
 import androidx.annotation.MainThread

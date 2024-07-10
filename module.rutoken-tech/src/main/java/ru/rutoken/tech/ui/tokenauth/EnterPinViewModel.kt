@@ -18,7 +18,7 @@ import kotlinx.coroutines.launch
 import ru.rutoken.tech.R
 import ru.rutoken.tech.bank.biometry.decryptWithBiometricPrompt
 import ru.rutoken.tech.bank.biometry.encryptWithBiometricPrompt
-import ru.rutoken.tech.repository.user.UserRepository
+import ru.rutoken.tech.repository.UserRepository
 import ru.rutoken.tech.session.AppSessionHolder
 import ru.rutoken.tech.session.bankUserLoginSession
 import ru.rutoken.tech.session.requireBankUserLoginSession

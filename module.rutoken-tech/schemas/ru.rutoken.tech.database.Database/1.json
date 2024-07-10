@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "149508df1a3d1187edb96fae1af0ef9f",
+    "identityHash": "85d3f9059c7b3a3bd00403c686a9556e",
     "entities": [
       {
         "tableName": "users",
@@ -69,38 +69,12 @@
           }
         ],
         "foreignKeys": []
-      },
-      {
-        "tableName": "documents",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `owner_user_id` INTEGER NOT NULL)",
-        "fields": [
-          {
-            "fieldPath": "id",
-            "columnName": "id",
-            "affinity": "INTEGER",
-            "notNull": true
-          },
-          {
-            "fieldPath": "ownerUserId",
-            "columnName": "owner_user_id",
-            "affinity": "INTEGER",
-            "notNull": true
-          }
-        ],
-        "primaryKey": {
-          "autoGenerate": true,
-          "columnNames": [
-            "id"
-          ]
-        },
-        "indices": [],
-        "foreignKeys": []
       }
     ],
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '149508df1a3d1187edb96fae1af0ef9f')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '85d3f9059c7b3a3bd00403c686a9556e')"
     ]
   }
 }

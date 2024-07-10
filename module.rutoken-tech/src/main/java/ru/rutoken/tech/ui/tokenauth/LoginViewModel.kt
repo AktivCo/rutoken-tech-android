@@ -26,11 +26,13 @@ import ru.rutoken.tech.pkcs11.findobjects.findGost256CertificateAndKeyContainerB
 import ru.rutoken.tech.pkcs11.findobjects.findGost256CertificateAndKeyContainers
 import ru.rutoken.tech.pkcs11.findobjects.findGost256KeyContainers
 import ru.rutoken.tech.pkcs11.serialNumberTrimmed
-import ru.rutoken.tech.repository.user.UserRepository
+import ru.rutoken.tech.repository.UserRepository
 import ru.rutoken.tech.session.AppSession
 import ru.rutoken.tech.session.AppSessionHolder
 import ru.rutoken.tech.session.AppSessionType
-import ru.rutoken.tech.session.AppSessionType.*
+import ru.rutoken.tech.session.AppSessionType.BANK_USER_ADDING_SESSION
+import ru.rutoken.tech.session.AppSessionType.BANK_USER_LOGIN_SESSION
+import ru.rutoken.tech.session.AppSessionType.CA_SESSION
 import ru.rutoken.tech.session.BankUserAddingAppSession
 import ru.rutoken.tech.session.BankUserLoginAppSession
 import ru.rutoken.tech.session.CaAppSession
@@ -39,6 +41,7 @@ import ru.rutoken.tech.session.requireBankUserLoginSession
 import ru.rutoken.tech.tokenmanager.RtPkcs11TokenData
 import ru.rutoken.tech.tokenmanager.TokenManager
 import ru.rutoken.tech.ui.bank.BankCertificate
+import ru.rutoken.tech.ui.bank.payments.getInitialPaymentsStorage
 import ru.rutoken.tech.ui.tokenconnector.TokenConnector
 import ru.rutoken.tech.ui.utils.DialogState
 import ru.rutoken.tech.ui.utils.callPkcs11Operation
@@ -209,7 +212,9 @@ class LoginViewModel(
                 if (!currentBankSession.certificate.contentEquals(container.certificate.encoded))
                     throw IllegalStateException("Certificate on Rutoken does not equal to the saved value")
 
-//                TODO initialize payments and add them to existing currentBankSession
+                val paymentsStorage =
+                    getInitialPaymentsStorage(applicationContext, X509CertificateHolder(currentBankSession.certificate))
+                currentBankSession.payments = paymentsStorage
             } catch (_: IllegalStateException) {
                 throw BusinessRuleException(NoSuchCertificate(isBankUser = true))
             }

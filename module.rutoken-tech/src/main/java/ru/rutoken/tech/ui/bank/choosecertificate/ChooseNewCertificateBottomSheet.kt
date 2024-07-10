@@ -37,6 +37,7 @@ import ru.rutoken.tech.ui.bank.CertificateCard
 import ru.rutoken.tech.ui.components.BottomSheetDragHandle
 import ru.rutoken.tech.ui.components.BottomSheetTitle
 import ru.rutoken.tech.ui.components.NavigationBarSpacer
+import ru.rutoken.tech.ui.components.ProgressIndicatorDialog
 import ru.rutoken.tech.ui.components.alertdialog.ConfirmationAlertDialog
 import ru.rutoken.tech.ui.components.alertdialog.ErrorAlertDialog
 import ru.rutoken.tech.ui.components.bottomSheetCornerShape
@@ -77,6 +78,7 @@ fun ChooseNewCertificateScreen(
 
     AskBiometryDialog(viewModel)
     BiometryActivationFailedDialog(viewModel)
+    ProgressIndicatorDialog(viewModel)
 
     val userAdded by viewModel.isUserAdded.observeAsState(false)
     val scope = rememberCoroutineScope()
@@ -158,6 +160,15 @@ private fun BiometryActivationFailedDialog(viewModel: ChooseNewCertificateViewMo
             text = stringResource(id = dialogState.errorDialogData.text),
             onDismissOrConfirm = viewModel::onDismissBiometryActivationFailedDialog
         )
+    }
+}
+
+@Composable
+private fun ProgressIndicatorDialog(viewModel: ChooseNewCertificateViewModel) {
+    val showProgress by viewModel.showProgress.observeAsState(false)
+
+    if (showProgress) {
+        ProgressIndicatorDialog()
     }
 }
 

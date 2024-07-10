@@ -7,6 +7,7 @@
 package ru.rutoken.tech.ui.bank.payments
 
 import androidx.compose.foundation.LocalOverscrollConfiguration
+import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -34,12 +35,14 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.launch
 import ru.rutoken.tech.R
 import ru.rutoken.tech.ui.components.AppIcons
 import ru.rutoken.tech.ui.components.ScreenTopAppBar
@@ -78,6 +81,8 @@ private fun PaymentsScreen(
     val incomingPayments = payments.filter { it.isIncoming() }
     val outgoingPayments = payments.filter { !it.isIncoming() }
     var showIncomingPayments by remember { mutableStateOf(true) }
+    val scrollState = rememberScrollState()
+    val scope = rememberCoroutineScope()
 
     Scaffold(
         topBar = {
@@ -98,12 +103,19 @@ private fun PaymentsScreen(
                 .consumeWindowInsets(innerPadding)
         ) {
             SegmentedButtonRow(
-                onIncomingPaymentsClicked = { showIncomingPayments = true },
-                onOutgoingPaymentsClicked = { showIncomingPayments = false }
+                onIncomingPaymentsClicked = {
+                    showIncomingPayments = true
+                    scope.launch { scrollState.scrollTo(0) }
+                },
+                onOutgoingPaymentsClicked = {
+                    showIncomingPayments = false
+                    scope.launch { scrollState.scrollTo(0) }
+                }
             )
             Spacer(Modifier.height(12.dp))
             PaymentsGroup(
                 payments = if (showIncomingPayments) incomingPayments else outgoingPayments,
+                scrollState = scrollState,
                 onPaymentClicked = onPaymentClicked
             )
         }
@@ -134,9 +146,9 @@ private fun SegmentedButtonRow(
 }
 
 @Composable
-private fun PaymentsGroup(payments: List<Payment>, onPaymentClicked: (Payment) -> Unit) {
+private fun PaymentsGroup(payments: List<Payment>, scrollState: ScrollState, onPaymentClicked: (Payment) -> Unit) {
     CompositionLocalProvider(LocalOverscrollConfiguration provides null) {
-        Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
+        Column(modifier = Modifier.verticalScroll(scrollState)) {
             val archivedPayments = payments.filter { it.isArchived() }
             val activePayments = payments.filter { !it.isArchived() }
 
@@ -226,15 +238,15 @@ private fun PaymentsScreenPreview() {
             date = LocalDate.now(),
             amount = "14 500 ₽",
             organization = "ОАО Нефтегаз",
-            operationType = OperationType.VERIFY
+            userActionType = UserActionType.VERIFY
         )
         val payment2 = Payment(
             title = "Инкассовое поручение №122",
             date = LocalDate.of(2023, 12, 10),
             amount = "4 500 ₽",
             organization = "ОАО Нефтегаз",
-            operationType = OperationType.DECRYPT,
-            operationTime = LocalDateTime.now()
+            userActionType = UserActionType.DECRYPT,
+            actionTime = LocalDateTime.now()
         )
 
         PaymentsScreen(

@@ -10,12 +10,11 @@ import org.bouncycastle.cert.X509CertificateHolder
 import org.bouncycastle.cert.X509v3CertificateBuilder
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder
 import org.bouncycastle.pkcs.PKCS10CertificationRequest
+import ru.rutoken.tech.utils.base64ToPrivateKey
+import ru.rutoken.tech.utils.decoded
 import java.math.BigInteger
-import java.security.KeyFactory
-import java.security.spec.PKCS8EncodedKeySpec
 import java.time.Period
 import java.time.ZonedDateTime
-import java.util.Base64
 import java.util.Date
 import java.util.Random
 
@@ -53,7 +52,7 @@ private val CA_CONFIG_GOST = LocalCAConfig(
 
 object LocalCA {
     val rootCertificate: ByteArray
-        get() = Base64.getDecoder().decode(CA_CONFIG_GOST.caCertificate)
+        get() = CA_CONFIG_GOST.caCertificate.decoded
 
     fun issueCertificate(csr: ByteArray): ByteArray {
         return with(CA_CONFIG_GOST) {
@@ -78,10 +77,7 @@ object LocalCA {
                 certificateBuilder.addExtension(oid, extension.isCritical, extension.parsedValue)
             }
 
-            val caPrivateKeySpec = PKCS8EncodedKeySpec(Base64.getDecoder().decode(caPrivateKey))
-            val keyFactory = KeyFactory.getInstance(privateKeyAlgorithm)
-            val caPrivateKey = keyFactory.generatePrivate(caPrivateKeySpec)
-
+            val caPrivateKey = base64ToPrivateKey(caPrivateKey, privateKeyAlgorithm)
             val signer = JcaContentSignerBuilder(signatureAlgorithm).build(caPrivateKey)
 
             certificateBuilder.build(signer).encoded

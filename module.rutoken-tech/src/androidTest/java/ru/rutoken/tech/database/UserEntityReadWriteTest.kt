@@ -16,15 +16,12 @@ import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import ru.rutoken.tech.database.document.DocumentDao
-import ru.rutoken.tech.database.document.DocumentEntity
 import ru.rutoken.tech.database.user.UserDao
 import ru.rutoken.tech.database.user.UserEntity
 
 @RunWith(AndroidJUnit4::class)
 class UserEntityReadWriteTest {
     private lateinit var userDao: UserDao
-    private lateinit var documentDao: DocumentDao
     private lateinit var db: Database
 
     @Before
@@ -34,7 +31,6 @@ class UserEntityReadWriteTest {
             Database::class.java
         ).build()
         userDao = db.userDao()
-        documentDao = db.documentDao()
     }
 
     @After
@@ -43,7 +39,7 @@ class UserEntityReadWriteTest {
     }
 
     @Test
-    fun writeUserAndReadRelatedDocumentsList() = runTest {
+    fun writeUser() = runTest {
         val user = UserEntity(
             certificateDerValue = byteArrayOf(),
             ckaId = byteArrayOf(),
@@ -53,15 +49,6 @@ class UserEntityReadWriteTest {
             cipherIv = byteArrayOf(2, 4, 6)
         )
         userDao.addUser(user)
-        val createdUser = userDao.getUsers().also {
-            withClue("Should be 1 user") { it.size shouldBe 1 }
-        }.first()
-        val document = DocumentEntity(ownerUserId = createdUser.id)
-        documentDao.addDocument(document)
-        val userWithDocuments = userDao.getUserWithDocuments(createdUser.id)
-        withClue("User should have 1 document") { userWithDocuments.documents.size shouldBe 1 }
-        withClue("User's document owner id should be equal to user id") {
-            userWithDocuments.documents.first().ownerUserId shouldBe createdUser.id
-        }
+        withClue("Should be 1 user") { userDao.getUsers().size shouldBe 1 }
     }
 }

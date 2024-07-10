@@ -15,10 +15,8 @@ import ru.rutoken.pkcs11wrapper.main.Pkcs11Module
 import ru.rutoken.tech.database.Database
 import ru.rutoken.tech.pkcs11.Pkcs11Launcher
 import ru.rutoken.tech.pkcs11.RtPkcs11Module
-import ru.rutoken.tech.repository.document.DocumentRepository
-import ru.rutoken.tech.repository.document.DocumentRepositoryImpl
-import ru.rutoken.tech.repository.user.UserRepository
-import ru.rutoken.tech.repository.user.UserRepositoryImpl
+import ru.rutoken.tech.repository.UserRepository
+import ru.rutoken.tech.repository.UserRepositoryImpl
 import ru.rutoken.tech.session.AppSessionHolder
 import ru.rutoken.tech.tokenmanager.TokenManager
 import ru.rutoken.tech.ui.bank.choosecertificate.ChooseNewCertificateViewModel
@@ -37,7 +35,6 @@ val koinModule = module {
         Room.databaseBuilder(androidContext(), Database::class.java, "rutoken_tech_database").build()
     }
     single<UserRepository> { UserRepositoryImpl(get()) }
-    single<DocumentRepository> { DocumentRepositoryImpl(get()) }
     single { TokenManager() }
     single { AppSessionHolder() }
 
@@ -48,5 +45,5 @@ val koinModule = module {
     viewModel { GenerateCertificateViewModel(get(), get()) }
     viewModel { BankStartScreenViewModel(get(), get(), get()) }
     viewModel { ChooseNewCertificateViewModel(get(), get(), get()) }
-    viewModel { PaymentsViewModel() }
+    viewModel { PaymentsViewModel(get()) }
 }

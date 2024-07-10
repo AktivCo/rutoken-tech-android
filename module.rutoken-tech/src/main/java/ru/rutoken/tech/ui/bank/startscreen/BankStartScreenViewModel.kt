@@ -14,11 +14,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import ru.rutoken.tech.repository.user.UserRepository
+import ru.rutoken.tech.repository.UserRepository
 import ru.rutoken.tech.session.AppSessionHolder
 import ru.rutoken.tech.session.BankUserLoginAppSession
 import ru.rutoken.tech.ui.bank.BankUser
-import ru.rutoken.tech.ui.tokenauth.LoginViewModel
 import ru.rutoken.tech.ui.utils.getCertificateErrorText
 import ru.rutoken.tech.utils.logd
 import ru.rutoken.tech.utils.toDateString
@@ -96,7 +95,8 @@ class BankStartScreenViewModel(
                     ckaId,
                     certificateDerValue,
                     isBiometryActive,
-                    pinData
+                    pinData,
+                    emptyList() // payments will be loaded later
                 )
                 sessionHolder.setSession(userLoginAppSession)
                 logd<BankStartScreenViewModel> { "New BankUserLogin session created for userId $id" }

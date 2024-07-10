@@ -43,10 +43,10 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import ru.rutoken.tech.R
 import ru.rutoken.tech.ui.components.AppIcons
-import ru.rutoken.tech.ui.components.ScreenTopAppBar
-import ru.rutoken.tech.ui.components.alertdialog.SimpleAlertDialog
+import ru.rutoken.tech.ui.components.MenuScreenTopAppBar
 import ru.rutoken.tech.ui.components.TextGroup
 import ru.rutoken.tech.ui.components.TextGroupItem
+import ru.rutoken.tech.ui.components.alertdialog.SimpleAlertDialog
 import ru.rutoken.tech.ui.theme.RutokenTechTheme
 import ru.rutoken.tech.ui.utils.DialogState
 import ru.rutoken.tech.ui.utils.PreviewDark
@@ -90,7 +90,7 @@ private fun TokenInfoScreen(
 ) {
     Scaffold(
         topBar = {
-            ScreenTopAppBar(
+            MenuScreenTopAppBar(
                 screenName = stringResource(id = R.string.tab_certificate_authority),
                 openDrawer = openDrawer,
                 trailingIcon = { AppIcons.Logout() },

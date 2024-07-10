@@ -43,7 +43,7 @@ import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat.startActivity
 import ru.rutoken.tech.BuildConfig
 import ru.rutoken.tech.R
-import ru.rutoken.tech.ui.components.ScreenTopAppBar
+import ru.rutoken.tech.ui.components.MenuScreenTopAppBar
 import ru.rutoken.tech.ui.components.TextGroup
 import ru.rutoken.tech.ui.components.TextGroupItem
 import ru.rutoken.tech.ui.theme.RutokenTechTheme
@@ -57,7 +57,7 @@ private const val PRIVACY_POLICY_URL = "https://www.rutoken.ru/company/policy/ru
 fun AboutScreen(openDrawer: () -> Unit) {
     Scaffold(
         topBar = {
-            ScreenTopAppBar(screenName = stringResource(id = R.string.about_app_menu_item), openDrawer = openDrawer)
+            MenuScreenTopAppBar(screenName = stringResource(id = R.string.about_app_menu_item), openDrawer = openDrawer)
         }
     ) { innerPadding ->
         CompositionLocalProvider(

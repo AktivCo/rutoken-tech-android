@@ -29,9 +29,9 @@ import ru.rutoken.tech.R
 import ru.rutoken.tech.ui.bank.BankUser
 import ru.rutoken.tech.ui.bank.CertificateCard
 import ru.rutoken.tech.ui.components.AppIcons
-import ru.rutoken.tech.ui.components.alertdialog.ConfirmationAlertDialog
+import ru.rutoken.tech.ui.components.MenuScreenTopAppBar
 import ru.rutoken.tech.ui.components.PrimaryButtonBox
-import ru.rutoken.tech.ui.components.ScreenTopAppBar
+import ru.rutoken.tech.ui.components.alertdialog.ConfirmationAlertDialog
 import ru.rutoken.tech.ui.theme.RutokenTechTheme
 import ru.rutoken.tech.ui.theme.bodyMediumOnSurfaceVariant
 import ru.rutoken.tech.ui.utils.PreviewDark
@@ -82,7 +82,7 @@ private fun BankStartScreen(
 
     Scaffold(
         topBar = {
-            ScreenTopAppBar(
+            MenuScreenTopAppBar(
                 screenName = stringResource(id = R.string.tab_bank),
                 openDrawer = openDrawer,
                 trailingIcon = if (users.isNotEmpty()) trailingIcon else null,

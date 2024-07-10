@@ -16,7 +16,8 @@ import ru.rutoken.tech.ui.utils.Modifiers
 @Composable
 fun ScreenTopAppBar(
     screenName: String,
-    openDrawer: () -> Unit,
+    navigationIcon: @Composable () -> Unit,
+    onNavigationIconClick: () -> Unit,
     trailingIcon: (@Composable () -> Unit)? = null,
     onTrailingIconClick: () -> Unit = {}
 ) {
@@ -29,17 +30,28 @@ fun ScreenTopAppBar(
             )
         },
         navigationIcon = {
-            IconButton(
-                onClick = { openDrawer() },
-                modifier = Modifiers.appBarIconSize
-            ) { AppIcons.Menu() }
+            IconButton(onClick = onNavigationIconClick, modifier = Modifiers.appBarIconSize, content = navigationIcon)
         },
         actions = {
             if (trailingIcon != null) {
-                IconButton(onClick = onTrailingIconClick, modifier = Modifiers.appBarIconSize) {
-                    trailingIcon()
-                }
+                IconButton(onClick = onTrailingIconClick, modifier = Modifiers.appBarIconSize, content = trailingIcon)
             }
         }
+    )
+}
+
+@Composable
+fun MenuScreenTopAppBar(
+    screenName: String,
+    openDrawer: () -> Unit,
+    trailingIcon: (@Composable () -> Unit)? = null,
+    onTrailingIconClick: () -> Unit = {}
+) {
+    ScreenTopAppBar(
+        screenName = screenName,
+        navigationIcon = { AppIcons.Menu() },
+        onNavigationIconClick = openDrawer,
+        trailingIcon = trailingIcon,
+        onTrailingIconClick = onTrailingIconClick
     )
 }

@@ -92,6 +92,12 @@
     <string name="skip">Пропустить</string>
     <string name="activate">Активировать</string>
 
+    <!--Related to payments screen-->
+    <string name="payments_title">Платежи</string>
+    <string name="incoming_payments">Входящие</string>
+    <string name="outgoing_payments">Исходящие</string>
+    <string name="archive">Архив</string>
+
     <!--Related to simple dialogs-->
     <string name="key_pair_generated">Ключевая пара сгенерирована</string>
     <string name="no_key_pairs_without_certificates">На Рутокене нет ключевых пар без\u00A0сертификата</string>

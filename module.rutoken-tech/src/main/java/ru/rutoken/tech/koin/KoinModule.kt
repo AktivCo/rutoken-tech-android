@@ -22,6 +22,7 @@ import ru.rutoken.tech.repository.user.UserRepositoryImpl
 import ru.rutoken.tech.session.AppSessionHolder
 import ru.rutoken.tech.tokenmanager.TokenManager
 import ru.rutoken.tech.ui.bank.choosecertificate.ChooseNewCertificateViewModel
+import ru.rutoken.tech.ui.bank.payments.PaymentsViewModel
 import ru.rutoken.tech.ui.bank.startscreen.BankStartScreenViewModel
 import ru.rutoken.tech.ui.ca.generateobjects.certificate.GenerateCertificateViewModel
 import ru.rutoken.tech.ui.ca.generateobjects.keypair.GenerateKeyPairViewModel
@@ -47,4 +48,5 @@ val koinModule = module {
     viewModel { GenerateCertificateViewModel(get(), get()) }
     viewModel { BankStartScreenViewModel(get(), get()) }
     viewModel { ChooseNewCertificateViewModel(get(), get(), get()) }
+    viewModel { PaymentsViewModel() }
 }

@@ -51,7 +51,7 @@ import ru.rutoken.tech.ui.utils.expandedSheetState
 @Composable
 fun ChooseNewCertificateScreen(
     viewModel: ChooseNewCertificateViewModel,
-    onNavigateToDocumentsScreen: () -> Unit,
+    onNavigateToPaymentsScreen: () -> Unit,
     onNavigateBack: () -> Unit
 ) {
     var showBottomSheet by remember { mutableStateOf(true) }
@@ -85,7 +85,7 @@ fun ChooseNewCertificateScreen(
         if (userAdded) {
             scope.launch { sheetState.hide() }.invokeOnCompletion {
                 showBottomSheet = false
-                onNavigateToDocumentsScreen()
+                onNavigateToPaymentsScreen()
             }
         }
     }

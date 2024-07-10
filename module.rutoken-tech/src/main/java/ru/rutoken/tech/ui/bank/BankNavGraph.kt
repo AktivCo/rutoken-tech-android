@@ -15,6 +15,8 @@ import ru.rutoken.tech.session.AppSessionHolder
 import ru.rutoken.tech.session.AppSessionType
 import ru.rutoken.tech.ui.bank.choosecertificate.ChooseNewCertificateScreen
 import ru.rutoken.tech.ui.bank.choosecertificate.ChooseNewCertificateViewModel
+import ru.rutoken.tech.ui.bank.payments.PaymentsScreen
+import ru.rutoken.tech.ui.bank.payments.PaymentsViewModel
 import ru.rutoken.tech.ui.bank.startscreen.BankStartScreen
 import ru.rutoken.tech.ui.bank.startscreen.BankStartScreenViewModel
 import ru.rutoken.tech.ui.main.Destination
@@ -30,6 +32,7 @@ sealed class BankDestination(override val route: String) : Destination {
     data object Start : BankDestination("bank/start")
     data object TokenAuth : BankDestination("bank/tokenAuth")
     data object Certificates : BankDestination("bank/certificates")
+    data object Payments : BankDestination("bank/payments")
 }
 
 fun NavGraphBuilder.addBankDestinations(
@@ -63,8 +66,17 @@ fun NavGraphBuilder.addBankDestinations(
     bottomSheet(BankDestination.Certificates.route) {
         ChooseNewCertificateScreen(
             viewModel = koinViewModel<ChooseNewCertificateViewModel>(),
-            onNavigateToDocumentsScreen = { navController.navigate(BankDestination.Start.route) /*TODO: navigate to documents screen*/ },
+            onNavigateToPaymentsScreen = { navController.navigate(BankDestination.Payments.route) },
             onNavigateBack = { navController.popBackStack(BankDestination.Start.route, false) }
+        )
+    }
+
+    composable(BankDestination.Payments) {
+        PaymentsScreen(
+            viewModel = koinViewModel<PaymentsViewModel>(),
+            onNavigateBack = navController::popBackStack,
+            onResetPaymentsClicked = { /*TODO*/ },
+            onPaymentClicked = { /*TODO*/ }
         )
     }
 }

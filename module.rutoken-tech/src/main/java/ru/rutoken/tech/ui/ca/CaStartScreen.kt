@@ -24,7 +24,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import ru.rutoken.tech.R
-import ru.rutoken.tech.ui.components.ScreenTopAppBar
+import ru.rutoken.tech.ui.components.MenuScreenTopAppBar
 import ru.rutoken.tech.ui.theme.RutokenTechTheme
 import ru.rutoken.tech.ui.theme.bodyMediumOnSurfaceVariant
 import ru.rutoken.tech.ui.utils.PreviewDark
@@ -35,7 +35,7 @@ import ru.rutoken.tech.ui.utils.figmaPadding
 fun CaStartScreen(onClickConnectToken: () -> Unit, openDrawer: () -> Unit) {
     Scaffold(
         topBar = {
-            ScreenTopAppBar(
+            MenuScreenTopAppBar(
                 screenName = stringResource(id = R.string.tab_certificate_authority),
                 openDrawer = openDrawer
             )

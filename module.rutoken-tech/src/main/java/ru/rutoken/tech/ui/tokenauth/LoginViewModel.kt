@@ -12,14 +12,17 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.bouncycastle.asn1.x500.style.BCStyle
 import org.bouncycastle.cert.X509CertificateHolder
 import ru.rutoken.pkcs11wrapper.constant.standard.Pkcs11UserType
 import ru.rutoken.pkcs11wrapper.datatype.Pkcs11TokenInfo
+import ru.rutoken.pkcs11wrapper.rutoken.main.RtPkcs11Session
 import ru.rutoken.tech.R
 import ru.rutoken.tech.pkcs11.findobjects.Gost256CertificateAndKeyContainer
+import ru.rutoken.tech.pkcs11.findobjects.findGost256CertificateAndKeyContainerByCkaId
 import ru.rutoken.tech.pkcs11.findobjects.findGost256CertificateAndKeyContainers
 import ru.rutoken.tech.pkcs11.findobjects.findGost256KeyContainers
 import ru.rutoken.tech.pkcs11.serialNumberTrimmed
@@ -27,9 +30,12 @@ import ru.rutoken.tech.repository.user.UserRepository
 import ru.rutoken.tech.session.AppSession
 import ru.rutoken.tech.session.AppSessionHolder
 import ru.rutoken.tech.session.AppSessionType
+import ru.rutoken.tech.session.AppSessionType.*
 import ru.rutoken.tech.session.BankUserAddingAppSession
+import ru.rutoken.tech.session.BankUserLoginAppSession
 import ru.rutoken.tech.session.CaAppSession
 import ru.rutoken.tech.session.CkaIdString
+import ru.rutoken.tech.session.requireBankUserLoginSession
 import ru.rutoken.tech.tokenmanager.RtPkcs11TokenData
 import ru.rutoken.tech.tokenmanager.TokenManager
 import ru.rutoken.tech.ui.bank.BankCertificate
@@ -39,6 +45,7 @@ import ru.rutoken.tech.ui.utils.callPkcs11Operation
 import ru.rutoken.tech.ui.utils.getCertificateErrorText
 import ru.rutoken.tech.ui.utils.toErrorDialogData
 import ru.rutoken.tech.utils.BusinessRuleCase.IncorrectPin
+import ru.rutoken.tech.utils.BusinessRuleCase.NoSuchCertificate
 import ru.rutoken.tech.utils.BusinessRuleCase.PinLocked
 import ru.rutoken.tech.utils.BusinessRuleException
 import ru.rutoken.tech.utils.checkSubjectRdns
@@ -74,8 +81,19 @@ class LoginViewModel(
     fun login(appSessionType: AppSessionType, tokenUserPin: String, invalidPinBlock: (String) -> Unit) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                val tokenData = with(tokenManager.getFirstTokenAsync()) {
-                    if (isCompleted) getCompleted() else tokenConnector.findFirstToken(tokenManager)
+                val tokenData = when (appSessionType) {
+                    BANK_USER_LOGIN_SESSION -> {
+                        tokenConnector.findTokenBySerialNumber(
+                            tokenManager,
+                            sessionHolder.requireBankUserLoginSession().tokenSerial
+                        )
+                    }
+
+                    else -> {
+                        with(tokenManager.getFirstTokenAsync()) {
+                            if (isCompleted) getCompleted() else tokenConnector.findFirstToken(tokenManager)
+                        }
+                    }
                 }
 
                 _showProgress.postValue(true)
@@ -83,6 +101,10 @@ class LoginViewModel(
                 doLogin(appSessionType, tokenUserPin, tokenData)
                     .onFailure { handleLoginFailure(it, invalidPinBlock) }
                     .onSuccess { _authDoneEvent.postValue(true) }
+            } catch (ignored: CancellationException) {
+//                Nothing to do in case of manual cancellation
+            } catch (exception: Exception) {
+                handleLoginFailure(exception, invalidPinBlock)
             } finally {
                 _showProgress.postValue(false)
             }
@@ -109,12 +131,23 @@ class LoginViewModel(
         val tokenInfo = tokenData.token.tokenInfo
 
         return when (appSessionType) {
-            AppSessionType.CA_SESSION -> {
-                createCaAppSession(tokenUserPin, tokenData, tokenInfo)
-            }
+            CA_SESSION -> createCaAppSession(tokenUserPin, tokenData, tokenInfo)
+            BANK_USER_ADDING_SESSION -> createBankUserAddingAppSession(tokenUserPin, tokenData, tokenInfo)
+            BANK_USER_LOGIN_SESSION -> updateBankUserLoginSession(tokenUserPin, tokenData, tokenInfo)
+        }
+    }
 
-            AppSessionType.BANK_USER_ADDING_SESSION -> {
-                createBankUserAddingAppSession(tokenUserPin, tokenData, tokenInfo)
+    private suspend fun withTokenSession(
+        tokenData: RtPkcs11TokenData,
+        tokenInfo: Pkcs11TokenInfo,
+        tokenUserPin: String,
+        block: suspend (RtPkcs11Session) -> Unit
+    ) {
+        callPkcs11Operation(_showProgress, tokenManager, tokenInfo.serialNumberTrimmed) {
+            tokenData.token.openSession(false).use { session ->
+                session.login(Pkcs11UserType.CKU_USER, tokenUserPin).use {
+                    block(session)
+                }
             }
         }
     }
@@ -126,13 +159,8 @@ class LoginViewModel(
     ): CaAppSession {
         var keyPairs: MutableList<CkaIdString> = mutableListOf()
 
-        callPkcs11Operation(_showProgress, tokenManager, tokenInfo.serialNumberTrimmed) {
-            tokenData.token.openSession(false).use { session ->
-                session.login(Pkcs11UserType.CKU_USER, tokenUserPin).use {
-                    keyPairs = session.findGost256KeyContainers().map { it.ckaId.toString(Charsets.UTF_8) }
-                        .toMutableList()
-                }
-            }
+        withTokenSession(tokenData, tokenInfo, tokenUserPin) { session ->
+            keyPairs = session.findGost256KeyContainers().map { it.ckaId.toString(Charsets.UTF_8) }.toMutableList()
         }
 
         logd<LoginViewModel> { "New CA session created, found ${keyPairs.size} key pairs" }
@@ -151,16 +179,11 @@ class LoginViewModel(
         tokenInfo: Pkcs11TokenInfo
     ): BankUserAddingAppSession {
         var certificates: List<BankCertificate> = listOf()
-        val tokenSerial = tokenInfo.serialNumberTrimmed
 
-        callPkcs11Operation(_showProgress, tokenManager, tokenSerial) {
-            tokenData.token.openSession(false).use { session ->
-                session.login(Pkcs11UserType.CKU_USER, tokenUserPin).use {
-                    certificates = session.findGost256CertificateAndKeyContainers().map { container ->
-                        container.toBankCertificate()
-                    }.toMutableList().apply { sortBy { it.errorText != null } }
-                }
-            }
+        withTokenSession(tokenData, tokenInfo, tokenUserPin) { session ->
+            certificates = session.findGost256CertificateAndKeyContainers().map { container ->
+                container.toBankCertificate()
+            }.toMutableList().apply { sortBy { it.errorText != null } }
         }
 
         logd<LoginViewModel> { "New Bank User Adding session created" }
@@ -169,6 +192,30 @@ class LoginViewModel(
             tokenSerial = tokenInfo.serialNumberTrimmed,
             certificates = certificates
         )
+    }
+
+    private suspend fun updateBankUserLoginSession(
+        tokenUserPin: String,
+        tokenData: RtPkcs11TokenData,
+        tokenInfo: Pkcs11TokenInfo
+    ): BankUserLoginAppSession {
+        val currentBankSession = sessionHolder.requireBankUserLoginSession()
+
+        withTokenSession(tokenData, tokenInfo, tokenUserPin) { session ->
+            try {
+                val container =
+                    session.findGost256CertificateAndKeyContainerByCkaId(currentBankSession.certificateCkaId)
+
+                if (!currentBankSession.certificate.contentEquals(container.certificate.encoded))
+                    throw IllegalStateException("Certificate on Rutoken does not equal to the saved value")
+
+//                TODO initialize payments and add them to existing currentBankSession
+            } catch (_: IllegalStateException) {
+                throw BusinessRuleException(NoSuchCertificate(isBankUser = true))
+            }
+        }
+
+        return currentBankSession
     }
 
     private suspend fun Gost256CertificateAndKeyContainer.toBankCertificate(): BankCertificate {

@@ -6,6 +6,8 @@
 
 package ru.rutoken.tech.session
 
+import android.content.Context
+import ru.rutoken.tech.bank.biometry.canUseBiometry
 import ru.rutoken.tech.ui.bank.BankCertificate
 import ru.rutoken.tech.ui.ca.tokeninfo.model.TokenModel
 
@@ -14,7 +16,8 @@ typealias CkaIdString = String
 
 enum class AppSessionType {
     CA_SESSION,
-    BANK_USER_ADDING_SESSION
+    BANK_USER_ADDING_SESSION,
+    BANK_USER_LOGIN_SESSION
 }
 
 abstract class AppSession
@@ -32,3 +35,21 @@ data class BankUserAddingAppSession(
     val tokenSerial: SerialHexString,
     val certificates: List<BankCertificate>
 ) : AppSession()
+
+class BankUserLoginAppSession(
+    val userId: Int,
+    val tokenSerial: SerialHexString,
+    val certificateCkaId: ByteArray,
+    val certificate: ByteArray,
+    val isBiometryActive: Boolean,
+    var encryptedPinData: EncryptedPinData?
+) : AppSession() {
+    fun hasPinToDecrypt(context: Context): Boolean {
+        if (!isBiometryActive || encryptedPinData == null)
+            return false
+
+        return context.canUseBiometry()
+    }
+
+    class EncryptedPinData(val bytes: ByteArray, val cipherIv: ByteArray)
+}

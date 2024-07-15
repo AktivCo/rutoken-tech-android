@@ -32,4 +32,12 @@ class UserRepositoryImpl(database: Database) : UserRepository {
     override suspend fun addUser(user: User) = userDao.addUser(user.userEntity)
 
     override suspend fun deleteAllUsers() = userDao.deleteAllUsers()
+
+    override suspend fun deleteUserEncryptedPin(userId: Int) {
+        userDao.updateEncryptedInfo(userId, null, null)
+    }
+
+    override suspend fun updateUserEncryptedPin(userId: Int, encryptedPin: ByteArray, cipherIv: ByteArray) {
+        userDao.updateEncryptedInfo(userId, encryptedPin, cipherIv)
+    }
 }

@@ -37,4 +37,7 @@ interface UserDao {
 
     @Query("DELETE FROM users")
     suspend fun deleteAllUsers()
+
+    @Query("UPDATE users SET encrypted_pin = :encryptedPin, cipher_iv = :cipherIv WHERE id = :userId")
+    suspend fun updateEncryptedInfo(userId: Int, encryptedPin: ByteArray?, cipherIv: ByteArray?)
 }

@@ -23,5 +23,6 @@ sealed class BusinessRuleCase {
     data object TokenRemoved : BusinessRuleCase()
     data object PinLocked : BusinessRuleCase()
     data object NoSuchKeyPair : BusinessRuleCase()
+    class NoSuchCertificate(val isBankUser: Boolean) : BusinessRuleCase()
     class IncorrectPin(val retryLeft: Long) : BusinessRuleCase()
 }

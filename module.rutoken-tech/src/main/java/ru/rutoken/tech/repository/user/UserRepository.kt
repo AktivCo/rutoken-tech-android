@@ -15,4 +15,6 @@ interface UserRepository {
     fun getUsersAsync(): LiveData<List<User>>
     suspend fun addUser(user: User)
     suspend fun deleteAllUsers()
+    suspend fun deleteUserEncryptedPin(userId: Int)
+    suspend fun updateUserEncryptedPin(userId: Int, encryptedPin: ByteArray, cipherIv: ByteArray)
 }

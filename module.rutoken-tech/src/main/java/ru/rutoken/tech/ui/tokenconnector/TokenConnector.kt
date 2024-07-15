@@ -13,7 +13,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancelChildren
 import kotlinx.coroutines.withContext
-import ru.rutoken.pkcs11wrapper.main.Pkcs11Token
 import ru.rutoken.tech.pkcs11.getSerialNumber
 import ru.rutoken.tech.session.SerialHexString
 import ru.rutoken.tech.tokenmanager.RtPkcs11TokenData
@@ -34,8 +33,8 @@ class TokenConnector {
     }
 
     /**
-     * @throws [kotlinx.coroutines.CancellationException] if the [onDismissConnectTokenDialog] method is called before the
-     * token is connected.
+     * @throws [kotlinx.coroutines.CancellationException] if the [onDismissConnectTokenDialog] method is called
+     * before the token is connected.
      */
     suspend fun findFirstToken(tokenManager: TokenManager): RtPkcs11TokenData {
         return withContext(findTokenJob) {
@@ -52,13 +51,13 @@ class TokenConnector {
      * @throws BusinessRuleException if the connected token has a serial number that doesn't match the [tokenSerial]
      * parameter
      */
-    suspend fun findTokenBySerialNumber(tokenManager: TokenManager, tokenSerial: SerialHexString): Pkcs11Token {
+    suspend fun findTokenBySerialNumber(tokenManager: TokenManager, tokenSerial: SerialHexString): RtPkcs11TokenData {
         return withContext(findTokenJob) {
-            tokenManager.getTokenBySerialNumber(tokenSerial)?.let { return@withContext it.token }
+            tokenManager.getTokenBySerialNumber(tokenSerial)?.let { return@withContext it }
 
-            val token = tokenManager.waitForTokenData().token
-            return@withContext if (token.getSerialNumber() == tokenSerial) {
-                token
+            val tokenData = tokenManager.waitForTokenData()
+            return@withContext if (tokenData.token.getSerialNumber() == tokenSerial) {
+                tokenData
             } else {
                 throw BusinessRuleException(BusinessRuleCase.WrongRutoken)
             }

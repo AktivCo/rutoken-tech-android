@@ -48,7 +48,9 @@ class UserEntityReadWriteTest {
             certificateDerValue = byteArrayOf(),
             ckaId = byteArrayOf(),
             tokenSerialNumber = "",
-            encryptedPin = null
+            isBiometryActive = true,
+            encryptedPin = byteArrayOf(1, 2, 3),
+            cipherIv = byteArrayOf(2, 4, 6)
         )
         userDao.addUser(user)
         val createdUser = userDao.getUsers().also {

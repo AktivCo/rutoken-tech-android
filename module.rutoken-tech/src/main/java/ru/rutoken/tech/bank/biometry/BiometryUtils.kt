@@ -20,14 +20,21 @@ import androidx.fragment.app.FragmentActivity
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import ru.rutoken.tech.R
+import ru.rutoken.tech.utils.loge
 import java.security.KeyStore
 import javax.crypto.Cipher
 import javax.crypto.KeyGenerator
 import javax.crypto.SecretKey
+import javax.crypto.spec.IvParameterSpec
 
 private const val SECRET_KEY_ALIAS = "rutoken tech pin encryption key"
 
-fun Context.shouldAskForBiometry(): Boolean {
+/**
+ * Logging purposes
+ */
+private class BiometryUtils
+
+fun Context.canUseBiometry(): Boolean {
     // We do not allow to use biometry on Android 8.1 and lower - this requires the app to use Theme.appCompat,
     // and we use Material themes
     if (Build.VERSION.SDK_INT < Build.VERSION_CODES.P) return false
@@ -41,30 +48,40 @@ suspend fun encryptWithBiometricPrompt(
     activity: FragmentActivity,
     data: ByteArray,
     onError: (Int?, String?) -> Unit,
-    onNonRecognized: () -> Unit,
-    onSuccess: (ByteArray) -> Unit
-) = performCipherCallWithBiometricPrompt(Cipher.ENCRYPT_MODE, activity, data, onError, onNonRecognized, onSuccess)
+    onSuccess: (ByteArray, ByteArray) -> Unit
+) = performCipherCallWithBiometricPrompt(activity, Cipher.ENCRYPT_MODE, data, null, onError, onSuccess)
 
 @WorkerThread
 suspend fun decryptWithBiometricPrompt(
     activity: FragmentActivity,
     data: ByteArray,
+    cipherIv: ByteArray,
     onError: (Int?, String?) -> Unit,
-    onNonRecognized: () -> Unit,
     onSuccess: (ByteArray) -> Unit
-) = performCipherCallWithBiometricPrompt(Cipher.DECRYPT_MODE, activity, data, onError, onNonRecognized, onSuccess)
+) = performCipherCallWithBiometricPrompt(
+    activity,
+    Cipher.DECRYPT_MODE,
+    data,
+    cipherIv,
+    onError,
+) { decryptedData, _ -> onSuccess(decryptedData) }
 
 private suspend fun performCipherCallWithBiometricPrompt(
-    cipherMode: Int,
     activity: FragmentActivity,
+    cipherMode: Int,
     data: ByteArray,
+    cipherIv: ByteArray?,
     onError: (Int?, String?) -> Unit,
-    onNonRecognized: () -> Unit,
-    onSuccess: (ByteArray) -> Unit
+    onSuccess: (ByteArray, ByteArray) -> Unit
 ) {
     val secretKey = getSecretKey() ?: generateSecretKey()
-    val cipher = getCipher().also { it.init(cipherMode, secretKey) }
-    val authenticationCallback = makeAuthenticationCallback(data, onError, onNonRecognized, onSuccess)
+    val cipher = getCipher().also {
+        if (cipherIv != null)
+            it.init(cipherMode, secretKey, IvParameterSpec(cipherIv))
+        else
+            it.init(cipherMode, secretKey)
+    }
+    val authenticationCallback = makeAuthenticationCallback(data, onError, onSuccess)
 
     withContext(Dispatchers.Main) {
         BiometricPrompt(activity, ContextCompat.getMainExecutor(activity), authenticationCallback)
@@ -102,25 +119,22 @@ private fun Context.getBiometricPromptInfo() = BiometricPrompt.PromptInfo.Builde
 private fun makeAuthenticationCallback(
     dataToCrypt: ByteArray,
     onError: (Int?, String?) -> Unit,
-    onNonRecognized: () -> Unit,
-    onSuccess: (ByteArray) -> Unit
+    onSuccess: (ByteArray, ByteArray) -> Unit
 ) = object : BiometricPrompt.AuthenticationCallback() {
     override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult) {
         super.onAuthenticationSucceeded(result)
         try {
-            onSuccess(result.cryptoObject!!.cipher!!.doFinal(dataToCrypt))
+            val cipher = result.cryptoObject!!.cipher!!
+            onSuccess(cipher.doFinal(dataToCrypt), cipher.iv)
         } catch (exception: Exception) {
+            loge<BiometryUtils>(exception) { "Biometric authentication failed" }
             onError(null, exception.toString())
         }
     }
 
-    override fun onAuthenticationFailed() {
-        super.onAuthenticationFailed()
-        onNonRecognized()
-    }
-
     override fun onAuthenticationError(errorCode: Int, errString: CharSequence) {
         super.onAuthenticationError(errorCode, errString)
+        loge<BiometryUtils> { "Biometric authentication failed with code $errorCode: $errString" }
         onError(errorCode, errString.toString())
     }
 }

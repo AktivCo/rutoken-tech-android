@@ -9,6 +9,7 @@ package ru.rutoken.tech.ui.utils
 import androidx.annotation.StringRes
 import ru.rutoken.tech.R
 import ru.rutoken.tech.utils.BusinessRuleCase.IncorrectPin
+import ru.rutoken.tech.utils.BusinessRuleCase.NoSuchCertificate
 import ru.rutoken.tech.utils.BusinessRuleCase.NoSuchKeyPair
 import ru.rutoken.tech.utils.BusinessRuleCase.PinLocked
 import ru.rutoken.tech.utils.BusinessRuleCase.TokenRemoved
@@ -58,6 +59,14 @@ fun Throwable.toErrorDialogData(): ErrorDialogData {
             is NoSuchKeyPair -> ErrorDialogData(
                 title = R.string.no_such_key_pair_title,
                 text = R.string.no_such_key_pair_text
+            )
+
+            is NoSuchCertificate -> ErrorDialogData(
+                title = R.string.no_such_certificate_title,
+                text = if (case.isBankUser)
+                    R.string.no_such_certificate_bank_text
+                else
+                    R.string.no_such_certificate_shift_text
             )
         }
 

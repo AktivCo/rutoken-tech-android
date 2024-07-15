@@ -17,7 +17,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import ru.rutoken.tech.R
 import ru.rutoken.tech.bank.biometry.encryptWithBiometricPrompt
-import ru.rutoken.tech.bank.biometry.shouldAskForBiometry
+import ru.rutoken.tech.bank.biometry.canUseBiometry
 import ru.rutoken.tech.database.user.UserEntity
 import ru.rutoken.tech.repository.user.UserRepository
 import ru.rutoken.tech.repository.user.makeUser
@@ -27,7 +27,6 @@ import ru.rutoken.tech.session.requireBankUserAddingSession
 import ru.rutoken.tech.ui.bank.BankCertificate
 import ru.rutoken.tech.ui.utils.DialogState
 import ru.rutoken.tech.ui.utils.ErrorDialogData
-import ru.rutoken.tech.utils.loge
 
 class ChooseNewCertificateViewModel(
     private val applicationContext: Context,
@@ -56,7 +55,7 @@ class ChooseNewCertificateViewModel(
     fun onCertificateClicked(certificate: BankCertificate) {
         chosenCertificate = certificate
 
-        if (applicationContext.shouldAskForBiometry())
+        if (applicationContext.canUseBiometry())
             _askBiometryDialog.value = true
         else
             saveUserToDatabase()
@@ -81,23 +80,19 @@ class ChooseNewCertificateViewModel(
             encryptWithBiometricPrompt(
                 activity = activity,
                 data = bankUserAddingAppSession.tokenUserPin.toByteArray(),
-                onError = { errorCode, errorMessage ->
-                    val errorText = if (errorMessage != null) ": $errorMessage" else ""
-                    loge { "Biometric authentication failed with code $errorCode$errorText" }
-
+                onError = { _, _ ->
                     val dialogData = ErrorDialogData(
                         title = R.string.biometry_activation_failed_title,
                         text = R.string.biometry_activation_failed_text
                     )
                     _biometryActivationFailedDialogState.postValue(DialogState(true, dialogData))
                 },
-                onNonRecognized = { /* Nothing to do - a user has more attempts left */ },
-                onSuccess = { encryptedPin -> saveUserToDatabase(encryptedPin) }
+                onSuccess = { encryptedPin, cipherIv -> saveUserToDatabase(encryptedPin, cipherIv) }
             )
         }
     }
 
-    private fun saveUserToDatabase(encryptedPin: ByteArray? = null) {
+    private fun saveUserToDatabase(encryptedPin: ByteArray? = null, cipherIv: ByteArray? = null) {
         viewModelScope.launch(Dispatchers.IO) {
             repository.addUser(
                 makeUser(
@@ -105,7 +100,9 @@ class ChooseNewCertificateViewModel(
                         certificateDerValue = chosenCertificate.bytes,
                         ckaId = chosenCertificate.ckaId,
                         tokenSerialNumber = bankUserAddingAppSession.tokenSerial,
-                        encryptedPin = encryptedPin
+                        isBiometryActive = encryptedPin != null,
+                        encryptedPin = encryptedPin,
+                        cipherIv = cipherIv
                     )
                 )
             )

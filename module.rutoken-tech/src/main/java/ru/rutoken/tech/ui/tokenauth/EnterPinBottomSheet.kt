@@ -20,10 +20,7 @@ import androidx.compose.material3.SheetState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
@@ -48,12 +45,15 @@ import ru.rutoken.tech.ui.utils.getHideKeyboardAction
 
 @Composable
 fun EnterPinBottomSheet(
+    pinValue: String,
     pinErrorText: String?,
     buttonEnabled: Boolean,
     onPinValueChanged: (String) -> Unit,
     onButtonClicked: (String) -> Unit,
     sheetState: SheetState,
-    onDismissRequest: () -> Unit
+    onDismissRequest: () -> Unit,
+    hasBiometricPin: Boolean,
+    onDecryptBiometricPin: () -> Unit
 ) {
     ModalBottomSheet(
         onDismissRequest = onDismissRequest,
@@ -63,9 +63,7 @@ fun EnterPinBottomSheet(
     ) {
         BottomSheetTitle(stringResource(R.string.enter_pin))
 
-        var pinValue by remember { mutableStateOf("") }
         val focusRequester = remember { FocusRequester() }
-
         val isPinError = !pinErrorText.isNullOrEmpty()
         val focusManager = LocalFocusManager.current
         val keyboardController = LocalSoftwareKeyboardController.current
@@ -80,7 +78,6 @@ fun EnterPinBottomSheet(
         OutlinedTextField(
             value = pinValue,
             onValueChange = {
-                pinValue = it
                 onPinValueChanged(it)
             },
             modifier = Modifier
@@ -105,8 +102,12 @@ fun EnterPinBottomSheet(
         NavigationBarSpacer()
 
         LaunchedEffect(Unit) {
-            delay(150) // Some devices do not show keyboard on autofocus without this delay
-            focusRequester.requestFocus()
+            if (hasBiometricPin) {
+                onDecryptBiometricPin()
+            } else {
+                delay(150) // Some devices do not show keyboard on autofocus without this delay
+                focusRequester.requestFocus()
+            }
         }
     }
 }
@@ -117,12 +118,15 @@ fun EnterPinBottomSheet(
 private fun EnterPinBottomSheetSuccess() {
     RutokenTechTheme {
         EnterPinBottomSheet(
+            pinValue = "12345678",
             pinErrorText = null,
             buttonEnabled = true,
             onPinValueChanged = {},
             onButtonClicked = {},
             sheetState = expandedSheetState(),
-            onDismissRequest = {}
+            onDismissRequest = {},
+            hasBiometricPin = false,
+            onDecryptBiometricPin = {}
         )
     }
 }
@@ -133,12 +137,15 @@ private fun EnterPinBottomSheetSuccess() {
 private fun EnterPinBottomSheetError() {
     RutokenTechTheme {
         EnterPinBottomSheet(
+            pinValue = "1234567",
             pinErrorText = stringResource(id = R.string.invalid_pin_supporting, 5),
             buttonEnabled = false,
             onPinValueChanged = {},
             onButtonClicked = {},
             sheetState = expandedSheetState(),
-            onDismissRequest = {}
+            onDismissRequest = {},
+            hasBiometricPin = false,
+            onDecryptBiometricPin = {}
         )
     }
 }

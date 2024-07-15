@@ -25,6 +25,9 @@ fun Pkcs11Session.findGost256CertificateAndKeyContainers() =
 
 fun Pkcs11Session.findGost256KeyContainers() = findGost256Containers().filterIsInstance<Gost256KeyContainer>()
 
+fun Pkcs11Session.findGost256CertificateAndKeyContainerByCkaId(ckaId: ByteArray) =
+    findGost256CertificateAndKeyContainers().filter { it.ckaId.contentEquals(ckaId) }.singleOrThrow()
+
 fun Pkcs11Session.findGost256KeyPairByCkaId(ckaId: ByteArray): GostKeyPair {
     val template = listOf(Pkcs11ByteArrayAttribute(Pkcs11AttributeType.CKA_ID, ckaId))
     val publicKey = objectManager.findObjectsAtOnce(Pkcs11Gost256PublicKeyObject::class.java, template).singleOrThrow()

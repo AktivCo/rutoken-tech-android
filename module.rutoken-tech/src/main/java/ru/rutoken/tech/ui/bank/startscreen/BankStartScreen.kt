@@ -40,32 +40,42 @@ import ru.rutoken.tech.ui.utils.PreviewLight
 @Composable
 fun BankStartScreen(
     viewModel: BankStartScreenViewModel,
-    onUserClicked: (Int) -> Unit,
-    onAddUserClicked: () -> Unit,
+    onNavigateToUserLogin: () -> Unit,
+    onNavigateToUserAdding: () -> Unit,
     openDrawer: () -> Unit
 ) {
-    val users by viewModel.users.observeAsState(emptyList())
-
-    LaunchedEffect(Unit) {
-        viewModel.loadUsers()
-    }
-
     val showDeleteUsersDialog by viewModel.showDeleteUsersDialog.observeAsState(false)
     if (showDeleteUsersDialog) {
         ConfirmationAlertDialog(
             text = stringResource(id = R.string.delete_all_users),
             dismissText = stringResource(id = R.string.cancel),
             confirmText = stringResource(id = R.string.delete),
-            onDismiss = viewModel::dismissDeleteUsersDialog,
+            onDismiss = viewModel::onDismissDeleteUsersDialog,
             onConfirm = viewModel::deleteAllUsers
         )
     }
 
+    LaunchedEffect(Unit) {
+        viewModel.loadUsers()
+    }
+
+    val userLoginSessionLoaded by viewModel.loginAppSessionLoaded.observeAsState(false)
+    LaunchedEffect(userLoginSessionLoaded) {
+        if (userLoginSessionLoaded) {
+            viewModel.onNavigateToUserLogin()
+            onNavigateToUserLogin()
+        }
+    }
+
+    val users by viewModel.users.observeAsState(emptyList())
     BankStartScreen(
         users = users,
-        onDeleteUsers = viewModel::showDeleteUsersDialog,
-        onUserClicked = onUserClicked,
-        onAddUserClicked = onAddUserClicked,
+        onDeleteUsers = viewModel::onShowDeleteUsersDialog,
+        onUserClicked = viewModel::onUserClicked,
+        onAddUserClicked = {
+            viewModel.onNavigateToAddUser()
+            onNavigateToUserAdding()
+        },
         openDrawer = openDrawer
     )
 }
@@ -74,7 +84,7 @@ fun BankStartScreen(
 private fun BankStartScreen(
     users: List<BankUser>,
     onDeleteUsers: () -> Unit,
-    onUserClicked: (Int) -> Unit,
+    onUserClicked: (BankUser) -> Unit,
     onAddUserClicked: () -> Unit,
     openDrawer: () -> Unit
 ) {
@@ -105,7 +115,7 @@ private fun BankStartScreen(
 }
 
 @Composable
-private fun UserList(modifier: Modifier, users: List<BankUser>, onUserClicked: (Int) -> Unit) {
+private fun UserList(modifier: Modifier, users: List<BankUser>, onUserClicked: (BankUser) -> Unit) {
     CompositionLocalProvider(
         LocalOverscrollConfiguration provides null
     ) {
@@ -130,7 +140,7 @@ private fun UserList(modifier: Modifier, users: List<BankUser>, onUserClicked: (
                         position = it.position ?: stringResource(R.string.not_set),
                         certificateExpirationDate = it.certificateExpirationDate,
                         errorText = it.errorText,
-                        onClick = { onUserClicked(it.id) }
+                        onClick = { onUserClicked(it) }
                     )
                 }
             }

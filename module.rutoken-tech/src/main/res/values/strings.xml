@@ -116,6 +116,11 @@
     <string name="pin_locked_text">Разблокируйте его в Панели Управления Рутокен либо\nобратитесь к администратору</string>
     <string name="pin_changed_title">PIN-код Рутокена\nбыл изменен</string>
     <string name="pin_changed_text">Необходимо заново подключить Рутокен в\u00A0разделе «Удостоверяющий центр»</string>
+    <string name="failed_biometry_use_title">Биометрия не подтверждена</string>
+    <string name="failed_biometry_use_text">Необходимо ввести PIN-код</string>
+    <string name="no_such_certificate_title">На Рутокене нет подходящего сертификата</string>
+    <string name="no_such_certificate_bank_text">Данный пользователь больше не\u00A0сможет войти в раздел «Банк»</string>
+    <string name="no_such_certificate_shift_text">Данный пользователь больше не\u00A0сможет войти в раздел «Мобильные бригады»</string>
 
     <!--Related to connect token dialog-->
     <string name="connect_token_title">Подключите\nРутокен</string>

@@ -16,7 +16,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.fragment.app.FragmentActivity
 import kotlinx.coroutines.launch
 import ru.rutoken.tech.session.AppSessionType
 import ru.rutoken.tech.ui.components.alertdialog.ConnectTokenDialog
@@ -37,12 +39,15 @@ fun TokenAuthScreen(
     var showEnterPinBottomSheet by remember { mutableStateOf(true) }
     val scope = rememberCoroutineScope()
 
+    val activity = LocalContext.current as FragmentActivity
+
     if (showEnterPinBottomSheet) {
         EnterPinBottomSheet(
             viewModel = enterPinViewModel,
             sheetState = enterPinSheetState,
             onNavigateBack = onNavigateBack,
-            onButtonClick = { loginViewModel.login(appSessionType, it, enterPinViewModel::setPinErrorValue) }
+            onButtonClick = { loginViewModel.login(appSessionType, it, enterPinViewModel::onInvalidPin) },
+            onDecryptBiometricPin = { enterPinViewModel.fillPinWithBiometricPrompt(activity) }
         )
     }
 
@@ -50,10 +55,18 @@ fun TokenAuthScreen(
     ProgressIndicatorDialog(loginViewModel)
     ErrorAlertDialog(loginViewModel)
 
-    val isAuthDone by loginViewModel.authDoneEvent.observeAsState(false)
+    BiometryErrorAlertDialog(enterPinViewModel)
 
+    val isAuthDone by loginViewModel.authDoneEvent.observeAsState(false)
     LaunchedEffect(isAuthDone) {
-        if (isAuthDone) {
+        if (isAuthDone)
+            enterPinViewModel.onValidPinLogin(activity)
+    }
+
+    val biometryUpdateDone by enterPinViewModel.biometryUpdateDone.observeAsState(false)
+
+    LaunchedEffect(biometryUpdateDone) {
+        if (biometryUpdateDone) {
             scope.launch { enterPinSheetState.hide() }.invokeOnCompletion {
                 showEnterPinBottomSheet = false
                 onAuthDone()
@@ -67,19 +80,37 @@ private fun EnterPinBottomSheet(
     viewModel: EnterPinViewModel,
     sheetState: SheetState,
     onNavigateBack: () -> Unit,
-    onButtonClick: (String) -> Unit
+    onButtonClick: (String) -> Unit,
+    onDecryptBiometricPin: () -> Unit
+
 ) {
     val pinErrorText by viewModel.pinErrorText.observeAsState("")
     val isButtonEnabled by viewModel.isButtonEnabled.observeAsState(false)
+    val hasBiometricPin by viewModel.hasBiometricPin.observeAsState(false)
+    val pinValue by viewModel.pinValue.observeAsState("")
 
     EnterPinBottomSheet(
+        pinValue = pinValue,
         pinErrorText = pinErrorText,
         buttonEnabled = isButtonEnabled,
         onPinValueChanged = viewModel::onPinValueChanged,
         onButtonClicked = onButtonClick,
         sheetState = sheetState,
-        onDismissRequest = onNavigateBack
+        onDismissRequest = onNavigateBack,
+        hasBiometricPin = hasBiometricPin,
+        onDecryptBiometricPin = onDecryptBiometricPin
     )
+}
+
+@Composable
+private fun BiometryErrorAlertDialog(viewModel: EnterPinViewModel) {
+    val dialogState by viewModel.biometryErrorDialogState.observeAsState(DialogState())
+    if (dialogState.showDialog)
+        ErrorAlertDialog(
+            title = stringResource(dialogState.errorDialogData.title),
+            text = stringResource(dialogState.errorDialogData.text),
+            onDismissOrConfirm = { viewModel.dismissBiometryErrorDialog(dialogState.errorDialogData) }
+        )
 }
 
 @Composable

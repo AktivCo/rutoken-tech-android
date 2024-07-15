@@ -23,5 +23,7 @@ data class UserEntity(
     @ColumnInfo(name = "certificate_der_value") val certificateDerValue: ByteArray,
     @ColumnInfo(name = "cka_id") val ckaId: ByteArray,
     @ColumnInfo(name = "token_serial_number") val tokenSerialNumber: String,
-    @ColumnInfo(name = "encrypted_pin") val encryptedPin: ByteArray?
+    @ColumnInfo(name = "is_biometry_active") val isBiometryActive: Boolean,
+    @ColumnInfo(name = "encrypted_pin") val encryptedPin: ByteArray?,
+    @ColumnInfo(name = "cipher_iv") val cipherIv: ByteArray?
 )

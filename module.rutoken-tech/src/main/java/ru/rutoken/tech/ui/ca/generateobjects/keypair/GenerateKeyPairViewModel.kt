@@ -78,7 +78,7 @@ class GenerateKeyPairViewModel(
 
                     val caSession = sessionHolder.requireCaSession()
                     val tokenSerial = caSession.tokenSerial
-                    val token = tokenConnector.findTokenBySerialNumber(tokenManager, tokenSerial)
+                    val token = tokenConnector.findTokenBySerialNumber(tokenManager, tokenSerial).token
 
                     callPkcs11Operation(_showProgress, tokenManager, tokenSerial) {
                         createGostKeyPair(

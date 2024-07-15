@@ -44,9 +44,9 @@ val koinModule = module {
     viewModel { LoginViewModel(androidContext(), get(), get(), get()) }
     viewModel { CaTokenInfoViewModel(androidContext(), get()) }
     viewModel { GenerateKeyPairViewModel(get(), get()) }
-    viewModel { EnterPinViewModel() }
+    viewModel { EnterPinViewModel(get(), get(), get()) }
     viewModel { GenerateCertificateViewModel(get(), get()) }
-    viewModel { BankStartScreenViewModel(get(), get()) }
+    viewModel { BankStartScreenViewModel(get(), get(), get()) }
     viewModel { ChooseNewCertificateViewModel(get(), get(), get()) }
     viewModel { PaymentsViewModel() }
 }

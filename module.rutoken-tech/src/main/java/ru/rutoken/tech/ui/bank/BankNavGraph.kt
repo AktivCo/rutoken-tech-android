@@ -30,7 +30,8 @@ import ru.rutoken.tech.ui.tokenauth.TokenAuthScreen
  */
 sealed class BankDestination(override val route: String) : Destination {
     data object Start : BankDestination("bank/start")
-    data object TokenAuth : BankDestination("bank/tokenAuth")
+    data object UserAddingTokenAuth : BankDestination("bank/userAddingTokenAuth")
+    data object UserLoginTokenAuth : BankDestination("bank/userLoginTokenAuth")
     data object Certificates : BankDestination("bank/certificates")
     data object Payments : BankDestination("bank/payments")
 }
@@ -47,13 +48,27 @@ fun NavGraphBuilder.addBankDestinations(
 
         BankStartScreen(
             viewModel = koinViewModel<BankStartScreenViewModel>(),
-            onUserClicked = { /*TODO*/ },
-            onAddUserClicked = { navController.navigate(BankDestination.TokenAuth.route) { launchSingleTop = true } },
+            onNavigateToUserLogin = {
+                navController.navigate(BankDestination.UserLoginTokenAuth.route) { launchSingleTop = true }
+            },
+            onNavigateToUserAdding = {
+                navController.navigate(BankDestination.UserAddingTokenAuth.route) { launchSingleTop = true }
+            },
             openDrawer = openDrawer
         )
     }
 
-    bottomSheet(BankDestination.TokenAuth.route) {
+    bottomSheet(BankDestination.UserLoginTokenAuth.route) {
+        TokenAuthScreen(
+            enterPinViewModel = koinViewModel<EnterPinViewModel>(),
+            loginViewModel = koinViewModel<LoginViewModel>(),
+            appSessionType = AppSessionType.BANK_USER_LOGIN_SESSION,
+            onAuthDone = { navController.navigate(BankDestination.Payments.route) },
+            onNavigateBack = navController::popBackStack
+        )
+    }
+
+    bottomSheet(BankDestination.UserAddingTokenAuth.route) {
         TokenAuthScreen(
             enterPinViewModel = koinViewModel<EnterPinViewModel>(),
             loginViewModel = koinViewModel<LoginViewModel>(),

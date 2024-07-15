@@ -31,6 +31,11 @@ val AppSessionHolder.caSession: CaAppSession?
 val AppSessionHolder.bankUserAddingSession: BankUserAddingAppSession?
     get() = session as? BankUserAddingAppSession
 
+val AppSessionHolder.bankUserLoginSession: BankUserLoginAppSession?
+    get() = session as? BankUserLoginAppSession
+
 fun AppSessionHolder.requireCaSession(): CaAppSession = requireNotNull(caSession)
 
 fun AppSessionHolder.requireBankUserAddingSession(): BankUserAddingAppSession = requireNotNull(bankUserAddingSession)
+
+fun AppSessionHolder.requireBankUserLoginSession(): BankUserLoginAppSession = requireNotNull(bankUserLoginSession)

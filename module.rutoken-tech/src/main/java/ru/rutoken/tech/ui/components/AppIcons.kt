@@ -13,6 +13,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.outlined.Share
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -160,6 +161,15 @@ object AppIcons {
                 tint = getPaymentIconTint(isArchived)
             )
         }
+    }
+
+    @Composable
+    fun Share() {
+        Icon(
+            imageVector = Icons.Outlined.Share,
+            contentDescription = "Share Icon",
+            tint = MaterialTheme.colorScheme.onSurfaceVariant
+        )
     }
 
     @Composable

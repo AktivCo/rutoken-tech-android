@@ -11,10 +11,13 @@ import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import com.google.accompanist.navigation.material.bottomSheet
 import org.koin.androidx.compose.koinViewModel
+import org.koin.core.parameter.parametersOf
 import ru.rutoken.tech.session.AppSessionHolder
 import ru.rutoken.tech.session.AppSessionType
 import ru.rutoken.tech.ui.bank.choosecertificate.ChooseNewCertificateScreen
 import ru.rutoken.tech.ui.bank.choosecertificate.ChooseNewCertificateViewModel
+import ru.rutoken.tech.ui.bank.payment.PaymentScreen
+import ru.rutoken.tech.ui.bank.payment.PaymentViewModel
 import ru.rutoken.tech.ui.bank.payments.PaymentsScreen
 import ru.rutoken.tech.ui.bank.payments.PaymentsViewModel
 import ru.rutoken.tech.ui.bank.startscreen.BankStartScreen
@@ -34,6 +37,7 @@ sealed class BankDestination(override val route: String) : Destination {
     data object UserLoginTokenAuth : BankDestination("bank/userLoginTokenAuth")
     data object Certificates : BankDestination("bank/certificates")
     data object Payments : BankDestination("bank/payments")
+    data object Payment : BankDestination("bank/payments/{paymentTitle}")
 }
 
 fun NavGraphBuilder.addBankDestinations(
@@ -91,7 +95,18 @@ fun NavGraphBuilder.addBankDestinations(
             viewModel = koinViewModel<PaymentsViewModel>(),
             onNavigateBack = navController::popBackStack,
             onResetPaymentsClicked = { /*TODO*/ },
-            onPaymentClicked = { /*TODO*/ }
+            onPaymentClicked = { navController.navigate(BankDestination.Payments.route + "/${it.title}") },
+        )
+    }
+
+    composable(BankDestination.Payment) { backStackEntry ->
+        PaymentScreen(
+            viewModel = koinViewModel<PaymentViewModel>(
+                parameters = { parametersOf(backStackEntry.arguments!!.getString("paymentTitle")!!) }
+            ),
+            onNavigateBack = navController::popBackStack,
+            onSharePaymentClicked = { /*TODO*/ },
+            onUserActionButtonClicked = { /*TODO*/ }
         )
     }
 }

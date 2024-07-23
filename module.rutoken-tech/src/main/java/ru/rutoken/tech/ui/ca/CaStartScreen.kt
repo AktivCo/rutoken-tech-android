@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -25,6 +24,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import ru.rutoken.tech.R
 import ru.rutoken.tech.ui.components.MenuScreenTopAppBar
+import ru.rutoken.tech.ui.components.SecondaryButton
 import ru.rutoken.tech.ui.theme.RutokenTechTheme
 import ru.rutoken.tech.ui.theme.bodyMediumOnSurfaceVariant
 import ru.rutoken.tech.ui.utils.PreviewDark
@@ -70,15 +70,7 @@ fun CaStartScreen(onClickConnectToken: () -> Unit, openDrawer: () -> Unit) {
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            FilledTonalButton(
-                onClick = onClickConnectToken,
-                modifier = Modifier.height(40.dp)
-            ) {
-                Text(
-                    text = stringResource(id = R.string.connect),
-                    style = MaterialTheme.typography.labelLarge
-                )
-            }
+            SecondaryButton(text = stringResource(id = R.string.connect), onClick = onClickConnectToken)
         }
     }
 }

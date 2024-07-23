@@ -98,6 +98,16 @@
     <string name="outgoing_payments">Исходящие</string>
     <string name="archive">Архив</string>
 
+    <!--Related to payment screen-->
+    <string name="sign">Подписать</string>
+    <string name="verify">Проверить подпись</string>
+    <string name="encrypt">Зашифровать</string>
+    <string name="decrypt">Расшифровать</string>
+    <string name="signed">Подписан\n%s</string>
+    <string name="verified">Подпись проверена\n%s</string>
+    <string name="encrypted">Зашифрован\n%s</string>
+    <string name="decrypted">Расшифрован\n%s</string>
+
     <!--Related to simple dialogs-->
     <string name="key_pair_generated">Ключевая пара сгенерирована</string>
     <string name="no_key_pairs_without_certificates">На Рутокене нет ключевых пар без\u00A0сертификата</string>

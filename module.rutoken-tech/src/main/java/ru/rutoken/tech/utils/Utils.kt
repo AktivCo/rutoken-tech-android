@@ -11,6 +11,7 @@ import org.bouncycastle.asn1.x500.style.BCStyle
 import org.bouncycastle.cert.X509CertificateHolder
 import java.text.SimpleDateFormat
 import java.time.LocalDate
+import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.Date
 import java.util.Locale
@@ -19,6 +20,9 @@ fun Date.toDateString(): String = SimpleDateFormat("dd.MM.yyyy", Locale.getDefau
 
 fun LocalDate.toDateString(): String =
     format(DateTimeFormatter.ofPattern("dd MMMM yyyy").withLocale(Locale("ru", "RU")))
+
+fun LocalDateTime.toDateTimeString(): String =
+    format(DateTimeFormatter.ofPattern("dd MMMM yyyy г. в HH:mm").withLocale(Locale("ru", "RU")))
 
 fun X509CertificateHolder.checkSubjectRdns() {
     check(subject.rdNs.all { !it.isMultiValued }) { "Multiple RDN values with the same type" }

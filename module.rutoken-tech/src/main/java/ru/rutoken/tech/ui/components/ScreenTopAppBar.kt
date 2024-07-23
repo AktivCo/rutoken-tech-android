@@ -10,6 +10,8 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.LargeTopAppBar
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBarColors
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import ru.rutoken.tech.ui.utils.Modifiers
 
@@ -19,7 +21,8 @@ fun ScreenTopAppBar(
     navigationIcon: @Composable () -> Unit,
     onNavigationIconClick: () -> Unit,
     trailingIcon: (@Composable () -> Unit)? = null,
-    onTrailingIconClick: () -> Unit = {}
+    onTrailingIconClick: () -> Unit = {},
+    colors: TopAppBarColors = TopAppBarDefaults.largeTopAppBarColors()
 ) {
     LargeTopAppBar(
         title = {
@@ -36,7 +39,8 @@ fun ScreenTopAppBar(
             if (trailingIcon != null) {
                 IconButton(onClick = onTrailingIconClick, modifier = Modifiers.appBarIconSize, content = trailingIcon)
             }
-        }
+        },
+        colors = colors
     )
 }
 

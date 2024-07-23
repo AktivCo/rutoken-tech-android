@@ -8,12 +8,15 @@ package ru.rutoken.tech.ui.bank.payments
 
 import android.content.Context
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.res.stringResource
+import ru.rutoken.tech.R
 import ru.rutoken.tech.ui.bank.payments.UserActionType.DECRYPT
 import ru.rutoken.tech.ui.bank.payments.UserActionType.ENCRYPT
 import ru.rutoken.tech.ui.bank.payments.UserActionType.SIGN
 import ru.rutoken.tech.ui.bank.payments.UserActionType.VERIFY
 import ru.rutoken.tech.ui.components.AppIcons
 import ru.rutoken.tech.utils.toBase64String
+import ru.rutoken.tech.utils.toDateTimeString
 import java.io.File
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -53,7 +56,7 @@ class Payment(
 
     fun isArchived() = actionTime != null
 
-    fun readFile(context: Context) = context.assets.open(fileName).bufferedReader().use { it.readText() }.toByteArray()
+    fun readFile(context: Context) = context.assets.open(fileName).use { it.readBytes() }
 
     fun getActionData(context: Context): Base64String = initialActionData ?: readFile(context).toBase64String()
 
@@ -93,6 +96,25 @@ class Payment(
         }
 
         return result
+    }
+
+    @Composable
+    fun getActionButtonText() = when (userActionType) {
+        SIGN -> stringResource(R.string.sign)
+        VERIFY -> stringResource(R.string.verify)
+        ENCRYPT -> stringResource(R.string.encrypt)
+        DECRYPT -> stringResource(R.string.decrypt)
+    }
+
+    @Composable
+    fun getArchivedActionText(): String {
+        val actionTimeString = actionTime!!.toDateTimeString()
+        return when (userActionType) {
+            SIGN -> stringResource(R.string.signed, actionTimeString)
+            VERIFY -> stringResource(R.string.verified, actionTimeString)
+            ENCRYPT -> stringResource(R.string.encrypted, actionTimeString)
+            DECRYPT -> stringResource(R.string.decrypted, actionTimeString)
+        }
     }
 }
 

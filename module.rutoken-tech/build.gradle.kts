@@ -138,6 +138,7 @@ dependencies {
     implementation(libs.rutoken.pkcs11jna) { isTransitive = false }
     implementation(libs.rutoken.pkcs11wrapper) { isTransitive = false }
     implementation(libs.rutoken.rtpcscbridge)
+    implementation(libs.android.pdf.viewer)
 
     ksp(libs.room.compiler)
 

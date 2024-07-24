@@ -59,7 +59,8 @@ fun PaymentsScreen(
     viewModel: PaymentsViewModel,
     onNavigateBack: () -> Unit,
     onResetPaymentsClicked: () -> Unit,
-    onPaymentClicked: (Payment) -> Unit
+    onPaymentClicked: (Payment) -> Unit,
+    isIncomingPaymentsSelected: Boolean = true
 ) {
     val payments by viewModel.payments.observeAsState(listOf())
 
@@ -67,7 +68,8 @@ fun PaymentsScreen(
         payments = payments,
         onNavigateBack = onNavigateBack,
         onResetPaymentsClicked = onResetPaymentsClicked,
-        onPaymentClicked = onPaymentClicked
+        onPaymentClicked = onPaymentClicked,
+        isIncomingPaymentsSelected = isIncomingPaymentsSelected
     )
 }
 
@@ -76,11 +78,12 @@ private fun PaymentsScreen(
     payments: List<Payment>,
     onNavigateBack: () -> Unit,
     onResetPaymentsClicked: () -> Unit,
-    onPaymentClicked: (Payment) -> Unit
+    onPaymentClicked: (Payment) -> Unit,
+    isIncomingPaymentsSelected: Boolean = true
 ) {
     val incomingPayments = payments.filter { it.isIncoming() }
     val outgoingPayments = payments.filter { !it.isIncoming() }
-    var showIncomingPayments by remember { mutableStateOf(true) }
+    var showIncomingPayments by remember { mutableStateOf(isIncomingPaymentsSelected) }
     val scrollState = rememberScrollState()
     val scope = rememberCoroutineScope()
 
@@ -110,7 +113,8 @@ private fun PaymentsScreen(
                 onOutgoingPaymentsClicked = {
                     showIncomingPayments = false
                     scope.launch { scrollState.scrollTo(0) }
-                }
+                },
+                isIncomingPaymentsSelected = isIncomingPaymentsSelected
             )
             Spacer(Modifier.height(12.dp))
             PaymentsGroup(
@@ -126,8 +130,9 @@ private fun PaymentsScreen(
 private fun SegmentedButtonRow(
     onIncomingPaymentsClicked: () -> Unit,
     onOutgoingPaymentsClicked: () -> Unit,
+    isIncomingPaymentsSelected: Boolean
 ) {
-    var selectedIndex by remember { mutableIntStateOf(0) }
+    var selectedIndex by remember { mutableIntStateOf(if (isIncomingPaymentsSelected) 0 else 1) }
     val options = listOf(stringResource(R.string.incoming_payments), stringResource(R.string.outgoing_payments))
     SingleChoiceSegmentedButtonRow(modifier = Modifier.fillMaxWidth()) {
         options.forEachIndexed { index, label ->

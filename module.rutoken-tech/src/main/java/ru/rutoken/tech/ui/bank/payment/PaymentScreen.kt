@@ -6,6 +6,7 @@
 
 package ru.rutoken.tech.ui.bank.payment
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -51,7 +52,7 @@ import java.time.LocalDateTime
 @Composable
 fun PaymentScreen(
     viewModel: PaymentViewModel,
-    onNavigateBack: () -> Unit,
+    onNavigateBack: (Boolean) -> Unit,
     onSharePaymentClicked: () -> Unit,
     onUserActionButtonClicked: (Payment) -> Unit
 ) {
@@ -59,10 +60,12 @@ fun PaymentScreen(
     payment?.let {
         PaymentScreen(
             payment = it,
-            onNavigateBack = onNavigateBack,
+            onNavigateBack = { onNavigateBack(it.isIncoming()) },
             onSharePaymentClicked = onSharePaymentClicked,
             onUserActionButtonClicked = onUserActionButtonClicked
         )
+
+        BackHandler { onNavigateBack(it.isIncoming()) }
     }
 }
 
@@ -105,8 +108,7 @@ private fun PaymentScreen(
 @Composable
 private fun PaymentView(modifier: Modifier, payment: Payment) {
     val renderData = payment.getRenderData(LocalContext.current)
-    // TODO: update this logic
-    if (payment.userActionType == UserActionType.DECRYPT) {
+    if (payment.hasEncryptedRenderData()) {
         EncryptedPaymentView(modifier, renderData)
     } else {
         PaymentPdfView(modifier, renderData.decoded)
@@ -207,7 +209,7 @@ private fun ArchivedPaymentScreenPreview() {
             date = LocalDate.now(),
             amount = "14 500 ₽",
             organization = "ОАО Нефтегаз",
-            userActionType = UserActionType.DECRYPT,
+            userActionType = UserActionType.ENCRYPT,
             actionResultData = "MIIDrTCCA1ygAwIBAgIKc522PB4SUNntVzAIBgYqhQMCAgMwgbMxCzAJBgNVBAYTAlJVMSAwHgYDVQQK",
             actionTime = LocalDateTime.now()
         )

@@ -116,6 +116,9 @@ class Payment(
             DECRYPT -> stringResource(R.string.decrypted, actionTimeString)
         }
     }
+
+    fun hasEncryptedRenderData() =
+        userActionType == DECRYPT && !isArchived() || userActionType == ENCRYPT && isArchived()
 }
 
 private fun makeFileInCacheDir(context: Context, fileName: String, fileContent: ByteArray) =

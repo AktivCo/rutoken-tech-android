@@ -90,12 +90,14 @@ fun NavGraphBuilder.addBankDestinations(
         )
     }
 
-    composable(BankDestination.Payments) {
+    composable(BankDestination.Payments) { backStackEntry ->
         PaymentsScreen(
             viewModel = koinViewModel<PaymentsViewModel>(),
             onNavigateBack = navController::popBackStack,
             onResetPaymentsClicked = { /*TODO*/ },
             onPaymentClicked = { navController.navigate(BankDestination.Payments.route + "/${it.title}") },
+            isIncomingPaymentsSelected = backStackEntry.savedStateHandle.get<Boolean>("isIncomingPaymentsSelected")
+                ?: true
         )
     }
 
@@ -104,7 +106,10 @@ fun NavGraphBuilder.addBankDestinations(
             viewModel = koinViewModel<PaymentViewModel>(
                 parameters = { parametersOf(backStackEntry.arguments!!.getString("paymentTitle")!!) }
             ),
-            onNavigateBack = navController::popBackStack,
+            onNavigateBack = {
+                navController.popBackStack()
+                navController.currentBackStackEntry?.savedStateHandle?.set("isIncomingPaymentsSelected", it)
+            },
             onSharePaymentClicked = { /*TODO*/ },
             onUserActionButtonClicked = { /*TODO*/ }
         )

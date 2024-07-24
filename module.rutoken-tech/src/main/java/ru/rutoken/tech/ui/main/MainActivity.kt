@@ -57,8 +57,7 @@ class MainActivity : FragmentActivity() {
         val navController = rememberNavController(bottomSheetNavigator)
 
         val navBackStackEntry by navController.currentBackStackEntryAsState()
-        val currentDestination = navBackStackEntry?.destination?.route
-            ?: CaDestination.Start.route // TODO: change to Bank start screen
+        val currentDestination = navBackStackEntry?.destination?.route ?: BankDestination.Start.route
 
         val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
         val scope = rememberCoroutineScope()

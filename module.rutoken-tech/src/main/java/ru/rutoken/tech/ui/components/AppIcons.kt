@@ -13,6 +13,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.outlined.CheckCircle
 import androidx.compose.material.icons.outlined.Share
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -169,6 +170,24 @@ object AppIcons {
             imageVector = Icons.Outlined.Share,
             contentDescription = "Share Icon",
             tint = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+    }
+
+    @Composable
+    fun ValidSignature() {
+        Icon(
+            imageVector = Icons.Outlined.CheckCircle,
+            contentDescription = "Valid Signature icon",
+            tint = MaterialTheme.colorScheme.secondary
+        )
+    }
+
+    @Composable
+    fun InvalidSignature() {
+        Icon(
+            painter = painterResource(id = R.drawable.invalid_signature),
+            contentDescription = "Valid Signature icon",
+            tint = MaterialTheme.colorScheme.secondary
         )
     }
 

@@ -158,4 +158,9 @@
     <!--Related to biometry prompt-->
     <string name="use_biometry_title">Подтвердите биометрию</string>
     <string name="use_biometry_subtitle">Она заменит ввод PIN-кода Рутокена</string>
+
+    <!--Related to verify result dialog-->
+    <string name="verify_valid_signature">Подпись верна</string>
+    <string name="verify_invalid_signature">Подпись неверна</string>
+    <string name="verify_invalid_chain">Но не удалось построить цепочку доверия для сертификата</string>
 </resources>

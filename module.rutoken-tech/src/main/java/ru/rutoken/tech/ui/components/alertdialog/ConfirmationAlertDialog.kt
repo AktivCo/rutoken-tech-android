@@ -31,8 +31,6 @@ fun ConfirmationAlertDialog(
     onDismiss: () -> Unit,
     onConfirm: () -> Unit,
 ) {
-    val dialogTitle = @Composable { Text(text = title!!) }
-
     AlertDialog(
         onDismissRequest = onDismiss,
         dismissButton = {
@@ -46,7 +44,7 @@ fun ConfirmationAlertDialog(
             }
         },
         modifier = Modifier.width(312.dp),
-        title = if (title != null) dialogTitle else null,
+        title = title?.let { { Text(text = it) } },
         text = { Text(text = text) },
         containerColor = MaterialTheme.colorScheme.surfaceContainerHigh
     )

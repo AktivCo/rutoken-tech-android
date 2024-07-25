@@ -8,13 +8,7 @@ package ru.rutoken.tech.ui.bank.payment
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.consumeWindowInsets
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
@@ -29,6 +23,7 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
@@ -41,8 +36,10 @@ import ru.rutoken.tech.ui.components.AppIcons
 import ru.rutoken.tech.ui.components.NavigationBarSpacer
 import ru.rutoken.tech.ui.components.ScreenTopAppBar
 import ru.rutoken.tech.ui.components.SecondaryButtonBox
+import ru.rutoken.tech.ui.components.alertdialog.SimpleAlertDialog
 import ru.rutoken.tech.ui.theme.RutokenTechTheme
 import ru.rutoken.tech.ui.theme.bodyMediumOnSurfaceVariant
+import ru.rutoken.tech.ui.utils.DialogState
 import ru.rutoken.tech.ui.utils.PreviewDark
 import ru.rutoken.tech.ui.utils.PreviewLight
 import ru.rutoken.tech.utils.decoded
@@ -54,18 +51,24 @@ fun PaymentScreen(
     viewModel: PaymentViewModel,
     onNavigateBack: (Boolean) -> Unit,
     onSharePaymentClicked: () -> Unit,
-    onUserActionButtonClicked: (Payment) -> Unit
+    onNavigateToTokenAuth: () -> Unit
 ) {
     val payment by viewModel.payment.observeAsState()
+
     payment?.let {
         PaymentScreen(
             payment = it,
             onNavigateBack = { onNavigateBack(it.isIncoming()) },
             onSharePaymentClicked = onSharePaymentClicked,
-            onUserActionButtonClicked = onUserActionButtonClicked
+            onUserActionButtonClicked = {
+                if (it.userActionType == UserActionType.SIGN)
+                    onNavigateToTokenAuth()
+            }
         )
 
         BackHandler { onNavigateBack(it.isIncoming()) }
+
+        OperationCompletedDialog(viewModel)
     }
 }
 
@@ -74,7 +77,7 @@ private fun PaymentScreen(
     payment: Payment,
     onNavigateBack: () -> Unit,
     onSharePaymentClicked: () -> Unit,
-    onUserActionButtonClicked: (Payment) -> Unit
+    onUserActionButtonClicked: () -> Unit
 ) {
     Scaffold(
         topBar = {
@@ -154,7 +157,7 @@ private fun PaymentPdfView(modifier: Modifier, renderData: ByteArray) {
 }
 
 @Composable
-private fun Footer(payment: Payment, onUserActionButtonClicked: (Payment) -> Unit) {
+private fun Footer(payment: Payment, onUserActionButtonClicked: () -> Unit) {
     if (payment.isArchived()) {
         Box(
             modifier = Modifier
@@ -172,7 +175,19 @@ private fun Footer(payment: Payment, onUserActionButtonClicked: (Payment) -> Uni
         SecondaryButtonBox(
             modifier = Modifier.fillMaxWidth(),
             text = payment.getActionButtonText(),
-            onClick = { onUserActionButtonClicked(payment) }
+            onClick = onUserActionButtonClicked
+        )
+    }
+}
+
+@Composable
+private fun OperationCompletedDialog(viewModel: PaymentViewModel) {
+    val dialogState by viewModel.operationCompletedDialogState.observeAsState(DialogState())
+
+    if (dialogState.showDialog) {
+        SimpleAlertDialog(
+            text = stringResource(id = dialogState.data.text),
+            onDismissOrConfirm = viewModel::onDismissOperationCompletedDialog
         )
     }
 }

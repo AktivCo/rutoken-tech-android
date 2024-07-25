@@ -107,6 +107,7 @@
     <string name="verified">Подпись проверена\n%s</string>
     <string name="encrypted">Зашифрован\n%s</string>
     <string name="decrypted">Расшифрован\n%s</string>
+    <string name="sign_operation_completed">Документ подписан</string>
 
     <!--Related to simple dialogs-->
     <string name="key_pair_generated">Ключевая пара сгенерирована</string>
@@ -129,8 +130,8 @@
     <string name="failed_biometry_use_title">Биометрия не подтверждена</string>
     <string name="failed_biometry_use_text">Необходимо ввести PIN-код</string>
     <string name="no_such_certificate_title">На Рутокене нет подходящего сертификата</string>
-    <string name="no_such_certificate_bank_text">Данный пользователь больше не\u00A0сможет войти в раздел «Банк»</string>
-    <string name="no_such_certificate_shift_text">Данный пользователь больше не\u00A0сможет войти в раздел «Мобильные бригады»</string>
+    <string name="no_such_certificate_bank_text">Данный пользователь больше не\u00A0сможет использовать раздел «Банк»</string>
+    <string name="no_such_certificate_shift_text">Данный пользователь больше не\u00A0сможет использовать раздел «Мобильные бригады»</string>
 
     <!--Related to connect token dialog-->
     <string name="connect_token_title">Подключите\nРутокен</string>

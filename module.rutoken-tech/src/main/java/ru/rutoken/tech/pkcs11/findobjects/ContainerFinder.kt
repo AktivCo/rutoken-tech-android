@@ -12,6 +12,7 @@ import ru.rutoken.pkcs11wrapper.attribute.Pkcs11ByteArrayAttribute
 import ru.rutoken.pkcs11wrapper.constant.standard.Pkcs11AttributeType
 import ru.rutoken.pkcs11wrapper.datatype.Pkcs11KeyPair
 import ru.rutoken.pkcs11wrapper.main.Pkcs11Session
+import ru.rutoken.pkcs11wrapper.`object`.certificate.Pkcs11CertificateObject
 import ru.rutoken.pkcs11wrapper.`object`.certificate.Pkcs11X509PublicKeyCertificateObject
 import ru.rutoken.pkcs11wrapper.`object`.key.Pkcs11Gost256PrivateKeyObject
 import ru.rutoken.pkcs11wrapper.`object`.key.Pkcs11Gost256PublicKeyObject
@@ -37,7 +38,7 @@ fun Pkcs11Session.findGost256KeyPairByCkaId(ckaId: ByteArray): GostKeyPair {
     return Pkcs11KeyPair(publicKey, privateKey)
 }
 
-fun Pkcs11Session.findGost256CertificateByCkaId(ckaId: ByteArray): X509CertificateHolder {
+fun Pkcs11Session.findGost256CertificateByCkaId(ckaId: ByteArray): Pkcs11CertificateObject {
     val template = listOf(Pkcs11ByteArrayAttribute(Pkcs11AttributeType.CKA_ID, ckaId))
     val certificate =
         objectManager.findObjectsAtOnce(Pkcs11X509PublicKeyCertificateObject::class.java, template).singleOrThrow()
@@ -46,7 +47,7 @@ fun Pkcs11Session.findGost256CertificateByCkaId(ckaId: ByteArray): X509Certifica
     if (x509CertificateHolder.subjectPublicKeyInfo.algorithm.algorithm != id_tc26_gost_3410_12_256)
         throw IllegalStateException("Found certificate's subjectPublicKeyInfo algorithm is not supported")
 
-    return x509CertificateHolder
+    return certificate
 }
 
 /**

@@ -35,6 +35,7 @@ sealed class BankDestination(override val route: String) : Destination {
     data object Start : BankDestination("bank/start")
     data object UserAddingTokenAuth : BankDestination("bank/userAddingTokenAuth")
     data object UserLoginTokenAuth : BankDestination("bank/userLoginTokenAuth")
+    data object UserOperationTokenAuth : BankDestination("bank/UserOperationTokenAuth")
     data object Certificates : BankDestination("bank/certificates")
     data object Payments : BankDestination("bank/payments")
     data object Payment : BankDestination("bank/payments/{paymentTitle}")
@@ -82,6 +83,16 @@ fun NavGraphBuilder.addBankDestinations(
         )
     }
 
+    bottomSheet(BankDestination.UserOperationTokenAuth.route) {
+        TokenAuthScreen(
+            enterPinViewModel = koinViewModel<EnterPinViewModel>(),
+            loginViewModel = koinViewModel<LoginViewModel>(),
+            appSessionType = AppSessionType.BANK_USER_LOGIN_SESSION,
+            onAuthDone = navController::popBackStack,
+            onNavigateBack = navController::popBackStack
+        )
+    }
+
     bottomSheet(BankDestination.Certificates.route) {
         ChooseNewCertificateScreen(
             viewModel = koinViewModel<ChooseNewCertificateViewModel>(),
@@ -111,7 +122,9 @@ fun NavGraphBuilder.addBankDestinations(
                 navController.currentBackStackEntry?.savedStateHandle?.set("isIncomingPaymentsSelected", it)
             },
             onSharePaymentClicked = { /*TODO*/ },
-            onUserActionButtonClicked = { /*TODO*/ }
+            onNavigateToTokenAuth = {
+                navController.navigate(BankDestination.UserOperationTokenAuth.route) { launchSingleTop = true }
+            }
         )
     }
 }

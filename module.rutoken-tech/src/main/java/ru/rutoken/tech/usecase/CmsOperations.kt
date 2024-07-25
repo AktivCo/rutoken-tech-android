@@ -6,8 +6,11 @@
 
 package ru.rutoken.tech.usecase
 
+import org.bouncycastle.asn1.ASN1Encoding
 import org.bouncycastle.cert.X509CRLHolder
 import org.bouncycastle.cert.X509CertificateHolder
+import org.bouncycastle.cms.CMSSignedData
+import org.bouncycastle.util.CollectionStore
 import ru.rutoken.pkcs11wrapper.constant.standard.Pkcs11AttributeType.CKA_VALUE
 import ru.rutoken.pkcs11wrapper.main.Pkcs11Session
 import ru.rutoken.pkcs11wrapper.`object`.certificate.Pkcs11CertificateObject
@@ -35,28 +38,33 @@ object CmsOperations {
         data: ByteArray,
         privateKey: Pkcs11GostPrivateKeyObject,
         certificate: Pkcs11CertificateObject,
-        additionalCertificates: List<Pkcs11CertificateObject>? = null
+        additionalCertificates: List<X509CertificateHolder>? = null
     ): ByteArray {
-        return when (provider) {
-            CmsOperationProvider.PKCS11_WRAPPER -> Pkcs11WrapperCmsOperations.signDetached(
-                session,
-                data,
-                privateKey,
-                certificate,
-                additionalCertificates
-            )
+        val x509CertificateHolder = certificate.toX509CertificateHolder(session)
+
+        when (provider) {
+            CmsOperationProvider.PKCS11_WRAPPER -> {
+                val cms = Pkcs11WrapperCmsOperations.signDetached(
+                    session,
+                    data,
+                    privateKey,
+                    certificate,
+                    null
+                )
+
+                // Adding certificate chain in cms
+                val store = CollectionStore(listOf(x509CertificateHolder) + additionalCertificates.orEmpty())
+                return CMSSignedData.replaceCertificatesAndCRLs(CMSSignedData(cms), store, null, null)
+                    .getEncoded(ASN1Encoding.DER)
+            }
 
             CmsOperationProvider.BOUNCY_CASTLE -> {
-                val x509CertificateHolder = certificate.toX509CertificateHolder(session)
-                val x509AdditionalCertificateHolders =
-                    additionalCertificates.orEmpty().map { it.toX509CertificateHolder(session) }
-
-                BouncyCastleCmsOperations.signDetached(
+                return BouncyCastleCmsOperations.signDetached(
                     session,
                     data,
                     privateKey,
                     x509CertificateHolder,
-                    x509AdditionalCertificateHolders
+                    additionalCertificates.orEmpty()
                 )
             }
         }

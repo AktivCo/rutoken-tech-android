@@ -27,17 +27,10 @@ import ru.rutoken.tech.pkcs11.findobjects.findGost256CertificateAndKeyContainers
 import ru.rutoken.tech.pkcs11.findobjects.findGost256KeyContainers
 import ru.rutoken.tech.pkcs11.serialNumberTrimmed
 import ru.rutoken.tech.repository.UserRepository
-import ru.rutoken.tech.session.AppSession
-import ru.rutoken.tech.session.AppSessionHolder
-import ru.rutoken.tech.session.AppSessionType
+import ru.rutoken.tech.session.*
 import ru.rutoken.tech.session.AppSessionType.BANK_USER_ADDING_SESSION
 import ru.rutoken.tech.session.AppSessionType.BANK_USER_LOGIN_SESSION
 import ru.rutoken.tech.session.AppSessionType.CA_SESSION
-import ru.rutoken.tech.session.BankUserAddingAppSession
-import ru.rutoken.tech.session.BankUserLoginAppSession
-import ru.rutoken.tech.session.CaAppSession
-import ru.rutoken.tech.session.CkaIdString
-import ru.rutoken.tech.session.requireBankUserLoginSession
 import ru.rutoken.tech.tokenmanager.RtPkcs11TokenData
 import ru.rutoken.tech.tokenmanager.TokenManager
 import ru.rutoken.tech.ui.bank.BankCertificate
@@ -47,16 +40,10 @@ import ru.rutoken.tech.ui.utils.DialogState
 import ru.rutoken.tech.ui.utils.callPkcs11Operation
 import ru.rutoken.tech.ui.utils.getCertificateErrorText
 import ru.rutoken.tech.ui.utils.toErrorDialogData
+import ru.rutoken.tech.utils.*
 import ru.rutoken.tech.utils.BusinessRuleCase.IncorrectPin
 import ru.rutoken.tech.utils.BusinessRuleCase.NoSuchCertificate
 import ru.rutoken.tech.utils.BusinessRuleCase.PinLocked
-import ru.rutoken.tech.utils.BusinessRuleException
-import ru.rutoken.tech.utils.checkSubjectRdns
-import ru.rutoken.tech.utils.getFullName
-import ru.rutoken.tech.utils.getIssuerRdnValue
-import ru.rutoken.tech.utils.logd
-import ru.rutoken.tech.utils.loge
-import ru.rutoken.tech.utils.toDateString
 import java.util.Date
 
 class LoginViewModel(
@@ -212,9 +199,14 @@ class LoginViewModel(
                 if (!currentBankSession.certificate.contentEquals(container.certificate.encoded))
                     throw IllegalStateException("Certificate on Rutoken does not equal to the saved value")
 
-                val paymentsStorage =
-                    getInitialPaymentsStorage(applicationContext, X509CertificateHolder(currentBankSession.certificate))
-                currentBankSession.payments = paymentsStorage
+                if (currentBankSession.payments.isEmpty()) {
+                    currentBankSession.payments = getInitialPaymentsStorage(
+                        applicationContext,
+                        X509CertificateHolder(currentBankSession.certificate)
+                    )
+                }
+
+                currentBankSession.operationWithToken?.let { it(session) }
             } catch (_: IllegalStateException) {
                 throw BusinessRuleException(NoSuchCertificate(isBankUser = true))
             }

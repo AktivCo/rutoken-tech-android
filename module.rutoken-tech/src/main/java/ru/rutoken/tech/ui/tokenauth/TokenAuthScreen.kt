@@ -8,22 +8,16 @@ package ru.rutoken.tech.ui.tokenauth
 
 import androidx.compose.material3.SheetState
 import androidx.compose.material3.rememberModalBottomSheetState
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.fragment.app.FragmentActivity
 import kotlinx.coroutines.launch
 import ru.rutoken.tech.session.AppSessionType
+import ru.rutoken.tech.ui.components.ProgressIndicatorDialog
 import ru.rutoken.tech.ui.components.alertdialog.ConnectTokenDialog
 import ru.rutoken.tech.ui.components.alertdialog.ErrorAlertDialog
-import ru.rutoken.tech.ui.components.ProgressIndicatorDialog
 import ru.rutoken.tech.ui.utils.DialogState
 import ru.rutoken.tech.ui.utils.errorDialogData
 
@@ -82,7 +76,6 @@ private fun EnterPinBottomSheet(
     onNavigateBack: () -> Unit,
     onButtonClick: (String) -> Unit,
     onDecryptBiometricPin: () -> Unit
-
 ) {
     val pinErrorText by viewModel.pinErrorText.observeAsState("")
     val isButtonEnabled by viewModel.isButtonEnabled.observeAsState(false)

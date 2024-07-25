@@ -7,6 +7,7 @@
 package ru.rutoken.tech.session
 
 import android.content.Context
+import ru.rutoken.pkcs11wrapper.rutoken.main.RtPkcs11Session
 import ru.rutoken.tech.bank.biometry.canUseBiometry
 import ru.rutoken.tech.ui.bank.BankCertificate
 import ru.rutoken.tech.ui.bank.payments.Payment
@@ -44,7 +45,8 @@ class BankUserLoginAppSession(
     val certificate: ByteArray,
     val isBiometryActive: Boolean,
     var encryptedPinData: EncryptedPinData?,
-    var payments: List<Payment>
+    var payments: List<Payment>,
+    var operationWithToken: ((RtPkcs11Session) -> Unit)? = null
 ) : AppSession() {
     fun hasPinToDecrypt(context: Context): Boolean {
         if (!isBiometryActive || encryptedPinData == null)

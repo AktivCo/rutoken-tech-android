@@ -36,37 +36,35 @@ object CmsOperations {
         provider: CmsOperationProvider,
         session: RtPkcs11Session,
         data: ByteArray,
-        privateKey: Pkcs11GostPrivateKeyObject,
-        certificate: Pkcs11CertificateObject,
+        signerPrivateKey: Pkcs11GostPrivateKeyObject,
+        signerCertificate: Pkcs11CertificateObject,
         additionalCertificates: List<X509CertificateHolder>? = null
     ): ByteArray {
-        val x509CertificateHolder = certificate.toX509CertificateHolder(session)
+        val x509CertificateHolder = signerCertificate.toX509CertificateHolder(session)
 
-        when (provider) {
+        return when (provider) {
             CmsOperationProvider.PKCS11_WRAPPER -> {
                 val cms = Pkcs11WrapperCmsOperations.signDetached(
                     session,
                     data,
-                    privateKey,
-                    certificate,
+                    signerPrivateKey,
+                    signerCertificate,
                     null
                 )
 
                 // Adding certificate chain in cms
                 val store = CollectionStore(listOf(x509CertificateHolder) + additionalCertificates.orEmpty())
-                return CMSSignedData.replaceCertificatesAndCRLs(CMSSignedData(cms), store, null, null)
+                CMSSignedData.replaceCertificatesAndCRLs(CMSSignedData(cms), store, null, null)
                     .getEncoded(ASN1Encoding.DER)
             }
 
-            CmsOperationProvider.BOUNCY_CASTLE -> {
-                return BouncyCastleCmsOperations.signDetached(
-                    session,
-                    data,
-                    privateKey,
-                    x509CertificateHolder,
-                    additionalCertificates.orEmpty()
-                )
-            }
+            CmsOperationProvider.BOUNCY_CASTLE -> BouncyCastleCmsOperations.signDetached(
+                session,
+                data,
+                signerPrivateKey,
+                x509CertificateHolder,
+                additionalCertificates.orEmpty()
+            )
         }
     }
 

@@ -9,10 +9,10 @@ package ru.rutoken.tech.bank
 import io.kotest.matchers.shouldBe
 import org.bouncycastle.cert.X509CertificateHolder
 import org.junit.ClassRule
-import org.junit.Ignore
 import org.junit.Test
 import org.junit.rules.RuleChain
 import ru.rutoken.tech.bank.rule.BouncyCastleProviderRule
+import ru.rutoken.tech.bank.rule.MockAndroidLogRule
 import ru.rutoken.tech.bouncycastle.BouncyCastleCmsOperations
 import ru.rutoken.tech.ca.LocalCA
 import ru.rutoken.tech.usecase.CmsOperationProvider
@@ -27,20 +27,19 @@ class PrepareBankPaymentsTest {
             DATA,
             BANK_PRIVATE_KEY_GOST,
             base64ToX509CertificateHolder(BANK_CERTIFICATE_GOST),
-            listOf(X509CertificateHolder(LocalCA.rootCertificate))
+            listOf(X509CertificateHolder(LocalCA.caCertificate))
         )
 
         verifyDetached(detachedCms) shouldBe VerifyCmsResult.SUCCESS
     }
 
-    @Ignore("add this test when issue #87 will be done")
     @Test
     fun signVerifyCertificateChainNotVerified() {
         val detachedCms = BouncyCastleCmsOperations.signDetachedGost256(
             DATA,
             BANK_PRIVATE_KEY_GOST,
             base64ToX509CertificateHolder(BANK_CERTIFICATE_GOST),
-            listOf(X509CertificateHolder(LocalCA.rootCertificate)) // TODO: Change this to new root certificate
+            emptyList()
         )
 
         verifyDetached(detachedCms) shouldBe VerifyCmsResult.CERTIFICATE_CHAIN_NOT_VERIFIED
@@ -52,23 +51,27 @@ class PrepareBankPaymentsTest {
             DATA + 1,
             BANK_PRIVATE_KEY_GOST,
             base64ToX509CertificateHolder(BANK_CERTIFICATE_GOST),
-            listOf(X509CertificateHolder(LocalCA.rootCertificate))
+            listOf(X509CertificateHolder(LocalCA.caCertificate))
         )
 
         verifyDetached(detachedCms) shouldBe VerifyCmsResult.SIGNATURE_INVALID
     }
 
-    private fun verifyDetached(detachedCms: ByteArray): VerifyCmsResult {
-        val trustedCertificates = listOf(LocalCA.rootCertificate)
-        return CmsOperations.verifyDetached(CmsOperationProvider.BOUNCY_CASTLE, detachedCms, DATA, trustedCertificates)
-    }
+    private fun verifyDetached(detachedCms: ByteArray): VerifyCmsResult =
+        CmsOperations.verifyDetached(
+            provider = CmsOperationProvider.BOUNCY_CASTLE,
+            cms = detachedCms,
+            data = DATA,
+            trustedCertificates = listOf(LocalCA.rootCertificate),
+        )
 
     companion object {
         private val DATA = byteArrayOf(0x01, 0x02, 0x03)
         private val bcProviderRule = BouncyCastleProviderRule()
+        private val mockAndroidLogRule = MockAndroidLogRule()
 
         @ClassRule
         @JvmField
-        val classRule: RuleChain = RuleChain.outerRule(bcProviderRule)
+        val classRule: RuleChain = RuleChain.outerRule(bcProviderRule).around(mockAndroidLogRule)
     }
 }

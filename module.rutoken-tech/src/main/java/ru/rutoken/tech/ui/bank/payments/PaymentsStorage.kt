@@ -184,20 +184,18 @@ suspend fun getInitialPaymentsStorage(context: Context, userCertificateHolder: X
                 // Make a valid signature and chain
                 0, 1 -> {
                     dataToSign = payment.readFile(context)
-                    // TODO: add new root certificate to make chain longer
-                    additionalCertificates = listOf(X509CertificateHolder(LocalCA.rootCertificate))
+                    additionalCertificates = listOf(X509CertificateHolder(LocalCA.caCertificate))
                 }
                 // Make a valid signature, but break chain
                 2 -> {
                     dataToSign = payment.readFile(context)
-                    // TODO: add new root certificate and remove LocalCA.rootCertificate from chain
-                    additionalCertificates = listOf(X509CertificateHolder(LocalCA.rootCertificate))
+                    additionalCertificates = emptyList()
                 }
                 // Make an invalid signature by corrupting data before signing
                 else -> {
                     dataToSign = payment.readFile(context) + 0b1
                     // Chain verification makes no sense when the Signature itself is invalid
-                    additionalCertificates = listOf()
+                    additionalCertificates = emptyList()
                 }
             }
 

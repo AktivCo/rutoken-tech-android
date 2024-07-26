@@ -58,8 +58,7 @@ object BouncyCastleCmsOperations {
     ): ByteArray {
         val signature =
             makeSignatureByHashOid(privateKey.getGostR3411ParamsAttributeValue(session).byteArrayValue, session)
-        val signer = GostContentSigner(signature)
-        signer.signInit(privateKey)
+        val signer = GostContentSigner(signature).apply { signInit(privateKey) }
         val generator = CMSSignedDataGenerator().apply {
             addCertificate(certificate)
             additionalCertificates.forEach { addCertificate(it) }
@@ -76,16 +75,14 @@ object BouncyCastleCmsOperations {
         additionalCertificates: List<X509CertificateHolder>
     ): ByteArray {
         val generator = CMSSignedDataGenerator().apply {
-            val contentSigner = JcaContentSignerBuilder("GOST3411WITHECGOST3410-2012-256")
+            val signer = JcaContentSignerBuilder("GOST3411WITHECGOST3410-2012-256")
                 .setProvider(BouncyCastleProvider.PROVIDER_NAME)
                 .build(base64ToPrivateKey(privateKey, "ECGOST3410-2012"))
-            addSignerInfoGenerator(
-                JcaSignerInfoGeneratorBuilder(
-                    JcaDigestCalculatorProviderBuilder().setProvider(BouncyCastleProvider.PROVIDER_NAME).build()
-                ).build(contentSigner, certificate)
-            )
+            val digestProvider =
+                JcaDigestCalculatorProviderBuilder().setProvider(BouncyCastleProvider.PROVIDER_NAME).build()
             addCertificate(certificate)
             additionalCertificates.forEach { addCertificate(it) }
+            addSignerInfoGenerator(JcaSignerInfoGeneratorBuilder(digestProvider).build(signer, certificate))
         }
 
         return generator.generate(CMSProcessableByteArray(data)).getEncoded(ASN1Encoding.DER)
@@ -131,22 +128,26 @@ object BouncyCastleCmsOperations {
                     }
 
                     // Validate signer's certificate chain
-                    val constraints = X509CertSelector()
-                    constraints.certificate =
-                        JcaX509CertificateConverter().setProvider(BouncyCastleProvider.PROVIDER_NAME)
+                    val constraints = X509CertSelector().apply {
+                        certificate = JcaX509CertificateConverter().setProvider(BouncyCastleProvider.PROVIDER_NAME)
                             .getCertificate(cert)
-                    val params = PKIXBuilderParameters(trustAnchors, constraints)
+                    }
 
-                    val certStoreBuilder = JcaCertStoreBuilder()
-                    certStoreBuilder.addCertificate(cert)
-                    intermediateCertificates.forEach { certStoreBuilder.addCertificate(it) }
-                    crls.forEach { certStoreBuilder.addCRL(it) }
+                    val certStoreBuilder = JcaCertStoreBuilder().apply {
+                        addCertificates(cmsCertStore)
+                        addCertificate(cert)
+                        intermediateCertificates.forEach { addCertificate(it) }
+                        crls.forEach { addCRL(it) }
+                    }
 
-                    params.addCertStore(certStoreBuilder.build())
-                    params.isRevocationEnabled = crls.isNotEmpty()
-                    /* According to the Oracle's docs,
-                     *      "all PKIX CertPathBuilders must return certification paths which have been
-                     *      validated according to the PKIX certification path validation algorithm."
+                    val params = PKIXBuilderParameters(trustAnchors, constraints).apply {
+                        addCertStore(certStoreBuilder.build())
+                        isRevocationEnabled = crls.isNotEmpty()
+                    }
+
+                    /*
+                     * According to the Oracle's docs, "all PKIX CertPathBuilders must return certification paths which
+                     * have been validated according to the PKIX certification path validation algorithm."
                      */
                     certPathBuilder.build(params)
                 }
@@ -164,9 +165,9 @@ object BouncyCastleCmsOperations {
         certificateHolder: X509CertificateHolder,
         contentEncryptionAlgorithm: ASN1ObjectIdentifier
     ): ByteArray {
-        val cmsEnvelopedDataGenerator = CMSEnvelopedDataGenerator()
-        val certificate = getX509Certificate(certificateHolder)
-        cmsEnvelopedDataGenerator.addRecipientInfoGenerator(JceKeyTransRecipientInfoGenerator(certificate))
+        val cmsEnvelopedDataGenerator = CMSEnvelopedDataGenerator().apply {
+            addRecipientInfoGenerator(JceKeyTransRecipientInfoGenerator(getX509Certificate(certificateHolder)))
+        }
         val contentEncryptor = JceCMSContentEncryptorBuilder(contentEncryptionAlgorithm)
             .setProvider(BouncyCastleProvider.PROVIDER_NAME)
             .build()

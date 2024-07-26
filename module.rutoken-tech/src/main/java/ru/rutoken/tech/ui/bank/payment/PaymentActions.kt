@@ -34,7 +34,7 @@ fun RtPkcs11Session.signPayment(
             getActionData(applicationContext).decoded,
             findGost256KeyPairByCkaId(certificateCkaId).privateKey,
             findGost256CertificateByCkaId(certificateCkaId),
-            listOf(X509CertificateHolder(LocalCA.rootCertificate))
+            listOf(X509CertificateHolder(LocalCA.caCertificate))
         ).toBase64String()
 
         actionTime = LocalDateTime.now()

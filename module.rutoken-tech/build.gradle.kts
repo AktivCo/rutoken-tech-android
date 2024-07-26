@@ -144,6 +144,7 @@ dependencies {
 
     testImplementation(libs.junit)
     testImplementation(libs.kotest.assertions.core)
+    testImplementation(libs.mockk)
 
     androidTestImplementation(libs.androidx.test.ext.junit)
     androidTestImplementation(platform(libs.compose.bom))

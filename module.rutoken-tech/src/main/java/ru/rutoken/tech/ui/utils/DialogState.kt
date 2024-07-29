@@ -7,6 +7,7 @@
 package ru.rutoken.tech.ui.utils
 
 import androidx.annotation.StringRes
+import androidx.compose.runtime.Composable
 import ru.rutoken.tech.R
 import ru.rutoken.tech.utils.BusinessRuleCase.IncorrectPin
 import ru.rutoken.tech.utils.BusinessRuleCase.NoSuchCertificate
@@ -24,11 +25,17 @@ class DialogState(
     val data: DialogData = UNKNOWN_ERROR_DIALOG_DATA
 )
 
-open class DialogData(@StringRes val text: Int)
+open class DialogData(@StringRes val text: Int?)
 
 class ErrorDialogData(
     @StringRes val title: Int,
     @StringRes text: Int
+) : DialogData(text)
+
+class DialogDataWithIcon(
+    val icon: @Composable () -> Unit,
+    @StringRes val title: Int,
+    @StringRes text: Int?
 ) : DialogData(text)
 
 val DialogState.errorDialogData get() = data as? ErrorDialogData ?: UNKNOWN_ERROR_DIALOG_DATA

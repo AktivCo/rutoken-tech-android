@@ -18,6 +18,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults.largeTopAppBarColors
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
@@ -32,16 +33,14 @@ import com.github.barteksc.pdfviewer.scroll.DefaultScrollHandle
 import ru.rutoken.tech.ui.bank.payments.Base64String
 import ru.rutoken.tech.ui.bank.payments.Payment
 import ru.rutoken.tech.ui.bank.payments.UserActionType
-import ru.rutoken.tech.ui.components.AppIcons
-import ru.rutoken.tech.ui.components.NavigationBarSpacer
-import ru.rutoken.tech.ui.components.ScreenTopAppBar
-import ru.rutoken.tech.ui.components.SecondaryButtonBox
+import ru.rutoken.tech.ui.components.*
+import ru.rutoken.tech.ui.components.alertdialog.AlertDialogWithIcon
+import ru.rutoken.tech.ui.components.alertdialog.ConnectTokenDialog
+import ru.rutoken.tech.ui.components.alertdialog.ErrorAlertDialog
 import ru.rutoken.tech.ui.components.alertdialog.SimpleAlertDialog
 import ru.rutoken.tech.ui.theme.RutokenTechTheme
 import ru.rutoken.tech.ui.theme.bodyMediumOnSurfaceVariant
-import ru.rutoken.tech.ui.utils.DialogState
-import ru.rutoken.tech.ui.utils.PreviewDark
-import ru.rutoken.tech.ui.utils.PreviewLight
+import ru.rutoken.tech.ui.utils.*
 import ru.rutoken.tech.utils.decoded
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -54,27 +53,36 @@ fun PaymentScreen(
     onNavigateToTokenAuth: () -> Unit
 ) {
     val payment by viewModel.payment.observeAsState()
+    val operationCompleted by viewModel.operationCompleted.observeAsState(false)
+    val navigateToTokenAuth by viewModel.navigateToTokenAuth.observeAsState(false)
 
     payment?.let {
         PaymentScreen(
             payment = it,
+            operationCompleted = operationCompleted,
             onNavigateBack = { onNavigateBack(it.isIncoming()) },
             onSharePaymentClicked = onSharePaymentClicked,
-            onUserActionButtonClicked = {
-                if (it.userActionType == UserActionType.SIGN)
-                    onNavigateToTokenAuth()
-            }
+            onUserActionButtonClicked = viewModel::onUserActionButtonClicked
         )
 
         BackHandler { onNavigateBack(it.isIncoming()) }
-
-        OperationCompletedDialog(viewModel)
     }
+
+    LaunchedEffect(navigateToTokenAuth) {
+        if (navigateToTokenAuth)
+            onNavigateToTokenAuth()
+    }
+
+    ConnectTokenDialog(viewModel)
+    ProgressIndicatorDialog(viewModel)
+    OperationCompletedDialog(viewModel)
+    ErrorDialog(viewModel)
 }
 
 @Composable
 private fun PaymentScreen(
     payment: Payment,
+    operationCompleted: Boolean,
     onNavigateBack: () -> Unit,
     onSharePaymentClicked: () -> Unit,
     onUserActionButtonClicked: () -> Unit
@@ -102,7 +110,11 @@ private fun PaymentScreen(
                 .consumeWindowInsets(innerPadding)
         ) {
             PaymentView(modifier = Modifier.weight(1f, false), payment = payment)
-            Footer(payment = payment, onUserActionButtonClicked = onUserActionButtonClicked)
+            Footer(
+                payment = payment,
+                operationCompleted = operationCompleted,
+                onUserActionButtonClicked = onUserActionButtonClicked
+            )
             NavigationBarSpacer()
         }
     }
@@ -157,8 +169,8 @@ private fun PaymentPdfView(modifier: Modifier, renderData: ByteArray) {
 }
 
 @Composable
-private fun Footer(payment: Payment, onUserActionButtonClicked: () -> Unit) {
-    if (payment.isArchived()) {
+private fun Footer(payment: Payment, operationCompleted: Boolean, onUserActionButtonClicked: () -> Unit) {
+    if (payment.isArchived() || operationCompleted) {
         Box(
             modifier = Modifier
                 .fillMaxWidth()
@@ -181,13 +193,53 @@ private fun Footer(payment: Payment, onUserActionButtonClicked: () -> Unit) {
 }
 
 @Composable
+private fun ConnectTokenDialog(viewModel: PaymentViewModel) {
+    val showDialog by viewModel.tokenConnector.showConnectTokenDialog.observeAsState(false)
+
+    if (showDialog)
+        ConnectTokenDialog(onDismissRequest = viewModel.tokenConnector::onDismissConnectTokenDialog)
+}
+
+@Composable
+private fun ProgressIndicatorDialog(viewModel: PaymentViewModel) {
+    val showProgress by viewModel.showProgress.observeAsState(false)
+
+    if (showProgress) {
+        ProgressIndicatorDialog()
+    }
+}
+
+@Composable
 private fun OperationCompletedDialog(viewModel: PaymentViewModel) {
     val dialogState by viewModel.operationCompletedDialogState.observeAsState(DialogState())
 
-    if (dialogState.showDialog) {
-        SimpleAlertDialog(
-            text = stringResource(id = dialogState.data.text),
+    if (!dialogState.showDialog) return
+
+    if (dialogState.data is DialogDataWithIcon) {
+        val dialogData = dialogState.data as DialogDataWithIcon
+        AlertDialogWithIcon(
+            icon = dialogData.icon,
+            title = stringResource(dialogData.title),
+            text = if (dialogData.text != null) stringResource(dialogData.text) else null,
             onDismissOrConfirm = viewModel::onDismissOperationCompletedDialog
+        )
+    } else {
+        SimpleAlertDialog(
+            text = stringResource(id = dialogState.data.text!!),
+            onDismissOrConfirm = viewModel::onDismissOperationCompletedDialog
+        )
+    }
+}
+
+@Composable
+private fun ErrorDialog(viewModel: PaymentViewModel) {
+    val dialogState by viewModel.errorDialogState.observeAsState(DialogState())
+
+    if (dialogState.showDialog) {
+        ErrorAlertDialog(
+            title = stringResource(id = dialogState.errorDialogData.title),
+            text = stringResource(id = dialogState.errorDialogData.text!!),
+            onDismissOrConfirm = viewModel::dismissErrorDialog
         )
     }
 }
@@ -207,6 +259,7 @@ private fun ActivePaymentScreenPreview() {
         )
         PaymentScreen(
             payment = payment,
+            operationCompleted = false,
             onNavigateBack = {},
             onSharePaymentClicked = {},
             onUserActionButtonClicked = {}
@@ -230,6 +283,7 @@ private fun ArchivedPaymentScreenPreview() {
         )
         PaymentScreen(
             payment = payment,
+            operationCompleted = true,
             onNavigateBack = {},
             onSharePaymentClicked = {},
             onUserActionButtonClicked = {}

@@ -16,6 +16,7 @@ import ru.rutoken.tech.pkcs11.findobjects.findGost256KeyPairByCkaId
 import ru.rutoken.tech.ui.bank.payments.Payment
 import ru.rutoken.tech.usecase.CmsOperationProvider
 import ru.rutoken.tech.usecase.CmsOperations
+import ru.rutoken.tech.utils.VerifyCmsResult
 import ru.rutoken.tech.utils.decoded
 import ru.rutoken.tech.utils.toBase64String
 import java.time.LocalDateTime
@@ -38,5 +39,27 @@ fun RtPkcs11Session.signPayment(
         ).toBase64String()
 
         actionTime = LocalDateTime.now()
+    }
+}
+
+@WorkerThread
+fun verifyPaymentSignature(
+    payment: Payment,
+    applicationContext: Context,
+    provider: CmsOperationProvider = CmsOperationProvider.PKCS11_WRAPPER,
+    session: RtPkcs11Session? = null
+): VerifyCmsResult {
+    payment.apply {
+        val verifyResult = CmsOperations.verifyDetached(
+            provider = provider,
+            cms = getActionData(applicationContext).decoded,
+            data = getRenderData(applicationContext).decoded,
+            trustedCertificates = listOf(LocalCA.rootCertificate),
+            session = session
+        )
+
+        actionTime = LocalDateTime.now()
+
+        return verifyResult
     }
 }

@@ -197,7 +197,7 @@ private fun NoKeyPairsOnTokenDialog(viewModel: CaTokenInfoViewModel) {
 
     if (dialogState.showDialog) {
         SimpleAlertDialog(
-            text = stringResource(id = dialogState.data.text),
+            text = stringResource(id = dialogState.data.text!!),
             onDismissOrConfirm = viewModel::onNoKeyPairsOnTokenDialogDismiss
         )
     }

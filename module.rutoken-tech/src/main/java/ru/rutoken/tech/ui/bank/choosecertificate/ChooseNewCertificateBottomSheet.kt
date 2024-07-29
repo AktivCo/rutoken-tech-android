@@ -157,7 +157,7 @@ private fun BiometryActivationFailedDialog(viewModel: ChooseNewCertificateViewMo
     if (dialogState.showDialog) {
         ErrorAlertDialog(
             title = stringResource(id = dialogState.errorDialogData.title),
-            text = stringResource(id = dialogState.errorDialogData.text),
+            text = stringResource(id = dialogState.errorDialogData.text!!),
             onDismissOrConfirm = viewModel::onDismissBiometryActivationFailedDialog
         )
     }

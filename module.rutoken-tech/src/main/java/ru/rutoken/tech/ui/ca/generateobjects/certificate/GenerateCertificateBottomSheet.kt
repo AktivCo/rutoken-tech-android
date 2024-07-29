@@ -282,7 +282,7 @@ private fun SuccessDialog(viewModel: GenerateCertificateViewModel, onDismissOrCo
 
     if (dialogState.showDialog) {
         SimpleAlertDialog(
-            text = stringResource(id = dialogState.data.text),
+            text = stringResource(id = dialogState.data.text!!),
             onDismissOrConfirm = {
                 viewModel.dismissSuccessDialog()
                 onDismissOrConfirm()
@@ -298,7 +298,7 @@ private fun ErrorDialog(viewModel: GenerateCertificateViewModel) {
     if (dialogState.showDialog) {
         ErrorAlertDialog(
             title = stringResource(id = dialogState.errorDialogData.title),
-            text = stringResource(id = dialogState.errorDialogData.text),
+            text = stringResource(id = dialogState.errorDialogData.text!!),
             onDismissOrConfirm = { viewModel.dismissErrorDialog() }
         )
     }

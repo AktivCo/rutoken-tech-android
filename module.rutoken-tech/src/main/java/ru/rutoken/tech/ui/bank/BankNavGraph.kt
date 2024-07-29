@@ -106,7 +106,9 @@ fun NavGraphBuilder.addBankDestinations(
             viewModel = koinViewModel<PaymentsViewModel>(),
             onNavigateBack = navController::popBackStack,
             onResetPaymentsClicked = { /*TODO*/ },
-            onPaymentClicked = { navController.navigate(BankDestination.Payments.route + "/${it.title}") },
+            onPaymentClicked = {
+                navController.navigate(BankDestination.Payments.route + "/${it.title}") { launchSingleTop = true }
+            },
             isIncomingPaymentsSelected = backStackEntry.savedStateHandle.get<Boolean>("isIncomingPaymentsSelected")
                 ?: true
         )

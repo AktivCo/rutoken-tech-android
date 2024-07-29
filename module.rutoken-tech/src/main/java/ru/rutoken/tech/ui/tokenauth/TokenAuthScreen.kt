@@ -101,7 +101,7 @@ private fun BiometryErrorAlertDialog(viewModel: EnterPinViewModel) {
     if (dialogState.showDialog)
         ErrorAlertDialog(
             title = stringResource(dialogState.errorDialogData.title),
-            text = stringResource(dialogState.errorDialogData.text),
+            text = stringResource(dialogState.errorDialogData.text!!),
             onDismissOrConfirm = { viewModel.dismissBiometryErrorDialog(dialogState.errorDialogData) }
         )
 }
@@ -131,7 +131,7 @@ private fun ErrorAlertDialog(viewModel: LoginViewModel) {
     if (dialogState.showDialog) {
         ErrorAlertDialog(
             title = stringResource(id = dialogState.errorDialogData.title),
-            text = stringResource(id = dialogState.errorDialogData.text),
+            text = stringResource(id = dialogState.errorDialogData.text!!),
             onDismissOrConfirm = { viewModel.onErrorDialogDismiss() }
         )
     }

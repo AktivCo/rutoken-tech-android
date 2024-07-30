@@ -83,7 +83,7 @@ class PaymentViewModel(
                 }
 
                 UserActionType.ENCRYPT -> {
-                    /* TODO */
+                    encryptPayment()
                 }
 
                 UserActionType.DECRYPT -> {
@@ -162,6 +162,24 @@ class PaymentViewModel(
 
             VerifyCmsResult.SIGNATURE_INVALID ->
                 _operationCompletedDialogState.postValue(DialogState(true, verifyInvalidSignatureDialogData))
+        }
+    }
+
+    private fun encryptPayment() {
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                _showProgress.postValue(true)
+                encryptPayment(_payment.value!!, applicationContext)
+                _operationCompleted.postValue(true)
+                _operationCompletedDialogState.postValue(
+                    DialogState(true, DialogData(R.string.encrypt_operation_completed))
+                )
+            } catch (e: Exception) {
+                loge(e) { "Payment encryption failed" }
+                _errorDialogState.postValue(DialogState(showDialog = true, data = e.toErrorDialogData()))
+            } finally {
+                _showProgress.postValue(false)
+            }
         }
     }
 }

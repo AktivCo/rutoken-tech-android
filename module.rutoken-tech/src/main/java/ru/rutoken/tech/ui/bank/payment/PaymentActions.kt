@@ -9,7 +9,10 @@ package ru.rutoken.tech.ui.bank.payment
 import android.content.Context
 import androidx.annotation.WorkerThread
 import org.bouncycastle.cert.X509CertificateHolder
+import org.bouncycastle.cms.CMSAlgorithm.GOST28147_GCFB
 import ru.rutoken.pkcs11wrapper.rutoken.main.RtPkcs11Session
+import ru.rutoken.tech.bank.BANK_CERTIFICATE_GOST
+import ru.rutoken.tech.bouncycastle.BouncyCastleCmsOperations
 import ru.rutoken.tech.ca.LocalCA
 import ru.rutoken.tech.pkcs11.findobjects.findGost256CertificateByCkaId
 import ru.rutoken.tech.pkcs11.findobjects.findGost256KeyPairByCkaId
@@ -17,6 +20,7 @@ import ru.rutoken.tech.ui.bank.payments.Payment
 import ru.rutoken.tech.usecase.CmsOperationProvider
 import ru.rutoken.tech.usecase.CmsOperations
 import ru.rutoken.tech.utils.VerifyCmsResult
+import ru.rutoken.tech.utils.base64ToX509CertificateHolder
 import ru.rutoken.tech.utils.decoded
 import ru.rutoken.tech.utils.toBase64String
 import java.time.LocalDateTime
@@ -61,5 +65,18 @@ fun verifyPaymentSignature(
         actionTime = LocalDateTime.now()
 
         return verifyResult
+    }
+}
+
+@WorkerThread
+fun encryptPayment(payment: Payment, applicationContext: Context) {
+    payment.apply {
+        actionResultData = BouncyCastleCmsOperations.encrypt(
+            readFile(applicationContext),
+            base64ToX509CertificateHolder(BANK_CERTIFICATE_GOST),
+            GOST28147_GCFB
+        ).toBase64String()
+
+        actionTime = LocalDateTime.now()
     }
 }

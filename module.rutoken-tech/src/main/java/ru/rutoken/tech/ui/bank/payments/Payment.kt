@@ -30,7 +30,7 @@ enum class UserActionType {
     DECRYPT
 }
 
-class Payment(
+data class Payment(
     val title: String,
     val date: LocalDate,
     val amount: String,

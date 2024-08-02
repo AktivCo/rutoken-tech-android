@@ -58,7 +58,6 @@ import java.time.LocalDateTime
 fun PaymentsScreen(
     viewModel: PaymentsViewModel,
     onNavigateBack: () -> Unit,
-    onResetPaymentsClicked: () -> Unit,
     onPaymentClicked: (Payment) -> Unit,
     isIncomingPaymentsSelected: Boolean = true
 ) {
@@ -67,7 +66,7 @@ fun PaymentsScreen(
     PaymentsScreen(
         payments = payments,
         onNavigateBack = onNavigateBack,
-        onResetPaymentsClicked = onResetPaymentsClicked,
+        onResetPaymentsClicked = viewModel::onResetPaymentsClicked,
         onPaymentClicked = onPaymentClicked,
         isIncomingPaymentsSelected = isIncomingPaymentsSelected
     )

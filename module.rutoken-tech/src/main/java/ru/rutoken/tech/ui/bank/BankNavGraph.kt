@@ -105,7 +105,6 @@ fun NavGraphBuilder.addBankDestinations(
         PaymentsScreen(
             viewModel = koinViewModel<PaymentsViewModel>(),
             onNavigateBack = navController::popBackStack,
-            onResetPaymentsClicked = { /*TODO*/ },
             onPaymentClicked = {
                 navController.navigate(BankDestination.Payments.route + "/${it.title}") { launchSingleTop = true }
             },

@@ -10,6 +10,7 @@ import android.content.Context
 import androidx.annotation.WorkerThread
 import org.bouncycastle.cert.X509CertificateHolder
 import org.bouncycastle.cms.CMSAlgorithm.GOST28147_GCFB
+import ru.rutoken.pkcs11wrapper.main.Pkcs11Session
 import ru.rutoken.pkcs11wrapper.rutoken.main.RtPkcs11Session
 import ru.rutoken.tech.bank.BANK_CERTIFICATE_GOST
 import ru.rutoken.tech.bouncycastle.BouncyCastleCmsOperations
@@ -75,6 +76,25 @@ fun encryptPayment(payment: Payment, applicationContext: Context) {
             readFile(applicationContext),
             base64ToX509CertificateHolder(BANK_CERTIFICATE_GOST),
             GOST28147_GCFB
+        ).toBase64String()
+
+        actionTime = LocalDateTime.now()
+    }
+}
+
+@WorkerThread
+fun Pkcs11Session.decryptPayment(
+    payment: Payment,
+    certificateCkaId: ByteArray,
+    certificateBytes: ByteArray,
+    applicationContext: Context
+) {
+    payment.apply {
+        actionResultData = BouncyCastleCmsOperations.decrypt(
+            session = this@decryptPayment,
+            data = getActionData(applicationContext).decoded,
+            possibleRecipientsCertificates = listOf(X509CertificateHolder(certificateBytes)),
+            privateKey = findGost256KeyPairByCkaId(certificateCkaId).privateKey
         ).toBase64String()
 
         actionTime = LocalDateTime.now()

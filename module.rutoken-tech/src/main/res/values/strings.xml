@@ -109,6 +109,7 @@
     <string name="decrypted">Расшифрован\n%s</string>
     <string name="sign_operation_completed">Документ подписан</string>
     <string name="encrypt_operation_completed">Документ зашифрован</string>
+    <string name="decrypt_operation_completed">Документ расшифрован</string>
 
     <!--Related to simple dialogs-->
     <string name="key_pair_generated">Ключевая пара сгенерирована</string>

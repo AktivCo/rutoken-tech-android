@@ -15,6 +15,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import ru.rutoken.pkcs11wrapper.main.Pkcs11Session
 import ru.rutoken.pkcs11wrapper.rutoken.main.RtPkcs11Session
 import ru.rutoken.tech.R
 import ru.rutoken.tech.session.AppSessionHolder
@@ -87,7 +88,8 @@ class PaymentViewModel(
                 }
 
                 UserActionType.DECRYPT -> {
-                    /* TODO */
+                    bankUserLoginSession.operationWithToken = ::decryptPaymentOnTokenAuth
+                    _navigateToTokenAuth.value = true
                 }
             }
         }
@@ -181,5 +183,17 @@ class PaymentViewModel(
                 _showProgress.postValue(false)
             }
         }
+    }
+
+    @WorkerThread
+    private fun decryptPaymentOnTokenAuth(session: Pkcs11Session) {
+        session.decryptPayment(
+            _payment.value!!,
+            bankUserLoginSession.certificateCkaId,
+            bankUserLoginSession.certificate,
+            applicationContext
+        )
+        _operationCompleted.postValue(true)
+        _operationCompletedDialogState.postValue(DialogState(true, DialogData(R.string.decrypt_operation_completed)))
     }
 }

@@ -4,7 +4,7 @@
  * All Rights Reserved.
  */
 
-package ru.rutoken.tech.database.user
+package ru.rutoken.tech.database.shift
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
@@ -13,17 +13,14 @@ import androidx.room.PrimaryKey
 import ru.rutoken.tech.database.AUTOGENERATE
 
 @Entity(
-    tableName = "users",
+    tableName = "shift_users",
     indices = [
         Index(value = ["certificate_der_value"], unique = true)
     ]
 )
-data class UserEntity(
+data class ShiftUserEntity(
     @PrimaryKey(autoGenerate = true) val id: Int = AUTOGENERATE,
     @ColumnInfo(name = "certificate_der_value") val certificateDerValue: ByteArray,
     @ColumnInfo(name = "cka_id") val ckaId: ByteArray,
-    @ColumnInfo(name = "token_serial_number") val tokenSerialNumber: String,
-    @ColumnInfo(name = "is_biometry_active") val isBiometryActive: Boolean,
-    @ColumnInfo(name = "encrypted_pin") val encryptedPin: ByteArray?,
-    @ColumnInfo(name = "cipher_iv") val cipherIv: ByteArray?
+    @ColumnInfo(name = "token_serial_number") val tokenSerialNumber: String
 )

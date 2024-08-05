@@ -2,10 +2,10 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "85d3f9059c7b3a3bd00403c686a9556e",
+    "identityHash": "821d0c2cf006a93d1284ac4be403fb24",
     "entities": [
       {
-        "tableName": "users",
+        "tableName": "bank_users",
         "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `certificate_der_value` BLOB NOT NULL, `cka_id` BLOB NOT NULL, `token_serial_number` TEXT NOT NULL, `is_biometry_active` INTEGER NOT NULL, `encrypted_pin` BLOB, `cipher_iv` BLOB)",
         "fields": [
           {
@@ -59,13 +59,61 @@
         },
         "indices": [
           {
-            "name": "index_users_certificate_der_value",
+            "name": "index_bank_users_certificate_der_value",
             "unique": true,
             "columnNames": [
               "certificate_der_value"
             ],
             "orders": [],
-            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_users_certificate_der_value` ON `${TABLE_NAME}` (`certificate_der_value`)"
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_bank_users_certificate_der_value` ON `${TABLE_NAME}` (`certificate_der_value`)"
+          }
+        ],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "shift_users",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `certificate_der_value` BLOB NOT NULL, `cka_id` BLOB NOT NULL, `token_serial_number` TEXT NOT NULL)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "certificateDerValue",
+            "columnName": "certificate_der_value",
+            "affinity": "BLOB",
+            "notNull": true
+          },
+          {
+            "fieldPath": "ckaId",
+            "columnName": "cka_id",
+            "affinity": "BLOB",
+            "notNull": true
+          },
+          {
+            "fieldPath": "tokenSerialNumber",
+            "columnName": "token_serial_number",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_shift_users_certificate_der_value",
+            "unique": true,
+            "columnNames": [
+              "certificate_der_value"
+            ],
+            "orders": [],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_shift_users_certificate_der_value` ON `${TABLE_NAME}` (`certificate_der_value`)"
           }
         ],
         "foreignKeys": []
@@ -74,7 +122,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '85d3f9059c7b3a3bd00403c686a9556e')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '821d0c2cf006a93d1284ac4be403fb24')"
     ]
   }
 }

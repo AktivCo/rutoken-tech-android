@@ -8,12 +8,16 @@ package ru.rutoken.tech.database
 
 import androidx.room.Database
 import androidx.room.RoomDatabase
-import ru.rutoken.tech.database.user.UserDao
-import ru.rutoken.tech.database.user.UserEntity
+import ru.rutoken.tech.database.bank.BankUserDao
+import ru.rutoken.tech.database.bank.BankUserEntity
+import ru.rutoken.tech.database.shift.ShiftUserDao
+import ru.rutoken.tech.database.shift.ShiftUserEntity
 
-@Database(entities = [UserEntity::class], version = 1)
+@Database(entities = [BankUserEntity::class, ShiftUserEntity::class], version = 1)
 abstract class Database : RoomDatabase() {
-    abstract fun userDao(): UserDao
+    abstract fun bankUserDao(): BankUserDao
+
+    abstract fun shiftUserDao(): ShiftUserDao
 }
 
 const val AUTOGENERATE = 0

@@ -4,16 +4,13 @@
  * All Rights Reserved.
  */
 
-package ru.rutoken.tech.repository
+package ru.rutoken.tech.repository.bank
 
-import androidx.lifecycle.LiveData
-
-interface UserRepository {
-    suspend fun getUser(userId: Int): User
-    suspend fun findUser(certificateDerValue: ByteArray): User?
-    suspend fun getUsers(): List<User>
-    fun getUsersAsync(): LiveData<List<User>>
-    suspend fun addUser(user: User)
+interface BankUserRepository {
+    suspend fun getUser(userId: Int): BankUser
+    suspend fun findUser(certificateDerValue: ByteArray): BankUser?
+    suspend fun getUsers(): List<BankUser>
+    suspend fun addUser(user: BankUser)
     suspend fun deleteAllUsers()
     suspend fun deleteUserEncryptedPin(userId: Int)
     suspend fun updateUserEncryptedPin(userId: Int, encryptedPin: ByteArray, cipherIv: ByteArray)

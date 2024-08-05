@@ -18,7 +18,7 @@ import kotlinx.coroutines.launch
 import ru.rutoken.tech.R
 import ru.rutoken.tech.bank.biometry.decryptWithBiometricPrompt
 import ru.rutoken.tech.bank.biometry.encryptWithBiometricPrompt
-import ru.rutoken.tech.repository.UserRepository
+import ru.rutoken.tech.repository.bank.BankUserRepository
 import ru.rutoken.tech.session.AppSessionHolder
 import ru.rutoken.tech.session.bankUserLoginSession
 import ru.rutoken.tech.session.requireBankUserLoginSession
@@ -34,7 +34,7 @@ private val failedBiometryActivationDialogData =
 class EnterPinViewModel(
     applicationContext: Context,
     private val sessionHolder: AppSessionHolder,
-    private val repository: UserRepository
+    private val repository: BankUserRepository
 ) : ViewModel() {
     private val _isButtonEnabled = MutableLiveData(false)
     val isButtonEnabled: LiveData<Boolean> get() = _isButtonEnabled

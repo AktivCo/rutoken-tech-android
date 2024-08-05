@@ -19,9 +19,9 @@ import org.bouncycastle.cert.X509CertificateHolder
 import ru.rutoken.tech.R
 import ru.rutoken.tech.bank.biometry.encryptWithBiometricPrompt
 import ru.rutoken.tech.bank.biometry.canUseBiometry
-import ru.rutoken.tech.database.user.UserEntity
-import ru.rutoken.tech.repository.UserRepository
-import ru.rutoken.tech.repository.makeUser
+import ru.rutoken.tech.database.bank.BankUserEntity
+import ru.rutoken.tech.repository.bank.BankUserRepository
+import ru.rutoken.tech.repository.bank.makeBankUser
 import ru.rutoken.tech.session.AppSessionHolder
 import ru.rutoken.tech.session.BankUserAddingAppSession
 import ru.rutoken.tech.session.BankUserLoginAppSession
@@ -34,7 +34,7 @@ import ru.rutoken.tech.ui.utils.ErrorDialogData
 class ChooseNewCertificateViewModel(
     private val applicationContext: Context,
     private val sessionHolder: AppSessionHolder,
-    private val repository: UserRepository
+    private val repository: BankUserRepository
 ) : ViewModel() {
     //    BankUserAddingAppSession instance MUST exist by the time this ViewModel is instantiated
     private val bankUserAddingAppSession: BankUserAddingAppSession
@@ -103,8 +103,8 @@ class ChooseNewCertificateViewModel(
             _showProgress.postValue(true)
 
             val tokenSerial = bankUserAddingAppSession.tokenSerial
-            val user = makeUser(
-                UserEntity(
+            val user = makeBankUser(
+                BankUserEntity(
                     certificateDerValue = chosenCertificate.bytes,
                     ckaId = chosenCertificate.ckaId,
                     tokenSerialNumber = tokenSerial,

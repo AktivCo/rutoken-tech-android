@@ -14,7 +14,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import ru.rutoken.tech.repository.UserRepository
+import ru.rutoken.tech.repository.bank.BankUserRepository
 import ru.rutoken.tech.session.AppSessionHolder
 import ru.rutoken.tech.session.BankUserLoginAppSession
 import ru.rutoken.tech.ui.bank.BankUser
@@ -24,7 +24,7 @@ import ru.rutoken.tech.utils.toDateString
 
 class BankStartScreenViewModel(
     private val applicationContext: Context,
-    private val repository: UserRepository,
+    private val repository: BankUserRepository,
     private val sessionHolder: AppSessionHolder
 ) : ViewModel() {
     private val _users = MutableLiveData<List<BankUser>>()

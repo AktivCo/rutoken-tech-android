@@ -26,7 +26,7 @@ import ru.rutoken.tech.pkcs11.findobjects.findGost256CertificateAndKeyContainerB
 import ru.rutoken.tech.pkcs11.findobjects.findGost256CertificateAndKeyContainers
 import ru.rutoken.tech.pkcs11.findobjects.findGost256KeyContainers
 import ru.rutoken.tech.pkcs11.serialNumberTrimmed
-import ru.rutoken.tech.repository.UserRepository
+import ru.rutoken.tech.repository.bank.BankUserRepository
 import ru.rutoken.tech.session.*
 import ru.rutoken.tech.session.AppSessionType.BANK_USER_ADDING_SESSION
 import ru.rutoken.tech.session.AppSessionType.BANK_USER_LOGIN_SESSION
@@ -50,7 +50,7 @@ class LoginViewModel(
     private val applicationContext: Context,
     private val tokenManager: TokenManager,
     private val sessionHolder: AppSessionHolder,
-    private val repository: UserRepository
+    private val repository: BankUserRepository
 ) : ViewModel() {
     val tokenConnector = TokenConnector()
 

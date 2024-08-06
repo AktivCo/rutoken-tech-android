@@ -26,11 +26,16 @@ import ru.rutoken.tech.ui.bank.payments.Payment
 import ru.rutoken.tech.ui.bank.payments.UserActionType
 import ru.rutoken.tech.ui.components.AppIcons
 import ru.rutoken.tech.ui.tokenconnector.TokenConnector
-import ru.rutoken.tech.ui.utils.*
+import ru.rutoken.tech.ui.utils.DialogData
+import ru.rutoken.tech.ui.utils.DialogDataWithIcon
+import ru.rutoken.tech.ui.utils.DialogState
+import ru.rutoken.tech.ui.utils.callPkcs11Operation
+import ru.rutoken.tech.ui.utils.toErrorDialogData
 import ru.rutoken.tech.usecase.CmsOperationProvider
 import ru.rutoken.tech.utils.VerifyCmsResult
 import ru.rutoken.tech.utils.logd
 import ru.rutoken.tech.utils.loge
+import java.io.File
 import kotlin.coroutines.cancellation.CancellationException
 
 private val verifyValidSignatureDialogData =
@@ -57,6 +62,9 @@ class PaymentViewModel(
 
     private val _operationCompleted = MutableLiveData(false)
     val operationCompleted: LiveData<Boolean> get() = _operationCompleted
+
+    private val _sharedFiles = MutableLiveData<List<File>>()
+    val sharedFiles: LiveData<List<File>> = _sharedFiles
 
     private val _navigateToTokenAuth = MutableLiveData<Boolean>()
     val navigateToTokenAuth: LiveData<Boolean> = _navigateToTokenAuth
@@ -98,6 +106,18 @@ class PaymentViewModel(
     @MainThread
     fun onDismissOperationCompletedDialog() {
         _operationCompletedDialogState.value = DialogState(showDialog = false)
+    }
+
+    @MainThread
+    fun onSharePaymentClicked() {
+        viewModelScope.launch(Dispatchers.IO) {
+            _sharedFiles.postValue(_payment.value!!.getSharedData(applicationContext))
+        }
+    }
+
+    @MainThread
+    fun resetOnSharePaymentClicked() {
+        _sharedFiles.value = emptyList()
     }
 
     @MainThread

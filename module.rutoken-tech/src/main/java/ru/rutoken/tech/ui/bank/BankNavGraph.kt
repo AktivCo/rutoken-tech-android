@@ -122,7 +122,6 @@ fun NavGraphBuilder.addBankDestinations(
                 navController.popBackStack()
                 navController.currentBackStackEntry?.savedStateHandle?.set("isIncomingPaymentsSelected", it)
             },
-            onSharePaymentClicked = { /*TODO*/ },
             onNavigateToTokenAuth = {
                 navController.navigate(BankDestination.UserOperationTokenAuth.route) { launchSingleTop = true }
             }

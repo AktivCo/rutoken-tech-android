@@ -8,7 +8,13 @@ package ru.rutoken.tech.ui.bank.payment
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.consumeWindowInsets
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
@@ -32,14 +38,23 @@ import com.github.barteksc.pdfviewer.scroll.DefaultScrollHandle
 import ru.rutoken.tech.ui.bank.payments.Base64String
 import ru.rutoken.tech.ui.bank.payments.Payment
 import ru.rutoken.tech.ui.bank.payments.UserActionType
-import ru.rutoken.tech.ui.components.*
+import ru.rutoken.tech.ui.components.AppIcons
+import ru.rutoken.tech.ui.components.NavigationBarSpacer
+import ru.rutoken.tech.ui.components.ProgressIndicatorDialog
+import ru.rutoken.tech.ui.components.ScreenTopAppBar
+import ru.rutoken.tech.ui.components.SecondaryButtonBox
 import ru.rutoken.tech.ui.components.alertdialog.AlertDialogWithIcon
 import ru.rutoken.tech.ui.components.alertdialog.ConnectTokenDialog
 import ru.rutoken.tech.ui.components.alertdialog.ErrorAlertDialog
 import ru.rutoken.tech.ui.components.alertdialog.SimpleAlertDialog
 import ru.rutoken.tech.ui.theme.RutokenTechTheme
 import ru.rutoken.tech.ui.theme.bodyMediumOnSurfaceVariant
-import ru.rutoken.tech.ui.utils.*
+import ru.rutoken.tech.ui.utils.DialogDataWithIcon
+import ru.rutoken.tech.ui.utils.DialogState
+import ru.rutoken.tech.ui.utils.PreviewDark
+import ru.rutoken.tech.ui.utils.PreviewLight
+import ru.rutoken.tech.ui.utils.errorDialogData
+import ru.rutoken.tech.ui.utils.startShareChooser
 import ru.rutoken.tech.utils.decoded
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -48,11 +63,11 @@ import java.time.LocalDateTime
 fun PaymentScreen(
     viewModel: PaymentViewModel,
     onNavigateBack: (Boolean) -> Unit,
-    onSharePaymentClicked: () -> Unit,
     onNavigateToTokenAuth: () -> Unit
 ) {
     val payment by viewModel.payment.observeAsState()
     val operationCompleted by viewModel.operationCompleted.observeAsState(false)
+    val sharedFiles by viewModel.sharedFiles.observeAsState(emptyList())
     val navigateToTokenAuth by viewModel.navigateToTokenAuth.observeAsState(false)
 
     payment?.let {
@@ -60,11 +75,16 @@ fun PaymentScreen(
             payment = it,
             operationCompleted = operationCompleted,
             onNavigateBack = { onNavigateBack(it.isIncoming()) },
-            onSharePaymentClicked = onSharePaymentClicked,
+            onSharePaymentClicked = viewModel::onSharePaymentClicked,
             onUserActionButtonClicked = viewModel::onUserActionButtonClicked
         )
 
         BackHandler { onNavigateBack(it.isIncoming()) }
+    }
+
+    if (sharedFiles.isNotEmpty()) {
+        LocalContext.current.startShareChooser(sharedFiles)
+        viewModel.resetOnSharePaymentClicked()
     }
 
     if (navigateToTokenAuth) {

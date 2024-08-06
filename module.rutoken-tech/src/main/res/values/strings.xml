@@ -166,4 +166,7 @@
     <string name="verify_valid_signature">Подпись верна</string>
     <string name="verify_invalid_signature">Подпись неверна</string>
     <string name="verify_invalid_chain">Но не удалось построить цепочку доверия для сертификата</string>
+
+    <!--Related to sharing file scenario-->
+    <string name="share_document">Поделиться документом</string>
 </resources>

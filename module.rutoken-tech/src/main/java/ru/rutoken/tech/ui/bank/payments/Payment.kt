@@ -15,6 +15,7 @@ import ru.rutoken.tech.ui.bank.payments.UserActionType.ENCRYPT
 import ru.rutoken.tech.ui.bank.payments.UserActionType.SIGN
 import ru.rutoken.tech.ui.bank.payments.UserActionType.VERIFY
 import ru.rutoken.tech.ui.components.AppIcons
+import ru.rutoken.tech.utils.decoded
 import ru.rutoken.tech.utils.toBase64String
 import ru.rutoken.tech.utils.toDateTimeString
 import java.io.File
@@ -89,7 +90,7 @@ data class Payment(
 
             DECRYPT -> {
                 if (isArchived())
-                    result.add(makeFileInCacheDir(context, fileName, actionResultData!!))
+                    result.add(makeFileInCacheDir(context, fileName, actionResultData!!.decoded))
                 else
                     result.add(makeFileInCacheDir(context, encryptedFileName, initialActionData!!))
             }

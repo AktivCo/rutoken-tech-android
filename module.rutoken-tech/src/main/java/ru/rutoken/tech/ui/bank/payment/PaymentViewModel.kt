@@ -105,6 +105,11 @@ class PaymentViewModel(
         _errorDialogState.value = DialogState(showDialog = false)
     }
 
+    @MainThread
+    fun resetNavigateToTokenAuthEvent() {
+        _navigateToTokenAuth.value = false
+    }
+
     @WorkerThread
     private fun signPaymentOnTokenAuth(session: RtPkcs11Session) {
         session.signPayment(_payment.value!!, bankUserLoginSession.certificateCkaId, applicationContext)

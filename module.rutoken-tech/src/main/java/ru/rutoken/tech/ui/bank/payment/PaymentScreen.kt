@@ -18,7 +18,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults.largeTopAppBarColors
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
@@ -68,9 +67,9 @@ fun PaymentScreen(
         BackHandler { onNavigateBack(it.isIncoming()) }
     }
 
-    LaunchedEffect(navigateToTokenAuth) {
-        if (navigateToTokenAuth)
-            onNavigateToTokenAuth()
+    if (navigateToTokenAuth) {
+        onNavigateToTokenAuth()
+        viewModel.resetNavigateToTokenAuthEvent()
     }
 
     ConnectTokenDialog(viewModel)

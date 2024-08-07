@@ -65,8 +65,8 @@ fun CaTokenInfoScreen(
     val shouldNavigateToCertGeneration by viewModel.navigateToCertGenerationEvent.observeAsState(false)
 
     if (shouldNavigateToCertGeneration) {
-        viewModel.resetNavigateToCertGenerationEvent()
         onNavigateToGenerateCertificate()
+        viewModel.resetNavigateToCertGenerationEvent()
     }
 
     NoKeyPairsOnTokenDialog(viewModel)

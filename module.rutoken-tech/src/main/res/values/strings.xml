@@ -168,5 +168,5 @@
     <string name="verify_invalid_chain">Но не удалось построить цепочку доверия для сертификата</string>
 
     <!--Related to sharing file scenario-->
-    <string name="share_document">Поделиться документом</string>
+    <string name="share_document">Поделиться</string>
 </resources>

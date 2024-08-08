@@ -74,12 +74,16 @@ class CaTokenInfoViewModel(
             is VendorDefinedTokenModel.UsbDual, is Ecp3UsbDual -> TokenType.UsbNfcDual
             else -> TokenType.Usb
         }
+        val label = if (isDefaultTokenLabel(tokenLabel)) applicationContext.getString(R.string.not_set) else tokenLabel
 
         return CaTokenInfoUiState(
             tokenType = tokenType,
-            label = tokenLabel,
+            label = label,
             model = tokenModel.getModelName(applicationContext),
             serial = tokenSerial.toLong(16).toString()
         )
     }
 }
+
+private fun isDefaultTokenLabel(label: String) =
+    arrayOf("<no label>", "<corrupted label!>").any { label.endsWith(it) }

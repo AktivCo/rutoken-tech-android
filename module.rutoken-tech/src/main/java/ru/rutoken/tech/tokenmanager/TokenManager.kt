@@ -6,6 +6,7 @@
 
 package ru.rutoken.tech.tokenmanager
 
+import androidx.annotation.MainThread
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
@@ -36,6 +37,7 @@ class TokenManager : SlotEventProvider.Listener, Pkcs11Launcher.Listener {
 
     private lateinit var eventJob: Job
 
+    @MainThread
     override fun onPkcs11Initialized(scope: CoroutineScope, pkcs11Module: Pkcs11Module) {
         eventJob = scope.launch {
             withContext(Dispatchers.IO) {
@@ -51,8 +53,10 @@ class TokenManager : SlotEventProvider.Listener, Pkcs11Launcher.Listener {
         }
     }
 
+    @MainThread
     override fun beforePkcs11Finalize(scope: CoroutineScope, pkcs11Module: Pkcs11Module) {
         eventJob.cancel()
+        tokens.clear()
     }
 
     override suspend fun onSlotEvent(event: SlotEvent) {
@@ -70,6 +74,7 @@ class TokenManager : SlotEventProvider.Listener, Pkcs11Launcher.Listener {
                     waitTokenDeferred.set(deferred)
                     return deferred
                 }
+
                 else -> CompletableDeferred(tokens.values.first())
             }
         }

@@ -38,7 +38,7 @@ class GenerateCertificateViewModel(
     private val tokenManager: TokenManager,
     private val sessionHolder: AppSessionHolder
 ) : ViewModel() {
-    val tokenConnector = TokenConnector()
+    val tokenConnector = TokenConnector(viewModelScope)
 
     private val _showProgress = MutableLiveData<Boolean>()
     val showProgress: LiveData<Boolean> = _showProgress
@@ -105,7 +105,7 @@ class GenerateCertificateViewModel(
         if (hasPinChanged) _shouldLogout.postValue(true)
     }
 
-    private fun createGostCertificate(
+    private suspend fun createGostCertificate(
         token: RtPkcs11Token,
         userPin: String,
         keyPairCkaId: CkaIdString,

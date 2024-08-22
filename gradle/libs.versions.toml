@@ -48,8 +48,8 @@ android-pdf-viewer = { module = "com.github.mhiew:android-pdf-viewer", version.r
 bouncycastle-bcpkix = { module = "org.bouncycastle:bcpkix-jdk18on", version.ref = "bouncycastle" }
 # To set breakpoints in bouncycastle's code we must use debug versions
 bouncycastle-bcpkix-debug = { module = "org.bouncycastle:bcpkix-debug-jdk18on", version.ref = "bouncycastle" }
-bouncycastle-bcprov-debug = { module = "org.bouncycastle:bcprov-debug-jdk18on", version.ref= "bouncycastle" }
-bouncycastle-bcutil-debug = { module = "org.bouncycastle:bcutil-debug-jdk18on", version.ref= "bouncycastle" }
+bouncycastle-bcprov-debug = { module = "org.bouncycastle:bcprov-debug-jdk18on", version.ref = "bouncycastle" }
+bouncycastle-bcutil-debug = { module = "org.bouncycastle:bcutil-debug-jdk18on", version.ref = "bouncycastle" }
 compose-bom = { module = "androidx.compose:compose-bom", version.ref = "compose-bom" }
 compose-material3 = { module = "androidx.compose.material3:material3", version.ref = "compose-material3" }
 compose-runtime-livedata = { module = "androidx.compose.runtime:runtime-livedata" }

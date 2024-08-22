@@ -15,6 +15,7 @@ import ru.rutoken.pkcs11wrapper.constant.standard.Pkcs11ReturnValue.CKR_PIN_LEN_
 import ru.rutoken.pkcs11wrapper.constant.standard.Pkcs11ReturnValue.CKR_PIN_LOCKED
 import ru.rutoken.pkcs11wrapper.main.Pkcs11Exception
 import ru.rutoken.tech.R
+import ru.rutoken.tech.pkcs11.Pkcs11CallScope.withPkcs11CallContext
 import ru.rutoken.tech.session.SerialHexString
 import ru.rutoken.tech.tokenmanager.TokenManager
 import ru.rutoken.tech.utils.BusinessRuleCase.IncorrectPin
@@ -32,10 +33,12 @@ suspend fun callPkcs11Operation(
 ) {
     try {
         showProgress.postValue(true)
-        block()
+        withPkcs11CallContext { block() }
     } catch (e: Pkcs11Exception) {
         val userRetryCountLeft = try {
-            tokenManager.getTokenBySerialNumber(tokenSerial)?.token?.tokenInfoExtended?.userRetryCountLeft
+            withPkcs11CallContext {
+                tokenManager.getTokenBySerialNumber(tokenSerial)?.token?.tokenInfoExtended?.userRetryCountLeft
+            }
         } catch (_: Throwable) {
             null
         }

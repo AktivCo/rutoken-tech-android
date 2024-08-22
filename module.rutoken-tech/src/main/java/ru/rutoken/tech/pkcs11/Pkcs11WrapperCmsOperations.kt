@@ -16,53 +16,57 @@ import ru.rutoken.pkcs11wrapper.rutoken.constant.RtPkcs11ReturnValue
 import ru.rutoken.pkcs11wrapper.rutoken.datatype.VendorX509Store
 import ru.rutoken.pkcs11wrapper.rutoken.main.RtPkcs11Session
 import ru.rutoken.pkcs11wrapper.rutoken.manager.RtPkcs11CmsManager.CrlCheckMode.OPTIONAL_CRL_CHECK
+import ru.rutoken.tech.pkcs11.Pkcs11CallScope.withPkcs11CallContext
 import ru.rutoken.tech.utils.VerifyCmsResult
 import ru.rutoken.tech.utils.loge
 
 object Pkcs11WrapperCmsOperations {
-    fun signDetached(
+    suspend fun signDetached(
         session: RtPkcs11Session,
         data: ByteArray,
         signerPrivateKey: Pkcs11GostPrivateKeyObject,
         signerCertificate: Pkcs11CertificateObject,
         additionalCertificates: List<Pkcs11CertificateObject>?
-    ): ByteArray = session.cmsManager.sign(
-        data,
-        signerCertificate,
-        signerPrivateKey,
-        additionalCertificates,
-        PKCS7_DETACHED_SIGNATURE
-    )
+    ): ByteArray = withPkcs11CallContext {
+        session.cmsManager.sign(
+            data,
+            signerCertificate,
+            signerPrivateKey,
+            additionalCertificates,
+            PKCS7_DETACHED_SIGNATURE
+        )
+    }
 
-    fun verifyDetached(
+    suspend fun verifyDetached(
         session: RtPkcs11Session,
         cms: ByteArray,
         data: ByteArray,
         trustedCertificates: List<ByteArray>,
         certificates: List<ByteArray>?,
         crls: List<ByteArray>?
-    ): VerifyCmsResult {
+    ): VerifyCmsResult = withPkcs11CallContext {
         val store = VendorX509Store(trustedCertificates, certificates, crls)
-        val code = session.cmsManager.verifyDetachedAtOnce(
-            cms,
-            data,
-            store,
-            OPTIONAL_CRL_CHECK,
-            CKF_VENDOR_ALLOW_PARTIAL_CHAINS
-        ).result
+        val code =
+            session.cmsManager.verifyDetachedAtOnce(
+                cms,
+                data,
+                store,
+                OPTIONAL_CRL_CHECK,
+                CKF_VENDOR_ALLOW_PARTIAL_CHAINS
+            ).result
 
-        return when (code) {
+        when (code) {
             Pkcs11ReturnValue.CKR_OK -> VerifyCmsResult.SUCCESS
             Pkcs11ReturnValue.CKR_SIGNATURE_INVALID -> VerifyCmsResult.SIGNATURE_INVALID
             RtPkcs11ReturnValue.CKR_CERT_CHAIN_NOT_VERIFIED -> {
-                loge { "Certificate chain not verified." }
+                loge<Pkcs11WrapperCmsOperations> { "Certificate chain not verified." }
                 VerifyCmsResult.CERTIFICATE_CHAIN_NOT_VERIFIED
             }
 
             else -> {
                 Pkcs11Exception.throwIfNotOk(code, "Signature verification failed.")
                 // Unreachable. Pkcs11Exception#throwIfNotOk will always throw an exception
-                return VerifyCmsResult.SIGNATURE_INVALID
+                VerifyCmsResult.SIGNATURE_INVALID
             }
         }
     }

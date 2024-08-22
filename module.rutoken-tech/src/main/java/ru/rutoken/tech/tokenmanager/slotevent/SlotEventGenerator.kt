@@ -14,6 +14,7 @@ import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import ru.rutoken.pkcs11wrapper.main.IPkcs11Module
 import ru.rutoken.pkcs11wrapper.main.Pkcs11Exception
+import ru.rutoken.tech.pkcs11.Pkcs11CallScope
 import ru.rutoken.tech.utils.loge
 
 /**
@@ -23,6 +24,13 @@ class SlotEventGenerator(
     private val slotEventChannel: SendChannel<SlotEvent>,
     private val pkcs11Module: IPkcs11Module
 ) {
+    /**
+     * Launches blocking calls to C_WaitForSlotEvent and adds events that occur with system slots (connecting and
+     * disconnecting the token) to the [slotEventChannel].
+     *
+     * We don't use [Pkcs11CallScope.withPkcs11CallContext] in this method because calling C_Finalize in the
+     * [IPkcs11Module.finalizeModule] from another thread is a valid way to make this call return.
+     */
     fun launchGeneration(scope: CoroutineScope) {
         scope.launch(Dispatchers.IO) {
             while (isActive) {

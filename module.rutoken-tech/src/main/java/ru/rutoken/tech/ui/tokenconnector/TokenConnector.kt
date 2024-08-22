@@ -9,9 +9,8 @@ package ru.rutoken.tech.ui.tokenconnector
 import androidx.annotation.MainThread
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.cancelChildren
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import ru.rutoken.tech.pkcs11.getSerialNumber
 import ru.rutoken.tech.session.SerialHexString
@@ -19,28 +18,29 @@ import ru.rutoken.tech.tokenmanager.RtPkcs11TokenData
 import ru.rutoken.tech.tokenmanager.TokenManager
 import ru.rutoken.tech.utils.BusinessRuleCase
 import ru.rutoken.tech.utils.BusinessRuleException
+import ru.rutoken.tech.utils.SingleThreadCoroutineDispatcherWrapper
 
-class TokenConnector {
-    private val findTokenJob = Job() + Dispatchers.IO
+class TokenConnector(private val parentCoroutineScope: CoroutineScope) {
+    private var dispatcher = SingleThreadCoroutineDispatcherWrapper()
 
     private val _showConnectTokenDialog = MutableLiveData<Boolean>()
     val showConnectTokenDialog: LiveData<Boolean> = _showConnectTokenDialog
 
     @MainThread
     fun onDismissConnectTokenDialog() {
-        findTokenJob.cancelChildren()
-        _showConnectTokenDialog.value = false
+        parentCoroutineScope.launch {
+            dispatcher.closeAndWaitForTerminating()
+            dispatcher = SingleThreadCoroutineDispatcherWrapper()
+            _showConnectTokenDialog.value = false
+        }
     }
 
     /**
      * @throws [kotlinx.coroutines.CancellationException] if the [onDismissConnectTokenDialog] method is called
      * before the token is connected.
      */
-    suspend fun findFirstToken(tokenManager: TokenManager): RtPkcs11TokenData {
-        return withContext(findTokenJob) {
-            tokenManager.waitForTokenData()
-        }
-    }
+    suspend fun findFirstToken(tokenManager: TokenManager): RtPkcs11TokenData =
+        withContext(dispatcher.context) { tokenManager.waitForTokenData() }
 
     /**
      * Tries to get a token by serial number. If it doesn't find it, method waits for the first token to be connected
@@ -52,7 +52,7 @@ class TokenConnector {
      * parameter
      */
     suspend fun findTokenBySerialNumber(tokenManager: TokenManager, tokenSerial: SerialHexString): RtPkcs11TokenData {
-        return withContext(findTokenJob) {
+        return withContext(dispatcher.context) {
             tokenManager.getTokenBySerialNumber(tokenSerial)?.let { return@withContext it }
 
             val tokenData = tokenManager.waitForTokenData()

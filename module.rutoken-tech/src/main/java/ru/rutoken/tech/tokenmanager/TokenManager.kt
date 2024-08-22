@@ -10,13 +10,12 @@ import androidx.annotation.MainThread
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import ru.rutoken.pkcs11wrapper.main.Pkcs11Module
 import ru.rutoken.pkcs11wrapper.main.Pkcs11Token
 import ru.rutoken.pkcs11wrapper.rutoken.main.RtPkcs11Token
+import ru.rutoken.tech.pkcs11.Pkcs11CallScope.withPkcs11CallContext
 import ru.rutoken.tech.pkcs11.Pkcs11Launcher
 import ru.rutoken.tech.pkcs11.getSerialNumber
 import ru.rutoken.tech.pkcs11.getTokenModel
@@ -40,7 +39,7 @@ class TokenManager : SlotEventProvider.Listener, Pkcs11Launcher.Listener {
     @MainThread
     override fun onPkcs11Initialized(scope: CoroutineScope, pkcs11Module: Pkcs11Module) {
         eventJob = scope.launch {
-            withContext(Dispatchers.IO) {
+            withPkcs11CallContext {
                 pkcs11Module.getSlotList(true).forEach {
                     addTokenIfSupported(it.token as RtPkcs11Token)
                 }

@@ -117,28 +117,31 @@ android {
 dependencies {
     coreLibraryDesugaring(libs.desugarJdkLibs)
 
-    implementation(libs.androidx.activity.compose)
-    implementation(libs.androidx.biometric.ktx)
-    implementation(libs.androidx.browser)
-    implementation(libs.androidx.navigation.compose)
-    implementation(libs.androidx.core.ktx)
-    implementation(libs.androidx.core.splashscreen)
-    implementation(libs.androidx.lifecycle.runtime.ktx)
-    releaseImplementation(libs.bouncycastle.bcpkix)
     debugImplementation(libs.bundles.bouncycastle.debug) {
         exclude(group = "org.bouncycastle", module = "bcprov-jdk18on")
         exclude(group = "org.bouncycastle", module = "bcutil-jdk18on")
     }
-    implementation(platform(libs.compose.bom))
+    debugImplementation(libs.bundles.compose.debug)
+
+    releaseImplementation(libs.bouncycastle.bcpkix)
+
+    implementation(libs.androidx.activity.compose)
+    implementation(libs.androidx.biometric.ktx)
+    implementation(libs.androidx.browser)
+    implementation(libs.androidx.core.ktx)
+    implementation(libs.androidx.core.splashscreen)
+    implementation(libs.androidx.lifecycle.runtime.ktx)
+    implementation(libs.androidx.navigation.compose)
+    implementation(libs.android.pdf.viewer)
     implementation(libs.bundles.compose)
+    implementation(libs.bundles.room)
     implementation(libs.jna) { artifact { type = "aar" } }
     implementation(libs.koin)
     implementation(libs.kstatemachine)
-    implementation(libs.bundles.room)
     implementation(libs.rutoken.pkcs11jna) { isTransitive = false }
     implementation(libs.rutoken.pkcs11wrapper) { isTransitive = false }
     implementation(libs.rutoken.rtpcscbridge)
-    implementation(libs.android.pdf.viewer)
+    implementation(platform(libs.compose.bom))
 
     ksp(libs.room.compiler)
 
@@ -147,13 +150,11 @@ dependencies {
     testImplementation(libs.mockk)
 
     androidTestImplementation(libs.androidx.test.ext.junit)
-    androidTestImplementation(platform(libs.compose.bom))
     androidTestImplementation(libs.compose.ui.test.junit4)
     androidTestImplementation(libs.espresso.core)
     androidTestImplementation(libs.kotest.assertions.core)
     androidTestImplementation(libs.room.testing)
-
-    debugImplementation(libs.bundles.compose.debug)
+    androidTestImplementation(platform(libs.compose.bom))
 }
 
 val architectures = listOf(

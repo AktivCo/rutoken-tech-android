@@ -32,7 +32,7 @@ object CmsOperations {
     /**
      * Method supposes that the user is logged in.
      */
-    fun signDetached(
+    suspend fun signDetached(
         provider: CmsOperationProvider,
         session: RtPkcs11Session,
         data: ByteArray,
@@ -71,7 +71,7 @@ object CmsOperations {
     /**
      * The [session] parameter is required only when verifying the signature via PKCS#11 wrapper.
      */
-    fun verifyDetached(
+    suspend fun verifyDetached(
         provider: CmsOperationProvider,
         cms: ByteArray,
         data: ByteArray,

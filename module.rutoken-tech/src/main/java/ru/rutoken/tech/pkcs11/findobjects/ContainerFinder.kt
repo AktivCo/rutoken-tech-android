@@ -16,91 +16,105 @@ import ru.rutoken.pkcs11wrapper.`object`.certificate.Pkcs11CertificateObject
 import ru.rutoken.pkcs11wrapper.`object`.certificate.Pkcs11X509PublicKeyCertificateObject
 import ru.rutoken.pkcs11wrapper.`object`.key.Pkcs11Gost256PrivateKeyObject
 import ru.rutoken.pkcs11wrapper.`object`.key.Pkcs11Gost256PublicKeyObject
+import ru.rutoken.tech.pkcs11.Pkcs11CallScope.withPkcs11CallContext
 import ru.rutoken.tech.pkcs11.createobjects.GostKeyPair
 
 /**
  * It is supposed that key pairs and certificates are linked by CKA_ID.
  */
-fun Pkcs11Session.findGost256CertificateAndKeyContainers() =
+suspend fun Pkcs11Session.findGost256CertificateAndKeyContainers() =
     findGost256Containers().filterIsInstance<Gost256CertificateAndKeyContainer>()
 
-fun Pkcs11Session.findGost256KeyContainers() = findGost256Containers().filterIsInstance<Gost256KeyContainer>()
+suspend fun Pkcs11Session.findGost256KeyContainers() = findGost256Containers().filterIsInstance<Gost256KeyContainer>()
 
-fun Pkcs11Session.findGost256CertificateAndKeyContainerByCkaId(ckaId: ByteArray) =
+suspend fun Pkcs11Session.findGost256CertificateAndKeyContainerByCkaId(ckaId: ByteArray) =
     findGost256CertificateAndKeyContainers().filter { it.ckaId.contentEquals(ckaId) }.singleOrThrow()
 
-fun Pkcs11Session.findGost256KeyPairByCkaId(ckaId: ByteArray): GostKeyPair {
-    val template = listOf(Pkcs11ByteArrayAttribute(Pkcs11AttributeType.CKA_ID, ckaId))
-    val publicKey = objectManager.findObjectsAtOnce(Pkcs11Gost256PublicKeyObject::class.java, template).singleOrThrow()
-    val privateKey =
-        objectManager.findObjectsAtOnce(Pkcs11Gost256PrivateKeyObject::class.java, template).singleOrThrow()
+suspend fun Pkcs11Session.findGost256KeyPairByCkaId(ckaId: ByteArray): GostKeyPair =
+    withPkcs11CallContext {
+        val template = listOf(Pkcs11ByteArrayAttribute(Pkcs11AttributeType.CKA_ID, ckaId))
+        val publicKey =
+            objectManager.findObjectsAtOnce(Pkcs11Gost256PublicKeyObject::class.java, template).singleOrThrow()
+        val privateKey =
+            objectManager.findObjectsAtOnce(Pkcs11Gost256PrivateKeyObject::class.java, template).singleOrThrow()
 
-    return Pkcs11KeyPair(publicKey, privateKey)
-}
+        Pkcs11KeyPair(publicKey, privateKey)
+    }
 
-fun Pkcs11Session.findGost256CertificateByCkaId(ckaId: ByteArray): Pkcs11CertificateObject {
-    val template = listOf(Pkcs11ByteArrayAttribute(Pkcs11AttributeType.CKA_ID, ckaId))
-    val certificate =
-        objectManager.findObjectsAtOnce(Pkcs11X509PublicKeyCertificateObject::class.java, template).singleOrThrow()
-    val x509CertificateHolder = X509CertificateHolder(certificate.getValueAttributeValue(this).byteArrayValue)
+suspend fun Pkcs11Session.findGost256CertificateByCkaId(ckaId: ByteArray): Pkcs11CertificateObject =
+    withPkcs11CallContext {
+        val template = listOf(Pkcs11ByteArrayAttribute(Pkcs11AttributeType.CKA_ID, ckaId))
 
-    if (x509CertificateHolder.subjectPublicKeyInfo.algorithm.algorithm != id_tc26_gost_3410_12_256)
-        throw IllegalStateException("Found certificate's subjectPublicKeyInfo algorithm is not supported")
+        val certificate =
+            objectManager.findObjectsAtOnce(Pkcs11X509PublicKeyCertificateObject::class.java, template).singleOrThrow()
 
-    return certificate
-}
+        val x509CertificateHolder =
+            X509CertificateHolder(certificate.getValueAttributeValue(this@findGost256CertificateByCkaId).byteArrayValue)
+
+        if (x509CertificateHolder.subjectPublicKeyInfo.algorithm.algorithm != id_tc26_gost_3410_12_256)
+            throw IllegalStateException("Found certificate's subjectPublicKeyInfo algorithm is not supported")
+
+        certificate
+    }
 
 /**
  * It is supposed that key pairs and certificates are linked by CKA_ID.
  */
-private fun Pkcs11Session.findGost256Containers(): List<Container> {
-    val result = mutableListOf<Container>()
+private suspend fun Pkcs11Session.findGost256Containers(): List<Container> =
+    withPkcs11CallContext {
+        val result = mutableListOf<Container>()
 
-    val gost256KeyContainers = findGost256KeyPairs()
-    val certificates = objectManager.findObjectsAtOnce(Pkcs11X509PublicKeyCertificateObject::class.java)
+        val gost256KeyContainers = findGost256KeyPairs()
+        val certificates = objectManager.findObjectsAtOnce(Pkcs11X509PublicKeyCertificateObject::class.java)
 
-    for (certificate in certificates) {
-        val x509CertificateHolder = X509CertificateHolder(certificate.getValueAttributeValue(this).byteArrayValue)
+        for (certificate in certificates) {
+            val x509CertificateHolder =
+                X509CertificateHolder(certificate.getValueAttributeValue(this@findGost256Containers).byteArrayValue)
 
-        if (x509CertificateHolder.subjectPublicKeyInfo.algorithm.algorithm != id_tc26_gost_3410_12_256)
-            continue
+            if (x509CertificateHolder.subjectPublicKeyInfo.algorithm.algorithm != id_tc26_gost_3410_12_256)
+                continue
 
-        val ckaId = runCatching { certificate.getIdAttributeValue(this).byteArrayValue }.getOrNull() ?: continue
-        val gost256KeyContainer = gost256KeyContainers.find { it.ckaId.contentEquals(ckaId) }
+            val ckaId = runCatching {
+                certificate.getIdAttributeValue(this@findGost256Containers).byteArrayValue
+            }.getOrNull() ?: continue
+            val gost256KeyContainer = gost256KeyContainers.find { it.ckaId.contentEquals(ckaId) }
 
-        if (gost256KeyContainer != null) {
-            result.add(Gost256CertificateAndKeyContainer(ckaId, x509CertificateHolder, gost256KeyContainer.keyPair))
-            gost256KeyContainers.remove(gost256KeyContainer)
+            if (gost256KeyContainer != null) {
+                result.add(Gost256CertificateAndKeyContainer(ckaId, x509CertificateHolder, gost256KeyContainer.keyPair))
+                gost256KeyContainers.remove(gost256KeyContainer)
+            }
         }
-    }
 
-    result.addAll(gost256KeyContainers)
-    return result
-}
+        result.addAll(gost256KeyContainers)
+        result
+    }
 
 /**
  * This method searches for all GOST 2012 256 key pairs and creates Gost256KeyContainers from them.
  */
-private fun Pkcs11Session.findGost256KeyPairs(): MutableList<Gost256KeyContainer> {
-    val result = mutableListOf<Gost256KeyContainer>()
-    val publicKeys = objectManager.findObjectsAtOnce(Pkcs11Gost256PublicKeyObject::class.java)
+private suspend fun Pkcs11Session.findGost256KeyPairs(): MutableList<Gost256KeyContainer> =
+    withPkcs11CallContext {
+        val result = mutableListOf<Gost256KeyContainer>()
+        val publicKeys = objectManager.findObjectsAtOnce(Pkcs11Gost256PublicKeyObject::class.java)
 
-    for (publicKey in publicKeys) {
-        val ckaId = runCatching { publicKey.getIdAttributeValue(this).byteArrayValue }.getOrNull() ?: continue
+        for (publicKey in publicKeys) {
+            val ckaId = runCatching {
+                publicKey.getIdAttributeValue(this@findGost256KeyPairs).byteArrayValue
+            }.getOrNull() ?: continue
 
-        val template = listOf(Pkcs11ByteArrayAttribute(Pkcs11AttributeType.CKA_ID, ckaId))
+            val template = listOf(Pkcs11ByteArrayAttribute(Pkcs11AttributeType.CKA_ID, ckaId))
 
-        val privateKey = try {
-            objectManager.findObjectsAtOnce(Pkcs11Gost256PrivateKeyObject::class.java, template).singleOrThrow()
-        } catch (ignore: IllegalStateException) {
-            continue
+            val privateKey = try {
+                objectManager.findObjectsAtOnce(Pkcs11Gost256PrivateKeyObject::class.java, template).singleOrThrow()
+            } catch (ignore: IllegalStateException) {
+                continue
+            }
+
+            result.add(Gost256KeyContainer(ckaId, Pkcs11KeyPair(publicKey, privateKey)))
         }
 
-        result.add(Gost256KeyContainer(ckaId, Pkcs11KeyPair(publicKey, privateKey)))
+        result
     }
-
-    return result
-}
 
 private fun <T> Collection<T>.singleOrThrow() =
     singleOrNull() ?: throw IllegalStateException("One object required, but $size found")

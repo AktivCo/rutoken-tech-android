@@ -9,8 +9,11 @@ package ru.rutoken.tech.bank.biometry
 import android.content.Context
 import android.os.Build
 import android.security.keystore.KeyGenParameterSpec
-import android.security.keystore.KeyProperties.*
-import androidx.annotation.WorkerThread
+import android.security.keystore.KeyProperties.BLOCK_MODE_CBC
+import android.security.keystore.KeyProperties.ENCRYPTION_PADDING_PKCS7
+import android.security.keystore.KeyProperties.KEY_ALGORITHM_AES
+import android.security.keystore.KeyProperties.PURPOSE_DECRYPT
+import android.security.keystore.KeyProperties.PURPOSE_ENCRYPT
 import androidx.biometric.BiometricManager
 import androidx.biometric.BiometricManager.Authenticators.BIOMETRIC_STRONG
 import androidx.biometric.BiometricManager.BIOMETRIC_SUCCESS
@@ -43,7 +46,6 @@ fun Context.canUseBiometry(): Boolean {
     return biometricManager.canAuthenticate(BIOMETRIC_STRONG) == BIOMETRIC_SUCCESS
 }
 
-@WorkerThread
 suspend fun encryptWithBiometricPrompt(
     activity: FragmentActivity,
     data: ByteArray,
@@ -51,7 +53,6 @@ suspend fun encryptWithBiometricPrompt(
     onSuccess: (ByteArray, ByteArray) -> Unit
 ) = performCipherCallWithBiometricPrompt(activity, Cipher.ENCRYPT_MODE, data, null, onError, onSuccess)
 
-@WorkerThread
 suspend fun decryptWithBiometricPrompt(
     activity: FragmentActivity,
     data: ByteArray,

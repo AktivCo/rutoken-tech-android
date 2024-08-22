@@ -51,20 +51,20 @@ android {
 }
 
 dependencies {
-    androidTestImplementation(project(":module.rutoken-tech"))
     androidTestImplementation(libs.androidx.test.ext.junit)
     androidTestImplementation(libs.androidx.test.runner)
     androidTestImplementation(libs.androidx.test.uiAutomator)
+    androidTestImplementation(libs.bundles.bouncycastle.debug) {
+        exclude(group = "org.bouncycastle", module = "bcprov-jdk18on")
+        exclude(group = "org.bouncycastle", module = "bcutil-jdk18on")
+    }
     androidTestImplementation(libs.jna) { artifact { type = "aar" } }
     androidTestImplementation(libs.junit)
     androidTestImplementation(libs.kotest.assertions.core)
     androidTestImplementation(libs.rutoken.pkcs11jna) { isTransitive = false }
     androidTestImplementation(libs.rutoken.pkcs11wrapper) { isTransitive = false }
     androidTestImplementation(libs.rutoken.rtpcscbridge)
-    androidTestImplementation(libs.bundles.bouncycastle.debug) {
-        exclude(group = "org.bouncycastle", module = "bcprov-jdk18on")
-        exclude(group = "org.bouncycastle", module = "bcutil-jdk18on")
-    }
+    androidTestImplementation(project(":module.rutoken-tech"))
 }
 
 val architectures = listOf(

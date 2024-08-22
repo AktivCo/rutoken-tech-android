@@ -7,6 +7,7 @@
 package ru.rutoken.tech.bank
 
 import io.kotest.matchers.shouldBe
+import kotlinx.coroutines.runBlocking
 import org.bouncycastle.cert.X509CertificateHolder
 import org.junit.ClassRule
 import org.junit.Test
@@ -30,7 +31,7 @@ class PrepareBankPaymentsTest {
             listOf(X509CertificateHolder(LocalCA.caCertificate))
         )
 
-        verifyDetached(detachedCms) shouldBe VerifyCmsResult.SUCCESS
+        runBlocking { verifyDetached(detachedCms) } shouldBe VerifyCmsResult.SUCCESS
     }
 
     @Test
@@ -42,7 +43,7 @@ class PrepareBankPaymentsTest {
             emptyList()
         )
 
-        verifyDetached(detachedCms) shouldBe VerifyCmsResult.CERTIFICATE_CHAIN_NOT_VERIFIED
+        runBlocking { verifyDetached(detachedCms) } shouldBe VerifyCmsResult.CERTIFICATE_CHAIN_NOT_VERIFIED
     }
 
     @Test
@@ -54,10 +55,10 @@ class PrepareBankPaymentsTest {
             listOf(X509CertificateHolder(LocalCA.caCertificate))
         )
 
-        verifyDetached(detachedCms) shouldBe VerifyCmsResult.SIGNATURE_INVALID
+        runBlocking { verifyDetached(detachedCms) } shouldBe VerifyCmsResult.SIGNATURE_INVALID
     }
 
-    private fun verifyDetached(detachedCms: ByteArray): VerifyCmsResult =
+    private suspend fun verifyDetached(detachedCms: ByteArray): VerifyCmsResult =
         CmsOperations.verifyDetached(
             provider = CmsOperationProvider.BOUNCY_CASTLE,
             cms = detachedCms,

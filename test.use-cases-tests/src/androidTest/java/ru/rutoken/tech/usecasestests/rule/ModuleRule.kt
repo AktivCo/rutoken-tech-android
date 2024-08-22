@@ -7,6 +7,7 @@
 package ru.rutoken.tech.usecasestests.rule
 
 import com.sun.jna.Native
+import kotlinx.coroutines.runBlocking
 import org.junit.rules.ExternalResource
 import ru.rutoken.pkcs11jna.Pkcs11
 import ru.rutoken.pkcs11wrapper.datatype.Pkcs11InitializeArgs
@@ -15,6 +16,8 @@ import ru.rutoken.pkcs11wrapper.lowlevel.jna.Pkcs11JnaLowLevelFactory
 import ru.rutoken.pkcs11wrapper.main.IPkcs11Module
 import ru.rutoken.pkcs11wrapper.main.Pkcs11Api
 import ru.rutoken.pkcs11wrapper.main.Pkcs11BaseModule
+import ru.rutoken.tech.pkcs11.Pkcs11CallScope.closePkcs11CallContext
+import ru.rutoken.tech.pkcs11.Pkcs11CallScope.initPkcs11CallContext
 
 private val pkcs11Module = Module("rtpkcs11ecp")
 
@@ -23,9 +26,11 @@ open class ModuleRule : ExternalResource() {
 
     override fun before() {
         value.initializeModule(Pkcs11InitializeArgs.Builder().setOsLockingOk(true).build())
+        initPkcs11CallContext()
     }
 
     override fun after() {
+        runBlocking { closePkcs11CallContext() }
         value.finalizeModule()
     }
 }

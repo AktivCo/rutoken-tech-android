@@ -7,6 +7,7 @@
 package ru.rutoken.tech.usecasestests.cms
 
 import io.kotest.matchers.shouldBe
+import kotlinx.coroutines.runBlocking
 import org.bouncycastle.cert.X509CertificateHolder
 import org.junit.ClassRule
 import org.junit.Test
@@ -42,15 +43,19 @@ import ru.rutoken.tech.utils.VerifyCmsResult
 class VerifyDetachedGostCmsTest {
     @Test
     fun verifyWrapperCmsViaBouncyCastle() {
-        verifyDetached(BOUNCY_CASTLE, signDetached(PKCS11_WRAPPER)) shouldBe VerifyCmsResult.SUCCESS
+        runBlocking {
+            verifyDetached(BOUNCY_CASTLE, signDetached(PKCS11_WRAPPER)) shouldBe VerifyCmsResult.SUCCESS
+        }
     }
 
     @Test
     fun verifyBouncyCastleCmsViaWrapper() {
-        verifyDetached(PKCS11_WRAPPER, signDetached(BOUNCY_CASTLE)) shouldBe VerifyCmsResult.SUCCESS
+        runBlocking {
+            verifyDetached(PKCS11_WRAPPER, signDetached(BOUNCY_CASTLE)) shouldBe VerifyCmsResult.SUCCESS
+        }
     }
 
-    private fun signDetached(provider: CmsOperationProvider): ByteArray =
+    private suspend fun signDetached(provider: CmsOperationProvider): ByteArray =
         CmsOperations.signDetached(
             provider = provider,
             session = session.value,
@@ -60,7 +65,7 @@ class VerifyDetachedGostCmsTest {
             additionalCertificates = listOf(X509CertificateHolder(caCertificate.encoded)),
         )
 
-    private fun verifyDetached(provider: CmsOperationProvider, detachedCms: ByteArray): VerifyCmsResult =
+    private suspend fun verifyDetached(provider: CmsOperationProvider, detachedCms: ByteArray): VerifyCmsResult =
         CmsOperations.verifyDetached(
             provider = provider,
             cms = detachedCms,

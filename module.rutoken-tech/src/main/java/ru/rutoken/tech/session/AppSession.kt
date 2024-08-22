@@ -46,7 +46,7 @@ class BankUserLoginAppSession(
     val isBiometryActive: Boolean,
     var encryptedPinData: EncryptedPinData?,
     var payments: List<Payment>,
-    var operationWithToken: ((RtPkcs11Session) -> Unit)? = null
+    var operationWithToken: (suspend (RtPkcs11Session) -> Unit)? = null
 ) : AppSession() {
     fun hasPinToDecrypt(context: Context): Boolean {
         if (!isBiometryActive || encryptedPinData == null)

@@ -7,6 +7,7 @@
 package ru.rutoken.tech.usecasestests.cms
 
 import io.kotest.matchers.shouldBe
+import kotlinx.coroutines.runBlocking
 import org.bouncycastle.cert.X509CertificateHolder
 import org.bouncycastle.cms.CMSAlgorithm.GOST28147_GCFB
 import org.junit.ClassRule
@@ -41,8 +42,9 @@ class EncryptDecryptGostTest {
         val encryptedData = BouncyCastleCmsOperations.encrypt(DATA, certificateHolder, GOST28147_GCFB)
 
         val certificates = listOf(certificateHolder)
-        val decryptedData =
+        val decryptedData = runBlocking {
             BouncyCastleCmsOperations.decrypt(session.value, encryptedData, certificates, keyPair.value.privateKey)
+        }
 
         decryptedData shouldBe DATA
     }

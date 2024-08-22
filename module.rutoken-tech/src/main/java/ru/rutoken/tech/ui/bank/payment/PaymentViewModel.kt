@@ -8,7 +8,6 @@ package ru.rutoken.tech.ui.bank.payment
 
 import android.content.Context
 import androidx.annotation.MainThread
-import androidx.annotation.WorkerThread
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -51,7 +50,7 @@ class PaymentViewModel(
     private val tokenManager: TokenManager,
     private val paymentTitle: String
 ) : ViewModel() {
-    val tokenConnector = TokenConnector()
+    val tokenConnector = TokenConnector(viewModelScope)
 
     // BankUserLoginAppSession instance MUST exist by the time this ViewModel is instantiated
     private val bankUserLoginSession: BankUserLoginAppSession
@@ -130,8 +129,7 @@ class PaymentViewModel(
         _navigateToTokenAuth.value = false
     }
 
-    @WorkerThread
-    private fun signPaymentOnTokenAuth(session: RtPkcs11Session) {
+    private suspend fun signPaymentOnTokenAuth(session: RtPkcs11Session) {
         session.signPayment(_payment.value!!, bankUserLoginSession.certificateCkaId, applicationContext)
         _operationCompleted.postValue(true)
         _operationCompletedDialogState.postValue(DialogState(true, DialogData(R.string.sign_operation_completed)))
@@ -164,7 +162,7 @@ class PaymentViewModel(
         }
     }
 
-    private fun verifyPaymentSignatureViaBouncyCastle() {
+    private suspend fun verifyPaymentSignatureViaBouncyCastle() {
         try {
             _showProgress.postValue(true)
             doVerifyPaymentSignature(CmsOperationProvider.BOUNCY_CASTLE)
@@ -176,7 +174,7 @@ class PaymentViewModel(
         }
     }
 
-    private fun doVerifyPaymentSignature(provider: CmsOperationProvider, session: RtPkcs11Session? = null) {
+    private suspend fun doVerifyPaymentSignature(provider: CmsOperationProvider, session: RtPkcs11Session? = null) {
         val verifyResult = verifyPaymentSignature(_payment.value!!, applicationContext, provider, session)
         _operationCompleted.postValue(true)
 
@@ -210,8 +208,7 @@ class PaymentViewModel(
         }
     }
 
-    @WorkerThread
-    private fun decryptPaymentOnTokenAuth(session: Pkcs11Session) {
+    private suspend fun decryptPaymentOnTokenAuth(session: Pkcs11Session) {
         session.decryptPayment(
             _payment.value!!,
             bankUserLoginSession.certificateCkaId,

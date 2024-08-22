@@ -26,8 +26,7 @@ import ru.rutoken.tech.utils.decoded
 import ru.rutoken.tech.utils.toBase64String
 import java.time.LocalDateTime
 
-@WorkerThread
-fun RtPkcs11Session.signPayment(
+suspend fun RtPkcs11Session.signPayment(
     payment: Payment,
     certificateCkaId: ByteArray,
     applicationContext: Context,
@@ -47,8 +46,7 @@ fun RtPkcs11Session.signPayment(
     }
 }
 
-@WorkerThread
-fun verifyPaymentSignature(
+suspend fun verifyPaymentSignature(
     payment: Payment,
     applicationContext: Context,
     provider: CmsOperationProvider = CmsOperationProvider.PKCS11_WRAPPER,
@@ -82,8 +80,7 @@ fun encryptPayment(payment: Payment, applicationContext: Context) {
     }
 }
 
-@WorkerThread
-fun Pkcs11Session.decryptPayment(
+suspend fun Pkcs11Session.decryptPayment(
     payment: Payment,
     certificateCkaId: ByteArray,
     certificateBytes: ByteArray,

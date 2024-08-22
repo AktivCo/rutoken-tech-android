@@ -6,6 +6,7 @@
 
 package ru.rutoken.tech.usecasestests.rule
 
+import kotlinx.coroutines.runBlocking
 import org.junit.Assume.assumeTrue
 import org.junit.rules.ExternalResource
 import ru.rutoken.pkcs11wrapper.attribute.Pkcs11Attribute
@@ -29,7 +30,7 @@ class GenerateKeyPairRule<PublicKey : Pkcs11PublicKeyObject, PrivateKey : Pkcs11
     val value get() = _value
 
     override fun before() {
-        assumeTrue(session.value.token.isMechanismSupported(mechanism.mechanismType))
+        runBlocking { assumeTrue(session.value.token.isMechanismSupported(mechanism.mechanismType)) }
         beforeGenerationCheck?.let { assumeTrue(it(session.value)) }
 
         _value = session.value.keyManager.generateKeyPair(

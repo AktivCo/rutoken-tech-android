@@ -37,6 +37,7 @@ import ru.rutoken.pkcs11wrapper.`object`.key.Pkcs11GostPrivateKeyObject
 import ru.rutoken.tech.bouncycastle.decrypt.RtGostKeyTransEnvelopedRecipient
 import ru.rutoken.tech.bouncycastle.signature.GostContentSigner
 import ru.rutoken.tech.bouncycastle.signature.makeSignatureByHashOid
+import ru.rutoken.tech.pkcs11.Pkcs11CallScope.withPkcs11CallContext
 import ru.rutoken.tech.ui.bank.payments.Base64String
 import ru.rutoken.tech.utils.VerifyCmsResult
 import ru.rutoken.tech.utils.base64ToPrivateKey
@@ -49,13 +50,13 @@ import java.security.cert.X509CertSelector
 import java.security.cert.X509Certificate
 
 object BouncyCastleCmsOperations {
-    fun signDetached(
+    suspend fun signDetached(
         session: Pkcs11Session,
         data: ByteArray,
         privateKey: Pkcs11GostPrivateKeyObject,
         certificate: X509CertificateHolder,
         additionalCertificates: List<X509CertificateHolder>
-    ): ByteArray {
+    ): ByteArray = withPkcs11CallContext {
         val signature =
             makeSignatureByHashOid(privateKey.getGostR3411ParamsAttributeValue(session).byteArrayValue, session)
         val signer = GostContentSigner(signature).apply { signInit(privateKey) }
@@ -65,7 +66,7 @@ object BouncyCastleCmsOperations {
             addSignerInfoGenerator(SignerInfoGeneratorBuilder(signer.getDigestProvider()).build(signer, certificate))
         }
 
-        return generator.generate(CMSProcessableByteArray(data)).getEncoded(ASN1Encoding.DER)
+        generator.generate(CMSProcessableByteArray(data)).getEncoded(ASN1Encoding.DER)
     }
 
     fun signDetachedGost256(
@@ -176,12 +177,12 @@ object BouncyCastleCmsOperations {
         return cmsEnvelopedData.encoded
     }
 
-    fun decrypt(
+    suspend fun decrypt(
         session: Pkcs11Session,
         data: ByteArray,
         possibleRecipientsCertificates: List<X509CertificateHolder>,
         privateKey: Pkcs11GostPrivateKeyObject
-    ): ByteArray {
+    ): ByteArray = withPkcs11CallContext {
         val cms = CMSEnvelopedData(data)
         val recipientsStore = cms.recipientInfos
 
@@ -190,7 +191,7 @@ object BouncyCastleCmsOperations {
                 .firstOrNull { it.isNotEmpty() }
                 ?: throw IllegalStateException("Certificates in $possibleRecipientsCertificates not found in CMS recipients")
 
-        return matchedRecipients.first().getContent(makeKeyTransEnvelopedRecipient(session, cms, privateKey))
+        matchedRecipients.first().getContent(makeKeyTransEnvelopedRecipient(session, cms, privateKey))
     }
 }
 

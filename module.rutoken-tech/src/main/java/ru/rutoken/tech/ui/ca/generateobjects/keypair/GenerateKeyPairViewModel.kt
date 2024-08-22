@@ -42,7 +42,7 @@ class GenerateKeyPairViewModel(
     private val tokenManager: TokenManager,
     private val sessionHolder: AppSessionHolder
 ) : ViewModel() {
-    val tokenConnector = TokenConnector()
+    val tokenConnector = TokenConnector(viewModelScope)
 
     private val _showProgress = MutableLiveData<Boolean>()
     val showProgress: LiveData<Boolean> get() = _showProgress
@@ -118,7 +118,7 @@ class GenerateKeyPairViewModel(
         if (hasPinChanged) _shouldLogout.postValue(true)
     }
 
-    private fun createGostKeyPair(
+    private suspend fun createGostKeyPair(
         token: Pkcs11Token,
         userPin: String,
         ckaId: CkaIdString,

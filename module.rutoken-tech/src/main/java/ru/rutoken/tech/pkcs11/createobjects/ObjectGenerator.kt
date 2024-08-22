@@ -39,6 +39,7 @@ import ru.rutoken.pkcs11wrapper.`object`.key.Pkcs11GostPrivateKeyObject
 import ru.rutoken.pkcs11wrapper.`object`.key.Pkcs11GostPublicKeyObject
 import ru.rutoken.pkcs11wrapper.rutoken.main.RtPkcs11Session
 import ru.rutoken.tech.ca.LocalCA
+import ru.rutoken.tech.pkcs11.Pkcs11CallScope.withPkcs11CallContext
 
 typealias GostKeyPair = Pkcs11KeyPair<Pkcs11GostPublicKeyObject, Pkcs11GostPrivateKeyObject>
 
@@ -51,17 +52,17 @@ fun generateCkaId() = generateCkaIdGroup() + CKA_ID_GROUP_SEPARATOR.code.toByte(
 /**
  * Method supposes that the user is logged in.
  */
-fun RtPkcs11Session.createGostCertificate(
+suspend fun RtPkcs11Session.createGostCertificate(
     keyPair: GostKeyPair,
     dn: List<String>,
     attributes: List<String>?,
     extensions: List<String>
-): Pkcs11CertificateObject {
-    val ckaId = keyPair.publicKey.getByteArrayAttributeValue(this, CKA_ID).byteArrayValue
+): Pkcs11CertificateObject = withPkcs11CallContext {
+    val ckaId = keyPair.publicKey.getByteArrayAttributeValue(this@createGostCertificate, CKA_ID).byteArrayValue
     val csr = createCsr(keyPair.publicKey, dn, keyPair.privateKey, attributes, extensions)
     val encodedCertificate = LocalCA.issueCertificate(csr)
 
-    return objectManager.createObject(
+    objectManager.createObject(
         Pkcs11CertificateObject::class.java,
         attributeFactory.makeCertificateTemplate(ckaId, encodedCertificate)
     )
@@ -70,7 +71,7 @@ fun RtPkcs11Session.createGostCertificate(
 /**
  * Method supposes that the user is logged in.
  */
-fun Pkcs11Session.createGostKeyPair(
+suspend fun Pkcs11Session.createGostKeyPair(
     keyPairParams: GostKeyPairParams,
     ckaId: ByteArray,
     privateKeyValidityNotBefore: Pkcs11Date,
@@ -79,19 +80,21 @@ fun Pkcs11Session.createGostKeyPair(
     if (!token.isMechanismSupported(keyPairParams.mechanismType))
         throw IllegalStateException("${keyPairParams.mechanismType} not supported by token")
 
-    return keyManager.generateKeyPair(
-        Pkcs11GostPublicKeyObject::class.java,
-        Pkcs11GostPrivateKeyObject::class.java,
-        Pkcs11Mechanism.make(keyPairParams.mechanismType),
-        attributeFactory.makeGostPublicKeyTemplate(keyPairParams, ckaId),
-        attributeFactory.makeGostPrivateKeyTemplate(
-            keyPairParams, ckaId, privateKeyValidityNotBefore, privateKeyValidityNotAfter
+    return withPkcs11CallContext {
+        keyManager.generateKeyPair(
+            Pkcs11GostPublicKeyObject::class.java,
+            Pkcs11GostPrivateKeyObject::class.java,
+            Pkcs11Mechanism.make(keyPairParams.mechanismType),
+            attributeFactory.makeGostPublicKeyTemplate(keyPairParams, ckaId),
+            attributeFactory.makeGostPrivateKeyTemplate(
+                keyPairParams, ckaId, privateKeyValidityNotBefore, privateKeyValidityNotAfter
+            )
         )
-    )
+    }
 }
 
-fun Pkcs11Token.isMechanismSupported(mechanism: IPkcs11MechanismType) =
-    mechanismList.any { it.asLong == mechanism.asLong }
+suspend fun Pkcs11Token.isMechanismSupported(mechanism: IPkcs11MechanismType) =
+    withPkcs11CallContext { mechanismList.any { it.asLong == mechanism.asLong } }
 
 fun IPkcs11AttributeFactory.makeCertificateTemplate(id: ByteArray, value: ByteArray): List<Pkcs11Attribute> {
     return listOf(

@@ -7,8 +7,6 @@
 package ru.rutoken.tech.ui.ca.tokeninfo.model
 
 import android.content.Context
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import ru.rutoken.pkcs11jna.RtPkcs11Constants.INTERFACE_TYPE_ISO
 import ru.rutoken.pkcs11jna.RtPkcs11Constants.INTERFACE_TYPE_NFC_TYPE_A
 import ru.rutoken.pkcs11jna.RtPkcs11Constants.INTERFACE_TYPE_NFC_TYPE_B
@@ -30,6 +28,7 @@ import ru.rutoken.pkcs11wrapper.main.Pkcs11Session
 import ru.rutoken.pkcs11wrapper.rutoken.constant.RtPkcs11AttributeType
 import ru.rutoken.pkcs11wrapper.rutoken.constant.RtPkcs11HardwareFeatureType
 import ru.rutoken.pkcs11wrapper.rutoken.datatype.TokenInfoExtended
+import ru.rutoken.tech.pkcs11.Pkcs11CallScope.withPkcs11CallContext
 import ru.rutoken.tech.ui.ca.tokeninfo.model.smartcard.Ecp2SmartCard
 import ru.rutoken.tech.ui.ca.tokeninfo.model.smartcard.Ecp3SmartCard
 import ru.rutoken.tech.ui.ca.tokeninfo.model.smartcard.Ecp3SmartCard.MarketingModel.ECP3_SC_3100
@@ -178,7 +177,7 @@ suspend fun defineTokenModel(
     tokenInfo: Pkcs11TokenInfo,
     tokenInfoExtended: TokenInfoExtended
 ): TokenModel {
-    return withContext(Dispatchers.IO) {
+    return withPkcs11CallContext {
         TokenModel.fromTokenInfo(tokenInfo, tokenInfoExtended, pkcs11Session.getTokenInfoHwFeatures())
     }
 }

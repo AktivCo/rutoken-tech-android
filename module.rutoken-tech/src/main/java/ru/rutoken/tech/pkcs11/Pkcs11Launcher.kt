@@ -29,6 +29,9 @@ import ru.nsk.kstatemachine.state
 import ru.nsk.kstatemachine.transition
 import ru.rutoken.pkcs11wrapper.datatype.Pkcs11InitializeArgs
 import ru.rutoken.pkcs11wrapper.main.Pkcs11Module
+import ru.rutoken.tech.pkcs11.Pkcs11CallScope.closePkcs11CallContext
+import ru.rutoken.tech.pkcs11.Pkcs11CallScope.initPkcs11CallContext
+import ru.rutoken.tech.utils.logd
 import java.util.concurrent.CopyOnWriteArraySet
 
 /**
@@ -76,9 +79,6 @@ class Pkcs11Launcher(private val pkcs11Module: Pkcs11Module) : DefaultLifecycleO
         }
     }
 
-    @MainThread
-    fun launchPkcs11() = stateMachine.processEventBlocking(Pkcs11Event.InitializeEvent)
-
     fun addListener(listener: Listener) {
         listeners.add(listener)
     }
@@ -101,14 +101,20 @@ class Pkcs11Launcher(private val pkcs11Module: Pkcs11Module) : DefaultLifecycleO
 
     private suspend fun initializePkcs11() {
         withContext(Dispatchers.IO) {
+            logd<Pkcs11Launcher> { "Initializing PKCS#11" }
             pkcs11Module.initializeModule(Pkcs11InitializeArgs.Builder().setOsLockingOk(true).build())
         }
+        initPkcs11CallContext()
+
         listeners.forEach { it.onPkcs11Initialized(scope, pkcs11Module) }
     }
 
     private suspend fun finalizePkcs11() {
         listeners.forEach { it.beforePkcs11Finalize(scope, pkcs11Module) }
+
+        closePkcs11CallContext()
         withContext(Dispatchers.IO) {
+            logd<Pkcs11Launcher> { "Finalizing PKCS#11" }
             pkcs11Module.finalizeModule()
         }
     }

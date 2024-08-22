@@ -21,16 +21,24 @@ import ru.rutoken.pkcs11wrapper.constant.standard.Pkcs11UserType
 import ru.rutoken.pkcs11wrapper.datatype.Pkcs11TokenInfo
 import ru.rutoken.pkcs11wrapper.rutoken.main.RtPkcs11Session
 import ru.rutoken.tech.R
+import ru.rutoken.tech.pkcs11.Pkcs11CallScope.withPkcs11CallContext
 import ru.rutoken.tech.pkcs11.findobjects.Gost256CertificateAndKeyContainer
 import ru.rutoken.tech.pkcs11.findobjects.findGost256CertificateAndKeyContainerByCkaId
 import ru.rutoken.tech.pkcs11.findobjects.findGost256CertificateAndKeyContainers
 import ru.rutoken.tech.pkcs11.findobjects.findGost256KeyContainers
 import ru.rutoken.tech.pkcs11.serialNumberTrimmed
 import ru.rutoken.tech.repository.bank.BankUserRepository
-import ru.rutoken.tech.session.*
+import ru.rutoken.tech.session.AppSession
+import ru.rutoken.tech.session.AppSessionHolder
+import ru.rutoken.tech.session.AppSessionType
 import ru.rutoken.tech.session.AppSessionType.BANK_USER_ADDING_SESSION
 import ru.rutoken.tech.session.AppSessionType.BANK_USER_LOGIN_SESSION
 import ru.rutoken.tech.session.AppSessionType.CA_SESSION
+import ru.rutoken.tech.session.BankUserAddingAppSession
+import ru.rutoken.tech.session.BankUserLoginAppSession
+import ru.rutoken.tech.session.CaAppSession
+import ru.rutoken.tech.session.CkaIdString
+import ru.rutoken.tech.session.requireBankUserLoginSession
 import ru.rutoken.tech.tokenmanager.RtPkcs11TokenData
 import ru.rutoken.tech.tokenmanager.TokenManager
 import ru.rutoken.tech.ui.bank.BankCertificate
@@ -40,10 +48,16 @@ import ru.rutoken.tech.ui.utils.DialogState
 import ru.rutoken.tech.ui.utils.callPkcs11Operation
 import ru.rutoken.tech.ui.utils.getCertificateErrorText
 import ru.rutoken.tech.ui.utils.toErrorDialogData
-import ru.rutoken.tech.utils.*
 import ru.rutoken.tech.utils.BusinessRuleCase.IncorrectPin
 import ru.rutoken.tech.utils.BusinessRuleCase.NoSuchCertificate
 import ru.rutoken.tech.utils.BusinessRuleCase.PinLocked
+import ru.rutoken.tech.utils.BusinessRuleException
+import ru.rutoken.tech.utils.checkSubjectRdns
+import ru.rutoken.tech.utils.getFullName
+import ru.rutoken.tech.utils.getIssuerRdnValue
+import ru.rutoken.tech.utils.logd
+import ru.rutoken.tech.utils.loge
+import ru.rutoken.tech.utils.toDateString
 import java.util.Date
 
 class LoginViewModel(
@@ -52,7 +66,7 @@ class LoginViewModel(
     private val sessionHolder: AppSessionHolder,
     private val repository: BankUserRepository
 ) : ViewModel() {
-    val tokenConnector = TokenConnector()
+    val tokenConnector = TokenConnector(viewModelScope)
 
     private val _showProgress: MutableLiveData<Boolean> = MutableLiveData(false)
     val showProgress: LiveData<Boolean> get() = _showProgress
@@ -118,7 +132,7 @@ class LoginViewModel(
         tokenUserPin: String,
         tokenData: RtPkcs11TokenData
     ): AppSession {
-        val tokenInfo = tokenData.token.tokenInfo
+        val tokenInfo = withPkcs11CallContext { tokenData.token.tokenInfo }
 
         return when (appSessionType) {
             CA_SESSION -> createCaAppSession(tokenUserPin, tokenData, tokenInfo)

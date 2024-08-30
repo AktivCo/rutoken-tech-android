@@ -6,6 +6,10 @@
 
 package ru.rutoken.tech.ui.components
 
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.WindowInsetsSides
+import androidx.compose.foundation.layout.only
+import androidx.compose.foundation.layout.systemBarsIgnoringVisibility
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LargeTopAppBar
 import androidx.compose.material3.MaterialTheme
@@ -40,6 +44,7 @@ fun ScreenTopAppBar(
                 IconButton(onClick = onTrailingIconClick, modifier = Modifiers.appBarIconSize, content = trailingIcon)
             }
         },
+        windowInsets = WindowInsets.systemBarsIgnoringVisibility.only(WindowInsetsSides.Top),
         colors = colors
     )
 }

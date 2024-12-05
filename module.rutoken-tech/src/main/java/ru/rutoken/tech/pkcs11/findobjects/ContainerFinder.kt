@@ -6,6 +6,7 @@
 
 package ru.rutoken.tech.pkcs11.findobjects
 
+import android.util.Base64
 import org.bouncycastle.asn1.rosstandart.RosstandartObjectIdentifiers.id_tc26_gost_3410_12_256
 import org.bouncycastle.cert.X509CertificateHolder
 import ru.rutoken.pkcs11wrapper.attribute.Pkcs11ByteArrayAttribute
@@ -18,6 +19,7 @@ import ru.rutoken.pkcs11wrapper.`object`.key.Pkcs11Gost256PrivateKeyObject
 import ru.rutoken.pkcs11wrapper.`object`.key.Pkcs11Gost256PublicKeyObject
 import ru.rutoken.tech.pkcs11.Pkcs11CallScope.withPkcs11CallContext
 import ru.rutoken.tech.pkcs11.createobjects.GostKeyPair
+import ru.rutoken.tech.utils.loge
 
 /**
  * It is supposed that key pairs and certificates are linked by CKA_ID.
@@ -68,8 +70,16 @@ private suspend fun Pkcs11Session.findGost256Containers(): List<Container> =
         val certificates = objectManager.findObjectsAtOnce(Pkcs11X509PublicKeyCertificateObject::class.java)
 
         for (certificate in certificates) {
-            val x509CertificateHolder =
-                X509CertificateHolder(certificate.getValueAttributeValue(this@findGost256Containers).byteArrayValue)
+            val certificateValue = certificate.getValueAttributeValue(this@findGost256Containers).byteArrayValue
+            val x509CertificateHolder = try {
+                X509CertificateHolder(certificateValue)
+            } catch (e: Exception) {
+                val base64EncodedValue = Base64.encodeToString(certificateValue, Base64.DEFAULT)
+
+                loge<Container>(e) { "Unable to parse certificate" }
+                loge<Container> { "Unparsed certificate(base64-encoded): $base64EncodedValue" }
+                continue
+            }
 
             if (x509CertificateHolder.subjectPublicKeyInfo.algorithm.algorithm != id_tc26_gost_3410_12_256)
                 continue

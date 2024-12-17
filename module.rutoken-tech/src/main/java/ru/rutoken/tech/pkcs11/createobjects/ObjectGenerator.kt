@@ -59,7 +59,7 @@ fun RtPkcs11Session.createGostCertificate(
 ): Pkcs11CertificateObject {
     val ckaId = keyPair.publicKey.getByteArrayAttributeValue(this, CKA_ID).byteArrayValue
     val csr = createCsr(keyPair.publicKey, dn, keyPair.privateKey, attributes, extensions)
-    val encodedCertificate = LocalCA.issueCertificate(csr)
+    val encodedCertificate = LocalCA.issueSelfSignedCertificate(csr, this, keyPair.privateKey)
 
     return objectManager.createObject(
         Pkcs11CertificateObject::class.java,

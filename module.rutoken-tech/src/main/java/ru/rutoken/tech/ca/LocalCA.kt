@@ -10,6 +10,10 @@ import org.bouncycastle.cert.X509CertificateHolder
 import org.bouncycastle.cert.X509v3CertificateBuilder
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder
 import org.bouncycastle.pkcs.PKCS10CertificationRequest
+import ru.rutoken.pkcs11wrapper.main.Pkcs11Session
+import ru.rutoken.pkcs11wrapper.`object`.key.Pkcs11GostPrivateKeyObject
+import ru.rutoken.tech.bouncycastle.signature.GostContentSigner
+import ru.rutoken.tech.bouncycastle.signature.makeSignatureByHashOid
 import ru.rutoken.tech.utils.base64ToPrivateKey
 import ru.rutoken.tech.utils.decoded
 import java.math.BigInteger
@@ -107,6 +111,37 @@ object LocalCA {
 
             certificateBuilder.build(signer).encoded
         }
+    }
+
+    fun issueSelfSignedCertificate(
+        csr: ByteArray,
+        session: Pkcs11Session,
+        privateKey: Pkcs11GostPrivateKeyObject
+    ): ByteArray {
+        val certificationRequest = PKCS10CertificationRequest(csr)
+
+        val notBefore = ZonedDateTime.now()
+        val notAfter = notBefore + CA_CONFIG_GOST.issuedCertificateValidityPeriod
+
+        val certificateBuilder = X509v3CertificateBuilder(
+            certificationRequest.subject,
+            BigInteger(160, Random()).also { it.setBit(0) },
+            Date.from(notBefore.toInstant()),
+            Date.from(notAfter.toInstant()),
+            certificationRequest.subject,
+            certificationRequest.subjectPublicKeyInfo
+        )
+
+        val certificateExtensions = certificationRequest.requestedExtensions
+        certificateExtensions.extensionOIDs.forEach { oid ->
+            val extension = certificateExtensions.getExtension(oid)
+            certificateBuilder.addExtension(oid, extension.isCritical, extension.parsedValue)
+        }
+
+        val signature =
+            makeSignatureByHashOid(privateKey.getGostR3411ParamsAttributeValue(session).byteArrayValue, session)
+        val signer = GostContentSigner(signature).apply { signInit(privateKey) }
+        return certificateBuilder.build(signer).encoded
     }
 }
 

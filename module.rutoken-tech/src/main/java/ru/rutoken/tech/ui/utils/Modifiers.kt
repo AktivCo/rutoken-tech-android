@@ -30,6 +30,7 @@ object Modifiers {
 
 fun Modifier.figmaPadding(top: Dp, right: Dp, bottom: Dp, left: Dp) = this.padding(left, top, right, bottom)
 
+@OptIn(Workaround::class)
 @Composable
 fun Modifier.statusBarsPaddingHeight(): Modifier {
     return if (VERSION.SDK_INT < VERSION_CODES.R) {

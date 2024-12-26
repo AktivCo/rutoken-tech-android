@@ -129,7 +129,7 @@ private fun BuildInfo() {
 
     val context = LocalContext.current
     LaunchedEffect(Unit) {
-        buildVersion = context.packageManager.getPackageInfo(context.packageName, 0).versionName
+        buildVersion = context.packageManager.getPackageInfo(context.packageName, 0).versionName!!
     }
 }
 

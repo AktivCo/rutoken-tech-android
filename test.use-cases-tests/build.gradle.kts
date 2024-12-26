@@ -10,10 +10,10 @@ plugins {
 android {
     namespace = "ru.rutoken.tech.usecasestests"
 
-    compileSdk = 34
+    compileSdk = 35
     defaultConfig.minSdk = 24
-    testOptions.targetSdk = 34
-    lint.targetSdk = 34
+    testOptions.targetSdk = 35
+    lint.targetSdk = 35
 
     defaultConfig {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"

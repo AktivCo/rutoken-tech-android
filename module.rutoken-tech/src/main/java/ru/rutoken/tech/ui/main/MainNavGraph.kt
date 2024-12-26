@@ -8,8 +8,8 @@ package ru.rutoken.tech.ui.main
 
 import androidx.compose.animation.AnimatedContentScope
 import androidx.compose.animation.core.tween
-import androidx.compose.animation.slideInHorizontally
-import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.runtime.Composable
 import androidx.navigation.NamedNavArgument
 import androidx.navigation.NavBackStackEntry
@@ -49,10 +49,8 @@ fun MainNavHost(navHostController: NavHostController, openDrawer: () -> Unit) {
     NavHost(
         navController = navHostController,
         startDestination = AppSectionDestination.Bank.route,
-        enterTransition = { slideInHorizontally(animationSpec = tween(500), initialOffsetX = { it }) },
-        exitTransition = { slideOutHorizontally(animationSpec = tween(500), targetOffsetX = { -it }) },
-        popEnterTransition = { slideInHorizontally(animationSpec = tween(500), initialOffsetX = { -it }) },
-        popExitTransition = { slideOutHorizontally(animationSpec = tween(500), targetOffsetX = { it }) }
+        enterTransition = { fadeIn(animationSpec = tween(500)) },
+        exitTransition = { fadeOut(animationSpec = tween(500)) }
     ) {
         navigation(
             route = AppSectionDestination.Bank.route,

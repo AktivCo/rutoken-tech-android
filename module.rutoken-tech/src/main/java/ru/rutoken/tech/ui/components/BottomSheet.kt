@@ -6,13 +6,16 @@
 
 package ru.rutoken.tech.ui.components
 
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.BottomSheetDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SheetState
@@ -21,15 +24,17 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import ru.rutoken.tech.R
 import ru.rutoken.tech.ui.theme.RutokenTechTheme
 import ru.rutoken.tech.ui.utils.PreviewDark
 import ru.rutoken.tech.ui.utils.PreviewLight
-import ru.rutoken.tech.ui.utils.statusBarsPaddingHeight
 
 data class ButtonContent(val text: String, val onClick: () -> Unit)
 
@@ -63,19 +68,33 @@ fun BottomSheetTitle(title: String, buttonContent: ButtonContent? = null) {
 
 @Composable
 fun BottomSheetDragHandle(sheetState: SheetState) {
-    if (sheetState.targetValue != SheetValue.Expanded) {
-        BottomSheetDefaults.DragHandle()
-    } else {
-        Spacer(Modifier.statusBarsPaddingHeight())
-    }
+    val alpha by animateFloatAsState(
+        targetValue = if (sheetState.targetValue != SheetValue.Expanded) {
+            1f
+        } else {
+            0f
+        }, animationSpec = tween(300),
+        label = "dragHandleAlpha"
+    )
+    BottomSheetDefaults.DragHandle(
+        Modifier.alpha(alpha)
+    )
 }
 
 @Composable
-fun bottomSheetCornerShape(sheetState: SheetState) =
-    if (sheetState.targetValue != SheetValue.Expanded)
-        BottomSheetDefaults.ExpandedShape
-    else
-        BottomSheetDefaults.HiddenShape
+fun bottomSheetCornerShape(sheetState: SheetState): Shape {
+    val corners by animateDpAsState(
+        targetValue = if (sheetState.targetValue != SheetValue.Expanded) {
+            28.dp
+        } else {
+            0.dp
+        },
+        animationSpec = tween(300),
+        label = "cornersRoundDp"
+    )
+
+    return RoundedCornerShape(corners)
+}
 
 @PreviewLight
 @PreviewDark

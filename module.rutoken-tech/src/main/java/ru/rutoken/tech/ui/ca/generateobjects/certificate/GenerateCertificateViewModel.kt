@@ -21,9 +21,9 @@ import ru.rutoken.tech.R
 import ru.rutoken.tech.pkcs11.createobjects.createGostCertificate
 import ru.rutoken.tech.pkcs11.findobjects.findGost256KeyPairByCkaId
 import ru.rutoken.tech.session.AppSessionHolder
-import ru.rutoken.tech.session.CkaIdString
 import ru.rutoken.tech.session.requireCaSession
 import ru.rutoken.tech.tokenmanager.TokenManager
+import ru.rutoken.tech.ui.ca.generateobjects.keypair.CkaID
 import ru.rutoken.tech.ui.tokenconnector.TokenConnector
 import ru.rutoken.tech.ui.utils.DialogData
 import ru.rutoken.tech.ui.utils.DialogState
@@ -50,15 +50,16 @@ class GenerateCertificateViewModel(
     val errorDialogState: LiveData<DialogState> = _errorDialogState
 
     // CaAppSession MUST exist and keyPairs MUST NOT be empty by the time this ViewModel is instantiated
-    private val _keyPairs = MutableLiveData<List<CkaIdString>>(sessionHolder.requireCaSession().keyPairs)
-    val keyPairs: LiveData<List<CkaIdString>> get() = _keyPairs
+    private val _keyPairs = MutableLiveData<List<CkaID>>(sessionHolder.requireCaSession().keyPairs)
+    val keyPairs: LiveData<List<CkaID>>
+        get() = _keyPairs
 
     private val _shouldLogout = MutableLiveData(false)
     val shouldLogout: LiveData<Boolean> get() = _shouldLogout
 
     private var hasPinChanged = false
 
-    fun generateGostCertificate(keyPairCkaId: CkaIdString, owner: String) {
+    fun generateGostCertificate(keyPairCkaId: CkaID, owner: String) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 val caSession = sessionHolder.requireCaSession()
@@ -69,12 +70,13 @@ class GenerateCertificateViewModel(
                     createGostCertificate(
                         token,
                         caSession.tokenUserPin,
-                        keyPairCkaId,
+                        keyPairCkaId.rawValue,
                         createDN(owner),
                         null,
                         EXTENSIONS
                     )
                     caSession.keyPairs.remove(keyPairCkaId)
+
                     _successDialogState.postValue(
                         DialogState(
                             showDialog = true,
@@ -108,7 +110,7 @@ class GenerateCertificateViewModel(
     private suspend fun createGostCertificate(
         token: RtPkcs11Token,
         userPin: String,
-        keyPairCkaId: CkaIdString,
+        keyPairCkaId: ByteArray,
         dn: List<String>,
         attributes: List<String>?,
         extensions: List<String>
@@ -116,7 +118,7 @@ class GenerateCertificateViewModel(
         return token.openSession(true).use { session ->
             session.login(CKU_USER, userPin).use {
                 val keyPair = try {
-                    session.findGost256KeyPairByCkaId(keyPairCkaId.toByteArray())
+                    session.findGost256KeyPairByCkaId(keyPairCkaId)
                 } catch (_: IllegalStateException) {
                     throw BusinessRuleException(BusinessRuleCase.NoSuchKeyPair)
                 }

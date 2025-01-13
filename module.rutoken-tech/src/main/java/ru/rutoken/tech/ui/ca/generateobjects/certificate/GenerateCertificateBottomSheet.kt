@@ -48,7 +48,8 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 import ru.rutoken.tech.R
-import ru.rutoken.tech.session.CkaIdString
+import ru.rutoken.tech.ui.ca.generateobjects.keypair.CkaID
+import ru.rutoken.tech.ui.ca.generateobjects.keypair.convertToDefaultString
 import ru.rutoken.tech.ui.components.BottomSheetDragHandle
 import ru.rutoken.tech.ui.components.BottomSheetTitle
 import ru.rutoken.tech.ui.components.alertdialog.ConnectTokenDialog
@@ -111,8 +112,8 @@ fun GenerateCertificateScreen(
 fun GenerateCertificateBottomSheet(
     sheetState: SheetState,
     onDismissRequest: () -> Unit,
-    keyPairs: List<CkaIdString>,
-    onGenerationButtonClicked: (CkaIdString, String) -> Unit
+    keyPairs: List<CkaID>,
+    onGenerationButtonClicked: (CkaID, String) -> Unit
 ) {
     ModalBottomSheet(
         onDismissRequest = onDismissRequest,
@@ -169,9 +170,9 @@ fun GenerateCertificateBottomSheet(
 
 @Composable
 private fun KeyPairSelectionDropdownMenu(
-    keyPairs: List<CkaIdString>,
-    selectedKeyPair: CkaIdString,
-    onItemClick: (keyPair: CkaIdString) -> Unit,
+    keyPairs: List<CkaID>,
+    selectedKeyPair: CkaID,
+    onItemClick: (keyPair: CkaID) -> Unit,
 ) {
     var menuExpanded by remember { mutableStateOf(false) }
 
@@ -181,7 +182,7 @@ private fun KeyPairSelectionDropdownMenu(
         modifier = Modifier.fillMaxWidth()
     ) {
         OutlinedTextField(
-            value = selectedKeyPair,
+            value = convertToDefaultString(selectedKeyPair),
             onValueChange = { /* Nothing to do */ },
             modifier = Modifier
                 .fillMaxWidth()
@@ -202,7 +203,7 @@ private fun KeyPairSelectionDropdownMenu(
         ) {
             keyPairs.forEach { keyPair ->
                 DropdownMenuItem(
-                    text = { Text(text = keyPair, style = MaterialTheme.typography.bodyLarge) },
+                    text = { Text(text = convertToDefaultString(keyPair), style = MaterialTheme.typography.bodyLarge) },
                     onClick = {
                         onItemClick(keyPair)
                         menuExpanded = false
@@ -313,11 +314,11 @@ private fun GenerateCertificateBottomSheetPreview() {
             sheetState = expandedSheetState(),
             onDismissRequest = {},
             keyPairs = listOf(
-                "f15da113-ce87b7d6",
-                "bf5b3861-5af06f67",
-                "5a2cc4ba-cd64bef4",
-                "0af7e1f8-5c0972cb",
-                "b15cabee-0d86845d"
+                CkaID(),
+                CkaID(),
+                CkaID(),
+                CkaID(),
+                CkaID(),
             ),
             onGenerationButtonClicked = { _, _ -> }
         )

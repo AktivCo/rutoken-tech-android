@@ -17,6 +17,7 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.map
 import kotlinx.coroutines.launch
 import ru.rutoken.tech.R
 import ru.rutoken.tech.pkcs11.createobjects.GostKeyPairParams
@@ -40,20 +41,16 @@ import ru.rutoken.tech.ui.utils.figmaPaddingValues
 
 @Composable
 fun GenerateKeyPairScreen(viewModel: GenerateKeyPairViewModel, onNavigateBack: () -> Unit, onLogout: () -> Unit) {
-    val keyPairId by viewModel.keyPairId.observeAsState("")
+    val keyPairId by viewModel.keyPairId.map { convertToDefaultString(it) }.observeAsState("")
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val scope = rememberCoroutineScope()
-
-    LaunchedEffect(Unit) {
-        viewModel.generateKeyPairId()
-    }
 
     if (keyPairId.isNotEmpty()) {
         GenerateKeyPairBottomSheet(
             keyPairId = keyPairId,
             sheetState = sheetState,
             onDismiss = onNavigateBack,
-            onGenerationButtonClicked = { viewModel.generateGostKeyPair(keyPairId, GostKeyPairParams.GOST_2012_256) }
+            onGenerationButtonClicked = { viewModel.generateGostKeyPair(GostKeyPairParams.GOST_2012_256) }
         )
     }
 
@@ -162,7 +159,7 @@ private fun ErrorDialog(viewModel: GenerateKeyPairViewModel) {
 private fun GenerateKeyPairBottomSheetPreview() {
     RutokenTechTheme {
         GenerateKeyPairBottomSheet(
-            keyPairId = "12345678-90abcdef",
+            keyPairId = "5a:8b:22:34:11",
             sheetState = expandedSheetState(),
             onDismiss = {}
         ) {}

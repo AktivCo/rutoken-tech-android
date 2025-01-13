@@ -13,9 +13,9 @@ import ru.rutoken.pkcs11wrapper.mechanism.Pkcs11Mechanism
 import ru.rutoken.pkcs11wrapper.`object`.key.Pkcs11GostPrivateKeyObject
 import ru.rutoken.pkcs11wrapper.`object`.key.Pkcs11GostPublicKeyObject
 import ru.rutoken.tech.pkcs11.createobjects.GostKeyPairParams
-import ru.rutoken.tech.pkcs11.createobjects.generateCkaId
 import ru.rutoken.tech.pkcs11.createobjects.makeGostPrivateKeyTemplate
 import ru.rutoken.tech.pkcs11.createobjects.makeGostPublicKeyTemplate
+import ru.rutoken.tech.ui.ca.generateobjects.keypair.CkaID
 import ru.rutoken.tech.usecasestests.rule.GenerateKeyPairRule
 import ru.rutoken.tech.usecasestests.rule.SessionRule
 import java.time.Period
@@ -24,7 +24,7 @@ import java.time.ZonedDateTime
 val appPackageName: String
     get() = InstrumentationRegistry.getInstrumentation().targetContext.packageName
 
-val ID = generateCkaId()
+val ID = CkaID().rawValue
 
 val DATA = byteArrayOf(0x01, 0x02, 0x03)
 

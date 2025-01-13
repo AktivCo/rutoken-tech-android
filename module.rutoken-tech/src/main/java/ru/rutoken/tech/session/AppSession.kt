@@ -11,10 +11,10 @@ import ru.rutoken.pkcs11wrapper.rutoken.main.RtPkcs11Session
 import ru.rutoken.tech.bank.biometry.canUseBiometry
 import ru.rutoken.tech.ui.bank.BankCertificate
 import ru.rutoken.tech.ui.bank.payments.Payment
+import ru.rutoken.tech.ui.ca.generateobjects.keypair.CkaID
 import ru.rutoken.tech.ui.ca.tokeninfo.model.TokenModel
 
 typealias SerialHexString = String
-typealias CkaIdString = String
 
 enum class AppSessionType {
     CA_SESSION,
@@ -29,7 +29,7 @@ data class CaAppSession(
     val tokenSerial: SerialHexString,
     val tokenModel: TokenModel,
     val tokenLabel: String,
-    val keyPairs: MutableList<CkaIdString>
+    val keyPairs: MutableList<CkaID>
 ) : AppSession()
 
 data class BankUserAddingAppSession(

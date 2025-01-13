@@ -37,12 +37,12 @@ import ru.rutoken.tech.session.AppSessionType.CA_SESSION
 import ru.rutoken.tech.session.BankUserAddingAppSession
 import ru.rutoken.tech.session.BankUserLoginAppSession
 import ru.rutoken.tech.session.CaAppSession
-import ru.rutoken.tech.session.CkaIdString
 import ru.rutoken.tech.session.requireBankUserLoginSession
 import ru.rutoken.tech.tokenmanager.RtPkcs11TokenData
 import ru.rutoken.tech.tokenmanager.TokenManager
 import ru.rutoken.tech.ui.bank.BankCertificate
 import ru.rutoken.tech.ui.bank.payments.getInitialPaymentsStorage
+import ru.rutoken.tech.ui.ca.generateobjects.keypair.CkaID
 import ru.rutoken.tech.ui.tokenconnector.TokenConnector
 import ru.rutoken.tech.ui.utils.DialogState
 import ru.rutoken.tech.ui.utils.callPkcs11Operation
@@ -161,10 +161,10 @@ class LoginViewModel(
         tokenData: RtPkcs11TokenData,
         tokenInfo: Pkcs11TokenInfo
     ): CaAppSession {
-        var keyPairs: MutableList<CkaIdString> = mutableListOf()
+        var keyPairs: MutableList<CkaID> = mutableListOf()
 
         withTokenSession(tokenData, tokenInfo, tokenUserPin) { session ->
-            keyPairs = session.findGost256KeyContainers().map { it.ckaId.toString(Charsets.UTF_8) }.toMutableList()
+            keyPairs = session.findGost256KeyContainers().map { CkaID(it.ckaId) }.toMutableList()
         }
 
         logd<LoginViewModel> { "New CA session created, found ${keyPairs.size} key pairs" }

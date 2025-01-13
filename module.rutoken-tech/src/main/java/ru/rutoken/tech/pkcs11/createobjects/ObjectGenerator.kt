@@ -40,14 +40,9 @@ import ru.rutoken.pkcs11wrapper.`object`.key.Pkcs11GostPublicKeyObject
 import ru.rutoken.pkcs11wrapper.rutoken.main.RtPkcs11Session
 import ru.rutoken.tech.ca.LocalCA
 import ru.rutoken.tech.pkcs11.Pkcs11CallScope.withPkcs11CallContext
+import kotlin.random.Random
 
 typealias GostKeyPair = Pkcs11KeyPair<Pkcs11GostPublicKeyObject, Pkcs11GostPrivateKeyObject>
-
-private const val CKA_ID_GROUP_SIZE = 8
-private val CKA_ID_GROUP_CHARSET = ('a'..'f') + ('0'..'9')
-private const val CKA_ID_GROUP_SEPARATOR = '-'
-
-fun generateCkaId() = generateCkaIdGroup() + CKA_ID_GROUP_SEPARATOR.code.toByte() + generateCkaIdGroup()
 
 /**
  * Method supposes that the user is logged in.
@@ -144,5 +139,3 @@ fun IPkcs11AttributeFactory.makeGostPrivateKeyTemplate(
         makeAttribute(CKA_END_DATE, keyValidityNotAfter)
     )
 }
-
-private fun generateCkaIdGroup() = ByteArray(CKA_ID_GROUP_SIZE) { CKA_ID_GROUP_CHARSET.random().code.toByte() }

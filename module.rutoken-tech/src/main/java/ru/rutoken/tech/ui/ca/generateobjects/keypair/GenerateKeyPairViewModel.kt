@@ -21,9 +21,7 @@ import ru.rutoken.tech.R
 import ru.rutoken.tech.pkcs11.createobjects.GostKeyPair
 import ru.rutoken.tech.pkcs11.createobjects.GostKeyPairParams
 import ru.rutoken.tech.pkcs11.createobjects.createGostKeyPair
-import ru.rutoken.tech.pkcs11.createobjects.generateCkaId
 import ru.rutoken.tech.session.AppSessionHolder
-import ru.rutoken.tech.session.CkaIdString
 import ru.rutoken.tech.session.requireCaSession
 import ru.rutoken.tech.tokenmanager.TokenManager
 import ru.rutoken.tech.ui.tokenconnector.TokenConnector
@@ -53,23 +51,16 @@ class GenerateKeyPairViewModel(
     private val _errorDialogState = MutableLiveData<DialogState>()
     val errorDialogState: LiveData<DialogState> get() = _errorDialogState
 
-    private val _keyPairId = MutableLiveData("")
-    val keyPairId: LiveData<CkaIdString> get() = _keyPairId
+    private val _keyPairId = MutableLiveData(CkaID())
+    val keyPairId: LiveData<CkaID>
+        get() = _keyPairId
 
     private val _shouldLogout = MutableLiveData(false)
     val shouldLogout: LiveData<Boolean> get() = _shouldLogout
 
     private var hasPinChanged = false
 
-    fun generateKeyPairId() {
-        viewModelScope.launch {
-            withContext(Dispatchers.IO) {
-                _keyPairId.postValue(generateCkaId().toString(Charsets.UTF_8))
-            }
-        }
-    }
-
-    fun generateGostKeyPair(ckaId: CkaIdString, keyPairParams: GostKeyPairParams) {
+    fun generateGostKeyPair(keyPairParams: GostKeyPairParams) {
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
                 try {
@@ -84,11 +75,12 @@ class GenerateKeyPairViewModel(
                         createGostKeyPair(
                             token,
                             caSession.tokenUserPin,
-                            ckaId, keyPairParams,
+                            _keyPairId.value!!.rawValue, keyPairParams,
                             keyPairValidityNotBefore,
                             keyPairValidityNotAfter
                         )
-                        caSession.keyPairs.add(0, ckaId)
+                        caSession.keyPairs.add(0, _keyPairId.value!!)
+
                         _successDialogState.postValue(
                             DialogState(
                                 showDialog = true,
@@ -121,7 +113,7 @@ class GenerateKeyPairViewModel(
     private suspend fun createGostKeyPair(
         token: Pkcs11Token,
         userPin: String,
-        ckaId: CkaIdString,
+        ckaId: ByteArray,
         keyPairParams: GostKeyPairParams,
         keyPairValidityNotBefore: ZonedDateTime,
         keyPairValidityNotAfter: ZonedDateTime
@@ -130,7 +122,7 @@ class GenerateKeyPairViewModel(
             session.login(CKU_USER, userPin).use {
                 session.createGostKeyPair(
                     keyPairParams,
-                    ckaId.toByteArray(),
+                    ckaId,
                     Pkcs11Date(keyPairValidityNotBefore.toLocalDate()),
                     Pkcs11Date(keyPairValidityNotAfter.toLocalDate())
                 )

@@ -26,7 +26,7 @@ import ru.rutoken.tech.session.AppSessionHolder
 import ru.rutoken.tech.session.BankUserAddingAppSession
 import ru.rutoken.tech.session.BankUserLoginAppSession
 import ru.rutoken.tech.session.requireBankUserAddingSession
-import ru.rutoken.tech.ui.bank.BankCertificate
+import ru.rutoken.tech.ui.Certificate
 import ru.rutoken.tech.ui.bank.payments.getInitialPaymentsStorage
 import ru.rutoken.tech.ui.utils.DialogState
 import ru.rutoken.tech.ui.utils.ErrorDialogData
@@ -40,7 +40,7 @@ class ChooseNewCertificateViewModel(
     private val bankUserAddingAppSession: BankUserAddingAppSession
         get() = sessionHolder.requireBankUserAddingSession()
 
-    private lateinit var chosenCertificate: BankCertificate
+    private lateinit var chosenCertificate: Certificate
 
     private val _askBiometryDialog = MutableLiveData(false)
     val askBiometryDialog: LiveData<Boolean> get() = _askBiometryDialog
@@ -49,7 +49,7 @@ class ChooseNewCertificateViewModel(
     val biometryActivationFailedDialogState: LiveData<DialogState> get() = _biometryActivationFailedDialogState
 
     private val _certificates = MutableLiveData(bankUserAddingAppSession.certificates)
-    val certificates: LiveData<List<BankCertificate>> get() = _certificates
+    val certificates: LiveData<List<Certificate>> get() = _certificates
 
     private val _isUserAdded = MutableLiveData(false)
     val isUserAdded: LiveData<Boolean> get() = _isUserAdded
@@ -58,7 +58,7 @@ class ChooseNewCertificateViewModel(
     val showProgress: LiveData<Boolean> = _showProgress
 
     @MainThread
-    fun onCertificateClicked(certificate: BankCertificate) {
+    fun onCertificateClicked(certificate: Certificate) {
         chosenCertificate = certificate
 
         if (applicationContext.canUseBiometry())

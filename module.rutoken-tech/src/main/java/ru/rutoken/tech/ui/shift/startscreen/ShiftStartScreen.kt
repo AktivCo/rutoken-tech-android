@@ -1,10 +1,10 @@
 /*
- * Copyright (c) 2024, Aktiv-Soft JSC.
+ * Copyright (c) 2025, Aktiv-Soft JSC.
  * See the LICENSE file at the top-level directory of this distribution.
  * All Rights Reserved.
  */
 
-package ru.rutoken.tech.ui.bank.startscreen
+package ru.rutoken.tech.ui.shift.startscreen
 
 import androidx.compose.foundation.LocalOverscrollConfiguration
 import androidx.compose.foundation.layout.Arrangement
@@ -26,20 +26,20 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import ru.rutoken.tech.R
-import ru.rutoken.tech.ui.User
 import ru.rutoken.tech.ui.components.CertificateCard
 import ru.rutoken.tech.ui.components.AppIcons
 import ru.rutoken.tech.ui.components.MenuScreenTopAppBar
 import ru.rutoken.tech.ui.components.PrimaryButtonBox
 import ru.rutoken.tech.ui.components.alertdialog.ConfirmationAlertDialog
+import ru.rutoken.tech.ui.User
 import ru.rutoken.tech.ui.theme.RutokenTechTheme
 import ru.rutoken.tech.ui.theme.bodyMediumOnSurfaceVariant
 import ru.rutoken.tech.ui.utils.PreviewDark
 import ru.rutoken.tech.ui.utils.PreviewLight
 
 @Composable
-fun BankStartScreen(
-    viewModel: BankStartScreenViewModel,
+fun ShiftStartScreen(
+    viewModel: ShiftStartScreenViewModel,
     onNavigateToUserLogin: () -> Unit,
     onNavigateToUserAdding: () -> Unit,
     openDrawer: () -> Unit
@@ -55,9 +55,7 @@ fun BankStartScreen(
         )
     }
 
-    LaunchedEffect(Unit) {
-        viewModel.loadUsers()
-    }
+    viewModel.loadUsers()
 
     val userLoginSessionLoaded by viewModel.loginAppSessionLoaded.observeAsState(false)
     LaunchedEffect(userLoginSessionLoaded) {
@@ -68,7 +66,7 @@ fun BankStartScreen(
     }
 
     val users by viewModel.users.observeAsState(emptyList())
-    BankStartScreen(
+    ShiftStartScreen(
         users = users,
         onDeleteUsers = viewModel::onShowDeleteUsersDialog,
         onUserClicked = viewModel::onUserClicked,
@@ -81,7 +79,7 @@ fun BankStartScreen(
 }
 
 @Composable
-private fun BankStartScreen(
+private fun ShiftStartScreen(
     users: List<User>,
     onDeleteUsers: () -> Unit,
     onUserClicked: (User) -> Unit,
@@ -93,7 +91,7 @@ private fun BankStartScreen(
     Scaffold(
         topBar = {
             MenuScreenTopAppBar(
-                screenName = stringResource(id = R.string.tab_bank),
+                screenName = stringResource(id = R.string.shift_header_title),
                 openDrawer = openDrawer,
                 trailingIcon = if (users.isNotEmpty()) trailingIcon else null,
                 onTrailingIconClick = onDeleteUsers
@@ -151,16 +149,28 @@ private fun UserList(modifier: Modifier, users: List<User>, onUserClicked: (User
 @Composable
 @PreviewLight
 @PreviewDark
-private fun BankStartScreenWithUsersPreview() {
+private fun ShiftStartScreenWithUsersPreview() {
     val testUsers = listOf(
         User(0, "Иванов Михаил Романович", "Дизайнер", "07.03.2024"),
         User(1, "Иванов Михаил Романович", "Дизайнер", "08.03.2024"),
-        User(2, "Иванов Михаил Романович", "Дизайнер", "07.03.2024", "Срок действия сертификата истек"),
-        User(5, "Иванов Михаил Романович", "Дизайнер", "07.03.2024", "Срок действия сертификата ещё не наступил")
+        User(
+            2,
+            "Иванов Михаил Романович",
+            "Дизайнер",
+            "07.03.2024",
+            "Срок действия сертификата истек"
+        ),
+        User(
+            5,
+            "Иванов Михаил Романович",
+            "Дизайнер",
+            "07.03.2024",
+            "Срок действия сертификата ещё не наступил"
+        )
     )
 
     RutokenTechTheme {
-        BankStartScreen(
+        ShiftStartScreen(
             users = testUsers,
             onDeleteUsers = { },
             onUserClicked = {},
@@ -173,9 +183,9 @@ private fun BankStartScreenWithUsersPreview() {
 @Composable
 @PreviewLight
 @PreviewDark
-private fun BankStartScreenNoUsersPreview() {
+private fun ShiftStartScreenNoUsersPreview() {
     RutokenTechTheme {
-        BankStartScreen(
+        ShiftStartScreen(
             users = listOf(),
             onDeleteUsers = { },
             onUserClicked = {},

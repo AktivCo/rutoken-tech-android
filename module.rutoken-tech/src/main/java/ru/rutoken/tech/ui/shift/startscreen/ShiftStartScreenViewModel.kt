@@ -1,10 +1,10 @@
 /*
- * Copyright (c) 2024, Aktiv-Soft JSC.
+ * Copyright (c) 2025, Aktiv-Soft JSC.
  * See the LICENSE file at the top-level directory of this distribution.
  * All Rights Reserved.
  */
 
-package ru.rutoken.tech.ui.bank.startscreen
+package ru.rutoken.tech.ui.shift.startscreen
 
 import android.content.Context
 import androidx.annotation.MainThread
@@ -14,17 +14,17 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import ru.rutoken.tech.repository.bank.BankUserRepository
+import ru.rutoken.tech.repository.shift.ShiftUserRepository
 import ru.rutoken.tech.session.AppSessionHolder
-import ru.rutoken.tech.session.BankUserLoginAppSession
+import ru.rutoken.tech.session.ShiftUserLoginAppSession
 import ru.rutoken.tech.ui.User
 import ru.rutoken.tech.ui.utils.getCertificateErrorText
 import ru.rutoken.tech.utils.logd
 import ru.rutoken.tech.utils.toDateString
 
-class BankStartScreenViewModel(
+class ShiftStartScreenViewModel(
     private val applicationContext: Context,
-    private val repository: BankUserRepository,
+    private val repository: ShiftUserRepository,
     private val sessionHolder: AppSessionHolder
 ) : ViewModel() {
     private val _users = MutableLiveData<List<User>>()
@@ -83,23 +83,14 @@ class BankStartScreenViewModel(
     fun onUserClicked(user: User) {
         viewModelScope.launch(Dispatchers.IO) {
             with(repository.getUser(user.id).userEntity) {
-                val pinData =
-                    if (encryptedPin != null && cipherIv != null)
-                        BankUserLoginAppSession.EncryptedPinData(encryptedPin, cipherIv)
-                    else
-                        null
-
-                val userLoginAppSession = BankUserLoginAppSession(
+                val userLoginAppSession = ShiftUserLoginAppSession(
                     id,
                     tokenSerialNumber,
                     ckaId,
                     certificateDerValue,
-                    isBiometryActive,
-                    pinData,
-                    emptyList() // payments will be loaded later
                 )
                 sessionHolder.setSession(userLoginAppSession)
-                logd<BankStartScreenViewModel> { "New BankUserLogin session created for userId $id" }
+                logd<ShiftStartScreenViewModel> { "New ShiftUserLogin session created for userId $id" }
             }
             _loginAppSessionLoaded.postValue(true)
         }

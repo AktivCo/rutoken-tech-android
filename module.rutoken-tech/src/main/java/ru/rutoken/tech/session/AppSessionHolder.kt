@@ -34,8 +34,18 @@ val AppSessionHolder.bankUserAddingSession: BankUserAddingAppSession?
 val AppSessionHolder.bankUserLoginSession: BankUserLoginAppSession?
     get() = session as? BankUserLoginAppSession
 
+val AppSessionHolder.shiftUserAddingSession: ShiftUserAddingAppSession?
+    get() = session as? ShiftUserAddingAppSession
+
+val AppSessionHolder.shiftUserLoginSession: ShiftUserLoginAppSession?
+    get() = session as? ShiftUserLoginAppSession
+
 fun AppSessionHolder.requireCaSession(): CaAppSession = requireNotNull(caSession)
 
 fun AppSessionHolder.requireBankUserAddingSession(): BankUserAddingAppSession = requireNotNull(bankUserAddingSession)
 
 fun AppSessionHolder.requireBankUserLoginSession(): BankUserLoginAppSession = requireNotNull(bankUserLoginSession)
+
+fun AppSessionHolder.requireShiftUserAddingSession(): ShiftUserAddingAppSession = requireNotNull(shiftUserAddingSession)
+
+fun AppSessionHolder.requireShiftUserLoginSession(): ShiftUserLoginAppSession = requireNotNull(shiftUserLoginSession)

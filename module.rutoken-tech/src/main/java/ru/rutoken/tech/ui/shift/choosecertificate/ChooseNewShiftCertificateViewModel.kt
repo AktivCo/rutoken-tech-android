@@ -1,0 +1,77 @@
+/*
+ * Copyright (c) 2025, Aktiv-Soft JSC.
+ * See the LICENSE file at the top-level directory of this distribution.
+ * All Rights Reserved.
+ */
+
+package ru.rutoken.tech.ui.shift.choosecertificate
+
+import androidx.annotation.MainThread
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import ru.rutoken.tech.database.shift.ShiftUserEntity
+import ru.rutoken.tech.repository.shift.ShiftUserRepository
+import ru.rutoken.tech.repository.shift.makeShiftUser
+import ru.rutoken.tech.session.AppSessionHolder
+import ru.rutoken.tech.session.ShiftUserAddingAppSession
+import ru.rutoken.tech.session.ShiftUserLoginAppSession
+import ru.rutoken.tech.session.requireShiftUserAddingSession
+import ru.rutoken.tech.ui.Certificate
+
+class ChooseNewShiftCertificateViewModel(
+    private val sessionHolder: AppSessionHolder,
+    private val repository: ShiftUserRepository
+) : ViewModel() {
+    //    ShiftUserAddingAppSession instance MUST exist by the time this ViewModel is instantiated
+    private val shiftUserAddingAppSession: ShiftUserAddingAppSession
+        get() = sessionHolder.requireShiftUserAddingSession()
+
+    private lateinit var chosenCertificate: Certificate
+
+    private val _certificates = MutableLiveData(shiftUserAddingAppSession.certificates)
+    val certificates: LiveData<List<Certificate>> get() = _certificates
+
+    private val _isUserAdded = MutableLiveData(false)
+    val isUserAdded: LiveData<Boolean> get() = _isUserAdded
+
+    private val _showProgress = MutableLiveData<Boolean>()
+    val showProgress: LiveData<Boolean> = _showProgress
+
+    @MainThread
+    fun onCertificateClicked(certificate: Certificate) {
+        chosenCertificate = certificate
+        saveUserToDatabase()
+    }
+
+    private fun saveUserToDatabase() {
+        viewModelScope.launch(Dispatchers.IO) {
+            _showProgress.postValue(true)
+
+            val tokenSerial = shiftUserAddingAppSession.tokenSerial
+            val user = makeShiftUser(
+                ShiftUserEntity(
+                    certificateDerValue = chosenCertificate.bytes,
+                    ckaId = chosenCertificate.ckaId,
+                    tokenSerialNumber = tokenSerial,
+                )
+            )
+            repository.addUser(user)
+
+            sessionHolder.setSession(
+                ShiftUserLoginAppSession(
+                    userId = user.userEntity.id,
+                    tokenSerial = tokenSerial,
+                    certificateCkaId = chosenCertificate.ckaId,
+                    certificate = chosenCertificate.bytes
+                )
+            )
+
+            _showProgress.postValue(false)
+            _isUserAdded.postValue(true)
+        }
+    }
+}

@@ -28,6 +28,8 @@ import ru.rutoken.tech.ui.bank.BankDestination
 import ru.rutoken.tech.ui.bank.addBankDestinations
 import ru.rutoken.tech.ui.ca.CaDestination
 import ru.rutoken.tech.ui.ca.addCaDestinations
+import ru.rutoken.tech.ui.shift.ShiftDestination
+import ru.rutoken.tech.ui.shift.addShiftDestinations
 
 interface Destination {
     val route: String
@@ -40,6 +42,7 @@ sealed class AppSectionDestination(override val route: String) : Destination {
     data object Bank : AppSectionDestination("bank")
     data object Ca : AppSectionDestination("ca")
     data object About : AppSectionDestination("about")
+    data object Shift : AppSectionDestination("shift")
 }
 
 @Composable
@@ -64,6 +67,13 @@ fun MainNavHost(navHostController: NavHostController, openDrawer: () -> Unit) {
             startDestination = CaDestination.Start.route
         ) {
             addCaDestinations(navHostController, session, openDrawer)
+        }
+
+        navigation(
+            route = AppSectionDestination.Shift.route,
+            startDestination = ShiftDestination.Start.route
+        ) {
+            addShiftDestinations(navHostController, session, openDrawer)
         }
 
         navigation(

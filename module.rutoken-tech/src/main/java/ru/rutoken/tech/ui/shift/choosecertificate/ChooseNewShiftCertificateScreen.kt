@@ -1,10 +1,10 @@
 /*
- * Copyright (c) 2024, Aktiv-Soft JSC.
+ * Copyright (c) 2025, Aktiv-Soft JSC.
  * See the LICENSE file at the top-level directory of this distribution.
  * All Rights Reserved.
  */
 
-package ru.rutoken.tech.ui.bank.choosecertificate
+package ru.rutoken.tech.ui.shift.choosecertificate
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -17,6 +17,7 @@ import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.SheetState
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import ru.rutoken.tech.ui.components.ProgressIndicatorDialog
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
@@ -26,33 +27,27 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.fragment.app.FragmentActivity
 import kotlinx.coroutines.launch
 import ru.rutoken.tech.R
-import ru.rutoken.tech.ui.Certificate
 import ru.rutoken.tech.ui.components.CertificateCard
 import ru.rutoken.tech.ui.components.BottomSheetDragHandle
 import ru.rutoken.tech.ui.components.BottomSheetTitle
 import ru.rutoken.tech.ui.components.NavigationBarSpacer
-import ru.rutoken.tech.ui.components.ProgressIndicatorDialog
-import ru.rutoken.tech.ui.components.alertdialog.ConfirmationAlertDialog
 import ru.rutoken.tech.ui.components.alertdialog.ErrorAlertDialog
 import ru.rutoken.tech.ui.components.bottomSheetCornerShape
+import ru.rutoken.tech.ui.Certificate
 import ru.rutoken.tech.ui.theme.RutokenTechTheme
-import ru.rutoken.tech.ui.utils.DialogState
 import ru.rutoken.tech.ui.utils.PreviewDark
 import ru.rutoken.tech.ui.utils.PreviewLight
 import ru.rutoken.tech.ui.utils.bottomSheetWindowInsets
-import ru.rutoken.tech.ui.utils.errorDialogData
 import ru.rutoken.tech.ui.utils.expandedSheetState
 
 @Composable
-fun ChooseNewCertificateScreen(
-    viewModel: ChooseNewCertificateViewModel,
-    onNavigateToPaymentsScreen: () -> Unit,
+fun ChooseNewShiftCertificateScreen(
+    viewModel: ChooseNewShiftCertificateViewModel,
+    onNavigateToDocumentsScreen: () -> Unit,
     onNavigateBack: () -> Unit
 ) {
     var showBottomSheet by remember { mutableStateOf(true) }
@@ -76,8 +71,6 @@ fun ChooseNewCertificateScreen(
         }
     }
 
-    AskBiometryDialog(viewModel)
-    BiometryActivationFailedDialog(viewModel)
     ProgressIndicatorDialog(viewModel)
 
     val userAdded by viewModel.isUserAdded.observeAsState(false)
@@ -87,7 +80,7 @@ fun ChooseNewCertificateScreen(
         if (userAdded) {
             scope.launch { sheetState.hide() }.invokeOnCompletion {
                 showBottomSheet = false
-                onNavigateToPaymentsScreen()
+                onNavigateToDocumentsScreen()
             }
         }
     }
@@ -134,37 +127,7 @@ private fun ChooseNewCertificateBottomSheet(
 }
 
 @Composable
-private fun AskBiometryDialog(viewModel: ChooseNewCertificateViewModel) {
-    val showDialog by viewModel.askBiometryDialog.observeAsState(false)
-    val activity = LocalContext.current as FragmentActivity
-
-    if (showDialog) {
-        ConfirmationAlertDialog(
-            title = stringResource(R.string.ask_biometry_title),
-            text = stringResource(R.string.ask_biometry_text),
-            dismissText = stringResource(R.string.skip),
-            confirmText = stringResource(R.string.activate),
-            onDismiss = viewModel::onDismissBiometryDialog,
-            onConfirm = { viewModel.onConfirmBiometryUsage(activity) }
-        )
-    }
-}
-
-@Composable
-private fun BiometryActivationFailedDialog(viewModel: ChooseNewCertificateViewModel) {
-    val dialogState by viewModel.biometryActivationFailedDialogState.observeAsState(DialogState())
-
-    if (dialogState.showDialog) {
-        ErrorAlertDialog(
-            title = stringResource(id = dialogState.errorDialogData.title),
-            text = stringResource(id = dialogState.errorDialogData.text!!),
-            onDismissOrConfirm = viewModel::onDismissBiometryActivationFailedDialog
-        )
-    }
-}
-
-@Composable
-private fun ProgressIndicatorDialog(viewModel: ChooseNewCertificateViewModel) {
+private fun ProgressIndicatorDialog(viewModel: ChooseNewShiftCertificateViewModel) {
     val showProgress by viewModel.showProgress.observeAsState(false)
 
     if (showProgress) {
@@ -187,7 +150,6 @@ private fun ChooseNewCertificateBottomSheetPreview() {
             Certificate(ckaIdBytes, derBytes, name, "Дизайнер", "07.03.2024", "Рутокен", algorithm, error),
             Certificate(ckaIdBytes, derBytes, name, "Дизайнер", "07.03.2024", "Рутокен", algorithm),
             Certificate(ckaIdBytes, derBytes, name, "Дизайнер", "07.03.2024", "Рутокен", algorithm, error)
-
         )
         ChooseNewCertificateBottomSheet(
             certificates = certificates,

@@ -9,7 +9,7 @@ package ru.rutoken.tech.session
 import android.content.Context
 import ru.rutoken.pkcs11wrapper.rutoken.main.RtPkcs11Session
 import ru.rutoken.tech.bank.biometry.canUseBiometry
-import ru.rutoken.tech.ui.bank.BankCertificate
+import ru.rutoken.tech.ui.Certificate
 import ru.rutoken.tech.ui.bank.payments.Payment
 import ru.rutoken.tech.ui.ca.generateobjects.keypair.CkaID
 import ru.rutoken.tech.ui.ca.tokeninfo.model.TokenModel
@@ -19,7 +19,9 @@ typealias SerialHexString = String
 enum class AppSessionType {
     CA_SESSION,
     BANK_USER_ADDING_SESSION,
-    BANK_USER_LOGIN_SESSION
+    BANK_USER_LOGIN_SESSION,
+    SHIFT_USER_ADDING_SESSION,
+    SHIFT_USER_LOGIN_SESSION
 }
 
 abstract class AppSession
@@ -35,7 +37,7 @@ data class CaAppSession(
 data class BankUserAddingAppSession(
     val tokenUserPin: String,
     val tokenSerial: SerialHexString,
-    val certificates: List<BankCertificate>
+    val certificates: List<Certificate>
 ) : AppSession()
 
 class BankUserLoginAppSession(
@@ -57,3 +59,17 @@ class BankUserLoginAppSession(
 
     class EncryptedPinData(val bytes: ByteArray, val cipherIv: ByteArray)
 }
+
+data class ShiftUserAddingAppSession(
+    val tokenUserPin: String,
+    val tokenSerial: SerialHexString,
+    val certificates: List<Certificate>
+) : AppSession()
+
+class ShiftUserLoginAppSession(
+    val userId: Int,
+    val tokenSerial: SerialHexString,
+    val certificateCkaId: ByteArray,
+    val certificate: ByteArray,
+    var operationWithToken: (suspend (RtPkcs11Session) -> Unit)? = null
+) : AppSession()

@@ -4,11 +4,11 @@
  * All Rights Reserved.
  */
 
-package ru.rutoken.tech.ui.bank
+package ru.rutoken.tech.ui
 
 import androidx.annotation.StringRes
 
-class BankUser(
+class User(
     val id: Int,
     val name: String,
     val position: String?,
@@ -16,7 +16,7 @@ class BankUser(
     val errorText: String? = null
 )
 
-class BankCertificate(
+class Certificate(
     val ckaId: ByteArray,
     val bytes: ByteArray,
     val name: String,

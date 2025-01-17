@@ -12,6 +12,7 @@
     <string name="tab_certificate_authority">Удостоверяющий центр</string>
     <string name="tab_about">О приложении</string>
     <string name="tab_bank">Банк</string>
+    <string name="tab_shift">Бригады</string>
 
     <!--Related to menu-->
     <string name="menu_title">Навигация</string>
@@ -169,4 +170,7 @@
 
     <!--Related to sharing file scenario-->
     <string name="share_document">Поделиться</string>
+
+    <!--Related to shift start screen-->
+    <string name="shift_header_title">Мобильные бригады</string>
 </resources>

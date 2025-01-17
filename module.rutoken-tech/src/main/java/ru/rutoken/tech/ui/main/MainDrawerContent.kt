@@ -35,7 +35,8 @@ fun MainDrawerContent(
     onCloseDrawer: () -> Unit,
     onNavigateToBank: () -> Unit,
     onNavigateToCa: () -> Unit,
-    onNavigateToAbout: () -> Unit
+    onNavigateToAbout: () -> Unit,
+    onNavigateToShift: () -> Unit
 ) {
     Column(modifier = Modifier.padding(12.dp)) {
         Column(
@@ -87,6 +88,19 @@ fun MainDrawerContent(
             }
         )
 
+        val isShiftSelected = currentDestination.contains(AppSectionDestination.Shift.route)
+        NavDrawerItem(
+            label = stringResource(id = R.string.tab_shift),
+            selected = isShiftSelected,
+            icon = { AppIcons.ShiftMenuItem(isShiftSelected) },
+            onClick = {
+                if (!isShiftSelected) {
+                    onCloseDrawer()
+                    onNavigateToShift()
+                }
+            }
+        )
+
         val isAboutSelected = currentDestination.contains(AppSectionDestination.About.route)
         NavDrawerItem(
             label = stringResource(id = R.string.tab_about),
@@ -118,7 +132,8 @@ private fun MainDrawerContentPreview() {
                         onCloseDrawer = {},
                         onNavigateToBank = {},
                         onNavigateToCa = {},
-                        onNavigateToAbout = {}
+                        onNavigateToAbout = {},
+                        onNavigateToShift = {}
                     )
                 }
             },

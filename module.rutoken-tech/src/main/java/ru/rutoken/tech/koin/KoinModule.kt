@@ -28,6 +28,8 @@ import ru.rutoken.tech.ui.bank.startscreen.BankStartScreenViewModel
 import ru.rutoken.tech.ui.ca.generateobjects.certificate.GenerateCertificateViewModel
 import ru.rutoken.tech.ui.ca.generateobjects.keypair.GenerateKeyPairViewModel
 import ru.rutoken.tech.ui.ca.tokeninfo.CaTokenInfoViewModel
+import ru.rutoken.tech.ui.shift.choosecertificate.ChooseNewShiftCertificateViewModel
+import ru.rutoken.tech.ui.shift.startscreen.ShiftStartScreenViewModel
 import ru.rutoken.tech.ui.tokenauth.EnterPinViewModel
 import ru.rutoken.tech.ui.tokenauth.LoginViewModel
 
@@ -42,13 +44,15 @@ val koinModule = module {
     single { TokenManager() }
     single { AppSessionHolder() }
 
-    viewModel { LoginViewModel(androidContext(), get(), get(), get()) }
+    viewModel { LoginViewModel(androidContext(), get(), get(), get(), get()) }
     viewModel { CaTokenInfoViewModel(androidContext(), get()) }
     viewModel { GenerateKeyPairViewModel(get(), get()) }
     viewModel { EnterPinViewModel(get(), get(), get()) }
     viewModel { GenerateCertificateViewModel(get(), get()) }
     viewModel { BankStartScreenViewModel(get(), get(), get()) }
+    viewModel { ShiftStartScreenViewModel(get(), get(), get()) }
     viewModel { ChooseNewCertificateViewModel(get(), get(), get()) }
+    viewModel { ChooseNewShiftCertificateViewModel(get(), get()) }
     viewModel { PaymentsViewModel(get()) }
     viewModel { PaymentViewModel(get(), get(), get(), get()) }
 }

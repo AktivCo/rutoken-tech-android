@@ -33,6 +33,7 @@ import ru.rutoken.tech.pkcs11.Pkcs11Launcher
 import ru.rutoken.tech.ui.about.AboutDestination
 import ru.rutoken.tech.ui.bank.BankDestination
 import ru.rutoken.tech.ui.ca.CaDestination
+import ru.rutoken.tech.ui.shift.ShiftDestination
 import ru.rutoken.tech.ui.theme.RutokenTechTheme
 import ru.rutoken.tech.ui.utils.clearNavGraph
 
@@ -85,6 +86,9 @@ class MainActivity : FragmentActivity() {
                             navController.navigate(AboutDestination.About.route) {
                                 clearNavGraph(navController)
                             }
+                        },
+                        onNavigateToShift = {
+                            navController.navigate(ShiftDestination.Start.route) { clearNavGraph(navController) }
                         }
                     )
                 }

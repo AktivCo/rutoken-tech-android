@@ -73,6 +73,17 @@ object AppIcons {
     }
 
     @Composable
+    fun ShiftMenuItem(selected: Boolean) {
+        Icon(
+            painter = painterResource(
+                id = if (selected) R.drawable.ic_shift_menu_item_selected else R.drawable.ic_shift_menu_item
+            ),
+            contentDescription = "Shift Menu Icon",
+            tint = getDrawerIconTint(selected = selected)
+        )
+    }
+
+    @Composable
     fun CaMenuItem(selected: Boolean) {
         Icon(
             painter = painterResource(

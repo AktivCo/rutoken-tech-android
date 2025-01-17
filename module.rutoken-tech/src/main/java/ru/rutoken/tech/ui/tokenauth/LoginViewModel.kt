@@ -28,19 +28,25 @@ import ru.rutoken.tech.pkcs11.findobjects.findGost256CertificateAndKeyContainers
 import ru.rutoken.tech.pkcs11.findobjects.findGost256KeyContainers
 import ru.rutoken.tech.pkcs11.serialNumberTrimmed
 import ru.rutoken.tech.repository.bank.BankUserRepository
+import ru.rutoken.tech.repository.shift.ShiftUserRepository
 import ru.rutoken.tech.session.AppSession
 import ru.rutoken.tech.session.AppSessionHolder
 import ru.rutoken.tech.session.AppSessionType
 import ru.rutoken.tech.session.AppSessionType.BANK_USER_ADDING_SESSION
 import ru.rutoken.tech.session.AppSessionType.BANK_USER_LOGIN_SESSION
+import ru.rutoken.tech.session.AppSessionType.SHIFT_USER_LOGIN_SESSION
+import ru.rutoken.tech.session.AppSessionType.SHIFT_USER_ADDING_SESSION
 import ru.rutoken.tech.session.AppSessionType.CA_SESSION
 import ru.rutoken.tech.session.BankUserAddingAppSession
 import ru.rutoken.tech.session.BankUserLoginAppSession
 import ru.rutoken.tech.session.CaAppSession
+import ru.rutoken.tech.session.ShiftUserAddingAppSession
+import ru.rutoken.tech.session.ShiftUserLoginAppSession
 import ru.rutoken.tech.session.requireBankUserLoginSession
+import ru.rutoken.tech.session.requireShiftUserLoginSession
 import ru.rutoken.tech.tokenmanager.RtPkcs11TokenData
 import ru.rutoken.tech.tokenmanager.TokenManager
-import ru.rutoken.tech.ui.bank.BankCertificate
+import ru.rutoken.tech.ui.Certificate
 import ru.rutoken.tech.ui.bank.payments.getInitialPaymentsStorage
 import ru.rutoken.tech.ui.ca.generateobjects.keypair.CkaID
 import ru.rutoken.tech.ui.tokenconnector.TokenConnector
@@ -64,7 +70,8 @@ class LoginViewModel(
     private val applicationContext: Context,
     private val tokenManager: TokenManager,
     private val sessionHolder: AppSessionHolder,
-    private val repository: BankUserRepository
+    private val bankRepository: BankUserRepository,
+    private val shiftRepository: ShiftUserRepository,
 ) : ViewModel() {
     val tokenConnector = TokenConnector(viewModelScope)
 
@@ -138,6 +145,8 @@ class LoginViewModel(
             CA_SESSION -> createCaAppSession(tokenUserPin, tokenData, tokenInfo)
             BANK_USER_ADDING_SESSION -> createBankUserAddingAppSession(tokenUserPin, tokenData, tokenInfo)
             BANK_USER_LOGIN_SESSION -> updateBankUserLoginSession(tokenUserPin, tokenData, tokenInfo)
+            SHIFT_USER_ADDING_SESSION -> createShiftUserAddingAppSession(tokenUserPin, tokenData, tokenInfo)
+            SHIFT_USER_LOGIN_SESSION -> updateShiftUserLoginSession(tokenUserPin, tokenData, tokenInfo)
         }
     }
 
@@ -182,11 +191,11 @@ class LoginViewModel(
         tokenData: RtPkcs11TokenData,
         tokenInfo: Pkcs11TokenInfo
     ): BankUserAddingAppSession {
-        var certificates: List<BankCertificate> = listOf()
+        var certificates: List<Certificate> = listOf()
 
         withTokenSession(tokenData, tokenInfo, tokenUserPin) { session ->
             certificates = session.findGost256CertificateAndKeyContainers().map { container ->
-                container.toBankCertificate()
+                container.toDomainCertificate()
             }.toMutableList().apply { sortBy { it.errorText != null } }
         }
 
@@ -196,6 +205,51 @@ class LoginViewModel(
             tokenSerial = tokenInfo.serialNumberTrimmed,
             certificates = certificates
         )
+    }
+
+    private suspend fun createShiftUserAddingAppSession(
+        tokenUserPin: String,
+        tokenData: RtPkcs11TokenData,
+        tokenInfo: Pkcs11TokenInfo
+    ): ShiftUserAddingAppSession {
+        var certificates: List<Certificate> = listOf()
+
+        withTokenSession(tokenData, tokenInfo, tokenUserPin) { session ->
+            certificates = session.findGost256CertificateAndKeyContainers().map { container ->
+                container.toDomainCertificate(isShiftCertificate = true)
+            }.toMutableList().apply { sortBy { it.errorText != null } }
+        }
+
+        logd<LoginViewModel> { "New Shift User Adding session created" }
+        return ShiftUserAddingAppSession(
+            tokenUserPin = tokenUserPin,
+            tokenSerial = tokenInfo.serialNumberTrimmed,
+            certificates = certificates
+        )
+    }
+
+    private suspend fun updateShiftUserLoginSession(
+        tokenUserPin: String,
+        tokenData: RtPkcs11TokenData,
+        tokenInfo: Pkcs11TokenInfo
+    ): ShiftUserLoginAppSession {
+        val currentShiftSession = sessionHolder.requireShiftUserLoginSession()
+
+        withTokenSession(tokenData, tokenInfo, tokenUserPin) { session ->
+            try {
+                val container =
+                    session.findGost256CertificateAndKeyContainerByCkaId(currentShiftSession.certificateCkaId)
+
+                if (!currentShiftSession.certificate.contentEquals(container.certificate.encoded))
+                    throw IllegalStateException("Certificate on Rutoken does not equal to the saved value")
+
+                currentShiftSession.operationWithToken?.let { it(session) }
+            } catch (_: IllegalStateException) {
+                throw BusinessRuleException(NoSuchCertificate(isBankUser = false))
+            }
+        }
+
+        return currentShiftSession
     }
 
     private suspend fun updateBankUserLoginSession(
@@ -229,11 +283,13 @@ class LoginViewModel(
         return currentBankSession
     }
 
-    private suspend fun Gost256CertificateAndKeyContainer.toBankCertificate(): BankCertificate {
+    private suspend fun Gost256CertificateAndKeyContainer.toDomainCertificate(
+        isShiftCertificate: Boolean = false
+    ): Certificate {
         val certificateEncoded = certificate.encoded
         val certificate = X509CertificateHolder(certificateEncoded).also { it.checkSubjectRdns() }
 
-        return BankCertificate(
+        return Certificate(
             ckaId = ckaId,
             bytes = certificateEncoded,
             name = certificate.getFullName(),
@@ -241,16 +297,21 @@ class LoginViewModel(
             certificateExpirationDate = certificate.notAfter.toDateString(),
             organization = certificate.getIssuerRdnValue(BCStyle.O),
             algorithm = R.string.gost256_algorithm,
-            errorText = getErrorText(certificateEncoded, certificate.notBefore, certificate.notAfter)
+            errorText = getErrorText(
+                certificateEncoded, certificate.notBefore, certificate.notAfter, isShiftCertificate
+            )
         )
     }
 
     private suspend fun getErrorText(
         certificateDerValue: ByteArray,
         certificateNotBefore: Date,
-        certificateNotAfter: Date
+        certificateNotAfter: Date,
+        isShiftCertificate: Boolean
     ): String? {
-        if (repository.findUser(certificateDerValue) != null) {
+        if ((!isShiftCertificate && bankRepository.findUser(certificateDerValue) != null) ||
+            (isShiftCertificate && shiftRepository.findUser(certificateDerValue) != null)
+        ) {
             return applicationContext.getString(R.string.certificate_already_used)
         }
 

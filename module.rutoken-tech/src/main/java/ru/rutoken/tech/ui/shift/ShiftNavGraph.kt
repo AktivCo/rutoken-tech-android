@@ -17,6 +17,8 @@ import ru.rutoken.tech.ui.main.Destination
 import ru.rutoken.tech.ui.main.composable
 import ru.rutoken.tech.ui.shift.choosecertificate.ChooseNewShiftCertificateScreen
 import ru.rutoken.tech.ui.shift.choosecertificate.ChooseNewShiftCertificateViewModel
+import ru.rutoken.tech.ui.shift.documents.DocumentsScreen
+import ru.rutoken.tech.ui.shift.documents.DocumentsViewModel
 import ru.rutoken.tech.ui.shift.startscreen.ShiftStartScreen
 import ru.rutoken.tech.ui.shift.startscreen.ShiftStartScreenViewModel
 import ru.rutoken.tech.ui.tokenauth.EnterPinViewModel
@@ -64,8 +66,7 @@ fun NavGraphBuilder.addShiftDestinations(
             loginViewModel = koinViewModel<LoginViewModel>(),
             appSessionType = AppSessionType.SHIFT_USER_LOGIN_SESSION,
             onAuthDone = {
-                navController.popBackStack() //TODO navigate on documents screen
-                println("Navigate on documents screen")
+                navController.navigate(ShiftDestination.Documents.route)
             },
             onNavigateBack = navController::popBackStack
         )
@@ -85,10 +86,19 @@ fun NavGraphBuilder.addShiftDestinations(
         ChooseNewShiftCertificateScreen(
             viewModel = koinViewModel<ChooseNewShiftCertificateViewModel>(),
             onNavigateToDocumentsScreen = {
-                navController.popBackStack(ShiftDestination.Start.route, false) //TODO navigate on documents screen
-                println("Navigate on documents screen")
+                navController.navigate(ShiftDestination.Documents.route)
             },
             onNavigateBack = { navController.popBackStack(ShiftDestination.Start.route, false) }
+        )
+    }
+
+    composable(ShiftDestination.Documents) {
+        DocumentsScreen(
+            viewModel = koinViewModel<DocumentsViewModel>(),
+            onNavigateBack = navController::popBackStack,
+            onDocumentClicked = {
+                println("Navigate on document screen")//TODO navigate on document screen
+            }
         )
     }
 }

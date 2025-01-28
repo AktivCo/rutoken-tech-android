@@ -88,6 +88,8 @@ class ShiftStartScreenViewModel(
                     tokenSerialNumber,
                     ckaId,
                     certificateDerValue,
+                    emptyList(), // documents will be loaded later
+                    emptyList()
                 )
                 sessionHolder.setSession(userLoginAppSession)
                 logd<ShiftStartScreenViewModel> { "New ShiftUserLogin session created for userId $id" }

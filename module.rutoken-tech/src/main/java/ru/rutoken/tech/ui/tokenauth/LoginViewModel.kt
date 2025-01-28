@@ -49,6 +49,8 @@ import ru.rutoken.tech.tokenmanager.TokenManager
 import ru.rutoken.tech.ui.Certificate
 import ru.rutoken.tech.ui.bank.payments.getInitialPaymentsStorage
 import ru.rutoken.tech.ui.ca.generateobjects.keypair.CkaID
+import ru.rutoken.tech.ui.shift.documents.initialDocumentsStorage
+import ru.rutoken.tech.ui.shift.documents.initialSignedDocuments
 import ru.rutoken.tech.ui.tokenconnector.TokenConnector
 import ru.rutoken.tech.ui.utils.DialogState
 import ru.rutoken.tech.ui.utils.callPkcs11Operation
@@ -242,6 +244,11 @@ class LoginViewModel(
 
                 if (!currentShiftSession.certificate.contentEquals(container.certificate.encoded))
                     throw IllegalStateException("Certificate on Rutoken does not equal to the saved value")
+
+                if (currentShiftSession.documents.isEmpty()) {
+                    currentShiftSession.documents = initialDocumentsStorage
+                    currentShiftSession.signedDocuments = initialSignedDocuments
+                }
 
                 currentShiftSession.operationWithToken?.let { it(session) }
             } catch (_: IllegalStateException) {

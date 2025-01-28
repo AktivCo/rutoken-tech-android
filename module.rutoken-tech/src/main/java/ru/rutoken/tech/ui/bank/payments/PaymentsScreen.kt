@@ -24,15 +24,11 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SegmentedButton
-import androidx.compose.material3.SegmentedButtonDefaults
-import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -46,6 +42,7 @@ import kotlinx.coroutines.launch
 import ru.rutoken.tech.R
 import ru.rutoken.tech.ui.components.AppIcons
 import ru.rutoken.tech.ui.components.ScreenTopAppBar
+import ru.rutoken.tech.ui.components.SegmentedButtonRow
 import ru.rutoken.tech.ui.theme.RutokenTechTheme
 import ru.rutoken.tech.ui.utils.PreviewDark
 import ru.rutoken.tech.ui.utils.PreviewLight
@@ -92,7 +89,7 @@ private fun PaymentsScreen(
                 screenName = stringResource(id = R.string.payments_title),
                 navigationIcon = { AppIcons.Back() },
                 onNavigationIconClick = onNavigateBack,
-                trailingIcon = { AppIcons.ResetPayments() },
+                trailingIcon = { AppIcons.ResetData() },
                 onTrailingIconClick = onResetPaymentsClicked
             )
         }
@@ -105,15 +102,17 @@ private fun PaymentsScreen(
                 .consumeWindowInsets(innerPadding)
         ) {
             SegmentedButtonRow(
-                onIncomingPaymentsClicked = {
+                onLeftSectionClicked = {
                     showIncomingPayments = true
                     scope.launch { scrollState.scrollTo(0) }
                 },
-                onOutgoingPaymentsClicked = {
+                onRightSectionClicked = {
                     showIncomingPayments = false
                     scope.launch { scrollState.scrollTo(0) }
                 },
-                isIncomingPaymentsSelected = isIncomingPaymentsSelected
+                isLeftSectionSelected = isIncomingPaymentsSelected,
+                leftSectionText = stringResource(R.string.incoming_payments),
+                rightSectionText = stringResource(R.string.outgoing_payments)
             )
             Spacer(Modifier.height(12.dp))
             PaymentsGroup(
@@ -121,30 +120,6 @@ private fun PaymentsScreen(
                 scrollState = scrollState,
                 onPaymentClicked = onPaymentClicked
             )
-        }
-    }
-}
-
-@Composable
-private fun SegmentedButtonRow(
-    onIncomingPaymentsClicked: () -> Unit,
-    onOutgoingPaymentsClicked: () -> Unit,
-    isIncomingPaymentsSelected: Boolean
-) {
-    var selectedIndex by remember { mutableIntStateOf(if (isIncomingPaymentsSelected) 0 else 1) }
-    val options = listOf(stringResource(R.string.incoming_payments), stringResource(R.string.outgoing_payments))
-    SingleChoiceSegmentedButtonRow(modifier = Modifier.fillMaxWidth()) {
-        options.forEachIndexed { index, label ->
-            SegmentedButton(
-                shape = SegmentedButtonDefaults.itemShape(index = index, count = options.size),
-                onClick = {
-                    selectedIndex = index
-                    if (selectedIndex == 0) onIncomingPaymentsClicked() else onOutgoingPaymentsClicked()
-                },
-                selected = index == selectedIndex
-            ) {
-                Text(text = label)
-            }
         }
     }
 }

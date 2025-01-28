@@ -13,6 +13,8 @@ import ru.rutoken.tech.ui.Certificate
 import ru.rutoken.tech.ui.bank.payments.Payment
 import ru.rutoken.tech.ui.ca.generateobjects.keypair.CkaID
 import ru.rutoken.tech.ui.ca.tokeninfo.model.TokenModel
+import ru.rutoken.tech.ui.shift.documents.Document
+import ru.rutoken.tech.ui.shift.documents.SignedDocumentsGroup
 
 typealias SerialHexString = String
 
@@ -71,5 +73,7 @@ class ShiftUserLoginAppSession(
     val tokenSerial: SerialHexString,
     val certificateCkaId: ByteArray,
     val certificate: ByteArray,
+    var documents: List<Document>,
+    var signedDocuments: List<SignedDocumentsGroup>,
     var operationWithToken: (suspend (RtPkcs11Session) -> Unit)? = null
 ) : AppSession()

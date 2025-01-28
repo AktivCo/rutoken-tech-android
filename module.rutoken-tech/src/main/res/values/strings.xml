@@ -112,6 +112,15 @@
     <string name="encrypt_operation_completed">Документ зашифрован</string>
     <string name="decrypt_operation_completed">Документ расшифрован</string>
 
+    <!--Related to documents screen-->
+    <string name="documents_title">Документы</string>
+    <string name="documents_to_sign">На подпись</string>
+    <string name="signed_documents">Подписанные</string>
+    <string name="signed_documents_count">Подписано документов: %d</string>
+    <string name="signatories_button">Подписавшие</string>
+    <string name="signed_documents_empty_state_title">Нет подписанных документов</string>
+    <string name="documents_to_sign_empty_state_title">Нет документов на подпись</string>
+
     <!--Related to simple dialogs-->
     <string name="key_pair_generated">Ключевая пара сгенерирована</string>
     <string name="no_key_pairs_without_certificates">На Рутокене нет ключевых пар без\u00A0сертификата</string>

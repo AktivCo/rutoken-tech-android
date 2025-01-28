@@ -12,6 +12,8 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.outlined.CheckCircle
 import androidx.compose.material.icons.outlined.Share
@@ -115,10 +117,10 @@ object AppIcons {
     }
 
     @Composable
-    fun ResetPayments() {
+    fun ResetData() {
         Icon(
-            painter = painterResource(id = R.drawable.reset_payments),
-            contentDescription = "Reset Payments icon",
+            painter = painterResource(id = R.drawable.reset_documents),
+            contentDescription = "Reset Data icon",
             tint = MaterialTheme.colorScheme.onSurfaceVariant
         )
     }
@@ -199,6 +201,43 @@ object AppIcons {
             painter = painterResource(id = R.drawable.invalid_signature),
             contentDescription = "Valid Signature icon",
             tint = MaterialTheme.colorScheme.secondary
+        )
+    }
+
+    @Composable
+    fun ExpandData() {
+        Icon(
+            imageVector = Icons.Default.KeyboardArrowDown,
+            contentDescription = "Expand data icon",
+            tint = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+    }
+
+    @Composable
+    fun CollapseData() {
+        Icon(
+            imageVector = Icons.Default.KeyboardArrowUp,
+            contentDescription = "Collapse data icon",
+            tint = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+    }
+
+    @Composable
+    fun DocumentToSign() {
+        PaymentToSign(false)
+    }
+
+    @Composable
+    fun SignedDocument() {
+        PaymentToSign(true)
+    }
+
+    @Composable
+    fun NoFiles() {
+        Icon(
+            painter = painterResource(R.drawable.ic_no_files),
+            contentDescription = "No files icon",
+            tint = MaterialTheme.colorScheme.onSurfaceVariant
         )
     }
 

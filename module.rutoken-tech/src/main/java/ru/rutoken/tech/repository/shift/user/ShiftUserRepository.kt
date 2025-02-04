@@ -1,10 +1,10 @@
 /*
- * Copyright (c) 2024, Aktiv-Soft JSC.
+ * Copyright (c) 2025, Aktiv-Soft JSC.
  * See the LICENSE file at the top-level directory of this distribution.
  * All Rights Reserved.
  */
 
-package ru.rutoken.tech.repository.shift
+package ru.rutoken.tech.repository.shift.user
 
 interface ShiftUserRepository {
     suspend fun getUser(userId: Int): ShiftUser

@@ -28,7 +28,8 @@ import ru.rutoken.tech.pkcs11.findobjects.findGost256CertificateAndKeyContainers
 import ru.rutoken.tech.pkcs11.findobjects.findGost256KeyContainers
 import ru.rutoken.tech.pkcs11.serialNumberTrimmed
 import ru.rutoken.tech.repository.bank.BankUserRepository
-import ru.rutoken.tech.repository.shift.ShiftUserRepository
+import ru.rutoken.tech.repository.shift.user.ShiftUserRepository
+import ru.rutoken.tech.repository.shift.signeddocument.ShiftSignedDocumentRepository
 import ru.rutoken.tech.session.AppSession
 import ru.rutoken.tech.session.AppSessionHolder
 import ru.rutoken.tech.session.AppSessionType
@@ -50,7 +51,6 @@ import ru.rutoken.tech.ui.Certificate
 import ru.rutoken.tech.ui.bank.payments.getInitialPaymentsStorage
 import ru.rutoken.tech.ui.ca.generateobjects.keypair.CkaID
 import ru.rutoken.tech.ui.shift.documents.initialDocumentsStorage
-import ru.rutoken.tech.ui.shift.documents.initialSignedDocuments
 import ru.rutoken.tech.ui.tokenconnector.TokenConnector
 import ru.rutoken.tech.ui.utils.DialogState
 import ru.rutoken.tech.ui.utils.callPkcs11Operation
@@ -73,7 +73,8 @@ class LoginViewModel(
     private val tokenManager: TokenManager,
     private val sessionHolder: AppSessionHolder,
     private val bankRepository: BankUserRepository,
-    private val shiftRepository: ShiftUserRepository,
+    private val shiftUserRepository: ShiftUserRepository,
+    private val shiftSignedDocumentRepository: ShiftSignedDocumentRepository
 ) : ViewModel() {
     val tokenConnector = TokenConnector(viewModelScope)
 
@@ -246,8 +247,14 @@ class LoginViewModel(
                     throw IllegalStateException("Certificate on Rutoken does not equal to the saved value")
 
                 if (currentShiftSession.documents.isEmpty()) {
-                    currentShiftSession.documents = initialDocumentsStorage
-                    currentShiftSession.signedDocuments = initialSignedDocuments
+                    val signedDocuments =
+                        shiftSignedDocumentRepository.getAllSignedDocumentsBySessionId(currentShiftSession.userId)
+                    val signedDocumentsWithoutGroup = signedDocuments.flatMap { it.documents }
+
+                    currentShiftSession.signedDocuments = signedDocuments
+                    currentShiftSession.documents = initialDocumentsStorage.filter { document ->
+                        !signedDocumentsWithoutGroup.any { it.title == document.title }
+                    }
                 }
 
                 currentShiftSession.operationWithToken?.let { it(session) }
@@ -317,7 +324,7 @@ class LoginViewModel(
         isShiftCertificate: Boolean
     ): String? {
         if ((!isShiftCertificate && bankRepository.findUser(certificateDerValue) != null) ||
-            (isShiftCertificate && shiftRepository.findUser(certificateDerValue) != null)
+            (isShiftCertificate && shiftUserRepository.findUser(certificateDerValue) != null)
         ) {
             return applicationContext.getString(R.string.certificate_already_used)
         }

@@ -6,7 +6,6 @@
 
 package ru.rutoken.tech.ui.shift.choosecertificate
 
-import android.content.Context
 import androidx.annotation.MainThread
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -15,15 +14,14 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import ru.rutoken.tech.database.shift.ShiftUserEntity
-import ru.rutoken.tech.repository.shift.ShiftUserRepository
-import ru.rutoken.tech.repository.shift.makeShiftUser
+import ru.rutoken.tech.repository.shift.user.ShiftUserRepository
+import ru.rutoken.tech.repository.shift.user.makeShiftUser
 import ru.rutoken.tech.session.AppSessionHolder
 import ru.rutoken.tech.session.ShiftUserAddingAppSession
 import ru.rutoken.tech.session.ShiftUserLoginAppSession
 import ru.rutoken.tech.session.requireShiftUserAddingSession
 import ru.rutoken.tech.ui.Certificate
 import ru.rutoken.tech.ui.shift.documents.initialDocumentsStorage
-import ru.rutoken.tech.ui.shift.documents.initialSignedDocuments
 
 class ChooseNewShiftCertificateViewModel(
     private val sessionHolder: AppSessionHolder,
@@ -71,7 +69,7 @@ class ChooseNewShiftCertificateViewModel(
                     certificateCkaId = chosenCertificate.ckaId,
                     certificate = chosenCertificate.bytes,
                     documents = initialDocumentsStorage,
-                    signedDocuments = initialSignedDocuments
+                    signedDocuments = emptyList()
                 )
             )
 

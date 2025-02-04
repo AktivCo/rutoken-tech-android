@@ -12,45 +12,52 @@ val initialDocumentsStorage
     get() = listOf(
         Document(
             title = "Инструктаж по ТБ №4",
-            date = LocalDate.now(),
-            organization = "ООО “МосЭнерго”",
+            date = LocalDate.of(2023, 2, 9),
+            organization = "ООО “МосЭнерго”"
         ),
         Document(
             title = "Инструктаж по ТБ №3",
-            date = LocalDate.of(2023, 12, 10),
-            organization = "ООО “МосЭнерго",
+            date = LocalDate.of(2023, 5, 30),
+            organization = "ООО “МосЭнерго”"
         ),
         Document(
             title = "Инструктаж по ТБ №2",
-            date = LocalDate.of(2023, 12, 10),
-            organization = "ООО “МосЭнерго",
+            date = LocalDate.of(2024, 8, 16),
+            organization = "ООО “МосЭнерго”"
         ),
         Document(
             title = "Инструктаж по ТБ №1",
-            date = LocalDate.of(2023, 12, 10),
-            organization = "ООО “МосЭнерго",
+            date = LocalDate.of(2024, 1, 10),
+            organization = "ООО “МосЭнерго”"
+        ),
+        Document(
+            title = "Наряд допуск 4",
+            date = LocalDate.of(2024, 9, 10),
+            organization = "ООО “Цмик”"
+        ),
+        Document(
+            title = "Наряд допуск 3",
+            date = LocalDate.of(2024, 11, 19),
+            organization = "АО “Кузнец”"
+        ),
+        Document(
+            title = "Наряд допуск 2",
+            date = LocalDate.of(2024, 12, 10),
+            organization = "ООО “БИК-Комфорт”"
+        ),
+        Document(
+            title = "Наряд допуск 1",
+            date = LocalDate.of(2024, 12, 15),
+            organization = "ООО “Сигма”"
+        ),
+        Document(
+            title = "Журнал работ 2",
+            date = LocalDate.of(2024, 12, 10),
+            organization = "ООО “БИК-Комфорт”"
+        ),
+        Document(
+            title = "Журнал работ 1",
+            date = LocalDate.of(2024, 12, 23),
+            organization = "АО “СтройМаш”"
         )
     )
-
-val initialSignedDocuments = listOf( // TODO delete after implemented signing the document
-    SignedDocumentsGroup(
-        documents = listOf(
-            initialDocumentsStorage[1],
-            initialDocumentsStorage[1],
-            initialDocumentsStorage[2]
-        ),
-        date = LocalDate.now()
-    ),
-    SignedDocumentsGroup(
-        documents = listOf(
-            initialDocumentsStorage[1],
-            initialDocumentsStorage[1],
-            initialDocumentsStorage[2]
-        ),
-        date = LocalDate.now()
-    ),
-    SignedDocumentsGroup(
-        documents = listOf(initialDocumentsStorage[1]),
-        date = LocalDate.of(2023, 12, 10)
-    )
-)

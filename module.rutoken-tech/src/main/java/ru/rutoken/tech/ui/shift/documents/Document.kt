@@ -12,9 +12,11 @@ data class Document(
     val title: String,
     val date: LocalDate,
     val organization: String,
+    val signedCms: ByteArray? = null
 )
 
 data class SignedDocumentsGroup(
     val documents: List<Document>,
-    val date: LocalDate
+    val date: LocalDate,
+    val signatories: List<String>
 )

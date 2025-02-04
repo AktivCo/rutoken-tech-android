@@ -14,7 +14,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import ru.rutoken.tech.repository.shift.ShiftUserRepository
+import ru.rutoken.tech.repository.shift.user.ShiftUserRepository
 import ru.rutoken.tech.session.AppSessionHolder
 import ru.rutoken.tech.session.ShiftUserLoginAppSession
 import ru.rutoken.tech.ui.User

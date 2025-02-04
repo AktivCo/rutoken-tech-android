@@ -17,8 +17,10 @@ import ru.rutoken.tech.pkcs11.Pkcs11Launcher
 import ru.rutoken.tech.pkcs11.RtPkcs11Module
 import ru.rutoken.tech.repository.bank.BankUserRepository
 import ru.rutoken.tech.repository.bank.BankUserRepositoryImpl
-import ru.rutoken.tech.repository.shift.ShiftUserRepository
-import ru.rutoken.tech.repository.shift.ShiftUserRepositoryImpl
+import ru.rutoken.tech.repository.shift.user.ShiftUserRepository
+import ru.rutoken.tech.repository.shift.user.ShiftUserRepositoryImpl
+import ru.rutoken.tech.repository.shift.signeddocument.ShiftSignedDocumentRepository
+import ru.rutoken.tech.repository.shift.signeddocument.ShiftSignedDocumentRepositoryImpl
 import ru.rutoken.tech.session.AppSessionHolder
 import ru.rutoken.tech.tokenmanager.TokenManager
 import ru.rutoken.tech.ui.bank.choosecertificate.ChooseNewCertificateViewModel
@@ -38,14 +40,16 @@ val koinModule = module {
     single { RtPkcs11Module() } bind Pkcs11Module::class
     single { Pkcs11Launcher(get()) }
     single {
-        Room.databaseBuilder(androidContext(), Database::class.java, "rutoken_tech_database").build()
+        Room.databaseBuilder(androidContext(), Database::class.java, "rutoken_tech_database")
+            .build()
     }
     single<BankUserRepository> { BankUserRepositoryImpl(get()) }
     single<ShiftUserRepository> { ShiftUserRepositoryImpl(get()) }
+    single<ShiftSignedDocumentRepository> { ShiftSignedDocumentRepositoryImpl(get()) }
     single { TokenManager() }
     single { AppSessionHolder() }
 
-    viewModel { LoginViewModel(androidContext(), get(), get(), get(), get()) }
+    viewModel { LoginViewModel(androidContext(), get(), get(), get(), get(), get()) }
     viewModel { CaTokenInfoViewModel(androidContext(), get()) }
     viewModel { GenerateKeyPairViewModel(get(), get()) }
     viewModel { EnterPinViewModel(get(), get(), get()) }

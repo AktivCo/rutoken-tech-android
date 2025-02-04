@@ -1,0 +1,214 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 2,
+    "identityHash": "631b3f8cf6025548e395b96e0e2174eb",
+    "entities": [
+      {
+        "tableName": "bank_users",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `certificate_der_value` BLOB NOT NULL, `cka_id` BLOB NOT NULL, `token_serial_number` TEXT NOT NULL, `is_biometry_active` INTEGER NOT NULL, `encrypted_pin` BLOB, `cipher_iv` BLOB)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "certificateDerValue",
+            "columnName": "certificate_der_value",
+            "affinity": "BLOB",
+            "notNull": true
+          },
+          {
+            "fieldPath": "ckaId",
+            "columnName": "cka_id",
+            "affinity": "BLOB",
+            "notNull": true
+          },
+          {
+            "fieldPath": "tokenSerialNumber",
+            "columnName": "token_serial_number",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "isBiometryActive",
+            "columnName": "is_biometry_active",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "encryptedPin",
+            "columnName": "encrypted_pin",
+            "affinity": "BLOB",
+            "notNull": false
+          },
+          {
+            "fieldPath": "cipherIv",
+            "columnName": "cipher_iv",
+            "affinity": "BLOB",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_bank_users_certificate_der_value",
+            "unique": true,
+            "columnNames": [
+              "certificate_der_value"
+            ],
+            "orders": [],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_bank_users_certificate_der_value` ON `${TABLE_NAME}` (`certificate_der_value`)"
+          }
+        ],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "shift_users",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `certificate_der_value` BLOB NOT NULL, `cka_id` BLOB NOT NULL, `token_serial_number` TEXT NOT NULL)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "certificateDerValue",
+            "columnName": "certificate_der_value",
+            "affinity": "BLOB",
+            "notNull": true
+          },
+          {
+            "fieldPath": "ckaId",
+            "columnName": "cka_id",
+            "affinity": "BLOB",
+            "notNull": true
+          },
+          {
+            "fieldPath": "tokenSerialNumber",
+            "columnName": "token_serial_number",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_shift_users_certificate_der_value",
+            "unique": true,
+            "columnNames": [
+              "certificate_der_value"
+            ],
+            "orders": [],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_shift_users_certificate_der_value` ON `${TABLE_NAME}` (`certificate_der_value`)"
+          }
+        ],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "signed_document",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `file_name` TEXT NOT NULL, `session_id` INTEGER NOT NULL, `sign_time` INTEGER NOT NULL, `sign_group_id` TEXT NOT NULL, `organization` TEXT NOT NULL, `signatories_names` TEXT NOT NULL, `signed_cms` BLOB NOT NULL, FOREIGN KEY(`session_id`) REFERENCES `shift_users`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "fileName",
+            "columnName": "file_name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "sessionId",
+            "columnName": "session_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "signTime",
+            "columnName": "sign_time",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "signGroupId",
+            "columnName": "sign_group_id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "organization",
+            "columnName": "organization",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "signatoriesNames",
+            "columnName": "signatories_names",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "signedCms",
+            "columnName": "signed_cms",
+            "affinity": "BLOB",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_signed_document_sign_group_id_session_id_file_name",
+            "unique": true,
+            "columnNames": [
+              "sign_group_id",
+              "session_id",
+              "file_name"
+            ],
+            "orders": [],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_signed_document_sign_group_id_session_id_file_name` ON `${TABLE_NAME}` (`sign_group_id`, `session_id`, `file_name`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "shift_users",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "session_id"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          }
+        ]
+      }
+    ],
+    "views": [],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '631b3f8cf6025548e395b96e0e2174eb')"
+    ]
+  }
+}

@@ -387,11 +387,13 @@ private fun SignedDocumentsScreenPreview() {
         )
         val signedDocumentsGroup1 = SignedDocumentsGroup(
             documents = listOf(document1, document1, document2),
-            date = LocalDate.now()
+            date = LocalDate.now(),
+            signatories = emptyList()
         )
         val signedDocumentsGroup2 = SignedDocumentsGroup(
             documents = listOf(document2),
-            date = LocalDate.of(2023, 12, 10)
+            date = LocalDate.of(2023, 12, 10),
+            signatories = emptyList()
         )
         DocumentsScreen(
             documents = listOf(document1, document2, document2, document1),

@@ -12,6 +12,8 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.Menu
@@ -112,6 +114,15 @@ object AppIcons {
         Icon(
             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
             contentDescription = "Back Icon",
+            tint = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+    }
+
+    @Composable
+    fun Clear() {
+        Icon(
+            imageVector = Icons.Filled.Clear,
+            contentDescription = "Clear Icon",
             tint = MaterialTheme.colorScheme.onSurfaceVariant
         )
     }
@@ -230,6 +241,23 @@ object AppIcons {
     @Composable
     fun SignedDocument() {
         PaymentToSign(true)
+    }
+
+    @Composable
+    fun SelectedDocument() {
+        Box(
+            modifier = Modifier
+                .clip(RoundedCornerShape(20.dp))
+                .size(40.dp)
+                .background(MaterialTheme.colorScheme.primary),
+            contentAlignment = Alignment.Center
+        ) {
+            Icon(
+                imageVector = Icons.Default.Check,
+                contentDescription = "Selected document icon",
+                tint = MaterialTheme.colorScheme.surface
+            )
+        }
     }
 
     @Composable

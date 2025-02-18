@@ -14,14 +14,38 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.LargeTopAppBar
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarColors
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import ru.rutoken.tech.ui.utils.Modifiers
 
 @Composable
-fun ScreenTopAppBar(
-    screenName: String,
+fun RutokenTechTopAppBar(
+    titleText: String,
+    navigationIcon: @Composable () -> Unit,
+    onNavigationIconClick: () -> Unit,
+    colors: TopAppBarColors = TopAppBarDefaults.mediumTopAppBarColors()
+) {
+    TopAppBar(
+        title = {
+            Text(
+                text = titleText,
+                color = MaterialTheme.colorScheme.onSurface,
+                style = MaterialTheme.typography.titleLarge
+            )
+        },
+        navigationIcon = {
+            IconButton(onClick = onNavigationIconClick, modifier = Modifiers.appBarIconSize, content = navigationIcon)
+        },
+        windowInsets = WindowInsets.systemBarsIgnoringVisibility.only(WindowInsetsSides.Top),
+        colors = colors
+    )
+}
+
+@Composable
+fun RutokenTechLargeTopAppBar(
+    titleText: String,
     navigationIcon: @Composable () -> Unit,
     onNavigationIconClick: () -> Unit,
     trailingIcon: (@Composable () -> Unit)? = null,
@@ -31,7 +55,7 @@ fun ScreenTopAppBar(
     LargeTopAppBar(
         title = {
             Text(
-                text = screenName,
+                text = titleText,
                 color = MaterialTheme.colorScheme.onSurface,
                 style = MaterialTheme.typography.headlineMedium
             )
@@ -56,8 +80,8 @@ fun MenuScreenTopAppBar(
     trailingIcon: (@Composable () -> Unit)? = null,
     onTrailingIconClick: () -> Unit = {}
 ) {
-    ScreenTopAppBar(
-        screenName = screenName,
+    RutokenTechLargeTopAppBar(
+        titleText = screenName,
         navigationIcon = { AppIcons.Menu() },
         onNavigationIconClick = openDrawer,
         trailingIcon = trailingIcon,

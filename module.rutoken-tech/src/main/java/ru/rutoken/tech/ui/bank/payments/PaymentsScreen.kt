@@ -41,7 +41,7 @@ import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 import ru.rutoken.tech.R
 import ru.rutoken.tech.ui.components.AppIcons
-import ru.rutoken.tech.ui.components.ScreenTopAppBar
+import ru.rutoken.tech.ui.components.RutokenTechLargeTopAppBar
 import ru.rutoken.tech.ui.components.SegmentedButtonRow
 import ru.rutoken.tech.ui.theme.RutokenTechTheme
 import ru.rutoken.tech.ui.utils.PreviewDark
@@ -85,8 +85,8 @@ private fun PaymentsScreen(
 
     Scaffold(
         topBar = {
-            ScreenTopAppBar(
-                screenName = stringResource(id = R.string.payments_title),
+            RutokenTechLargeTopAppBar(
+                titleText = stringResource(id = R.string.payments_title),
                 navigationIcon = { AppIcons.Back() },
                 onNavigationIconClick = onNavigateBack,
                 trailingIcon = { AppIcons.ResetData() },

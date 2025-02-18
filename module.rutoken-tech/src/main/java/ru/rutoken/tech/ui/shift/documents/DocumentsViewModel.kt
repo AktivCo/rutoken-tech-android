@@ -13,10 +13,12 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import ru.rutoken.tech.repository.shift.signeddocument.ShiftSignedDocumentRepository
 import ru.rutoken.tech.session.AppSessionHolder
 import ru.rutoken.tech.session.ShiftUserLoginAppSession
 import ru.rutoken.tech.session.requireShiftUserLoginSession
+import java.time.LocalDate
 
 class DocumentsViewModel(
     private val sessionHolder: AppSessionHolder,
@@ -26,14 +28,22 @@ class DocumentsViewModel(
     private val shiftUserLoginSession: ShiftUserLoginAppSession
         get() = sessionHolder.requireShiftUserLoginSession()
 
-    private val _documents = MutableLiveData(shiftUserLoginSession.documents)
-    val documents: LiveData<List<Document>> get() = _documents
+    private val _documents = MutableLiveData<Map<LocalDate, List<Document>>>()
+    val documents: LiveData<Map<LocalDate, List<Document>>> get() = _documents
 
-    private val _signedDocuments = MutableLiveData(shiftUserLoginSession.signedDocuments)
-    val signedDocuments: LiveData<List<SignedDocumentsGroup>> get() = _signedDocuments
+    private val _signedDocuments = MutableLiveData<Map<LocalDate, List<SignedDocumentsGroup>>>()
+    val signedDocuments: LiveData<Map<LocalDate, List<SignedDocumentsGroup>>>
+        get() = _signedDocuments
+
+    private val _documentsToSign = MutableLiveData(emptySet<Document>())
+    val documentsToSign: LiveData<Set<Document>> get() = _documentsToSign
 
     private val _documentsGroupSignatories = MutableLiveData(emptyList<String>())
     val documentsGroupSignatories: LiveData<List<String>> get() = _documentsGroupSignatories
+
+    init {
+        viewModelScope.launch { updateDocumentsFlow() }
+    }
 
     fun onShareClicked(documents: SignedDocumentsGroup) {
         //TODO
@@ -48,16 +58,45 @@ class DocumentsViewModel(
         _documentsGroupSignatories.value = documents.signatories
     }
 
+    fun onDocumentSelected(document: Document) {
+        val currentDocumentsToSign = _documentsToSign.value!!
+        _documentsToSign.value = currentDocumentsToSign.toMutableSet().apply {
+            if (!currentDocumentsToSign.contains(document)) add(document)
+            else remove(document)
+        }
+    }
+
+    fun onNavigateToPreview() {
+        shiftUserLoginSession.documentsToSign = _documentsToSign.value!!
+    }
+
+    fun onResetSelectedDocumentsClicked() {
+        _documentsToSign.value = emptySet()
+    }
+
     @MainThread
     fun onResetDocumentsClicked() {
         viewModelScope.launch(Dispatchers.IO) {
             shiftSignedDocumentRepository.deleteAllSignedDocumentsBySessionId(shiftUserLoginSession.userId)
 
             shiftUserLoginSession.documents = initialDocumentsStorage
-            _documents.postValue(shiftUserLoginSession.documents)
-
             shiftUserLoginSession.signedDocuments = emptyList()
-            _signedDocuments.postValue(shiftUserLoginSession.signedDocuments)
+
+            updateDocumentsFlow()
+        }
+    }
+
+    private suspend fun updateDocumentsFlow() = withContext(Dispatchers.Default) {
+        launch {
+            shiftUserLoginSession.documents.sortedByDescending { it.date }
+                .groupBy { it.date }
+                .let { _documents.postValue(it) }
+        }
+
+        launch {
+            shiftUserLoginSession.signedDocuments.sortedByDescending { it.date }
+                .groupBy { it.date }
+                .let { _signedDocuments.postValue(it) }
         }
     }
 }

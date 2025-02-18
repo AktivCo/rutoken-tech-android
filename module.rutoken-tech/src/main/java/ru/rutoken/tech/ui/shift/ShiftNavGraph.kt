@@ -96,7 +96,7 @@ fun NavGraphBuilder.addShiftDestinations(
         DocumentsScreen(
             viewModel = koinViewModel<DocumentsViewModel>(),
             onNavigateBack = navController::popBackStack,
-            onDocumentClicked = {
+            onNavigateToDocumentsPreview = {
                 println("Navigate on document screen")//TODO navigate on document screen
             }
         )

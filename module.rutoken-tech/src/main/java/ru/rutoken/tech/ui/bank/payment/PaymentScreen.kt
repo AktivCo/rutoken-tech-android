@@ -41,7 +41,7 @@ import ru.rutoken.tech.ui.bank.payments.UserActionType
 import ru.rutoken.tech.ui.components.AppIcons
 import ru.rutoken.tech.ui.components.NavigationBarSpacer
 import ru.rutoken.tech.ui.components.ProgressIndicatorDialog
-import ru.rutoken.tech.ui.components.ScreenTopAppBar
+import ru.rutoken.tech.ui.components.RutokenTechLargeTopAppBar
 import ru.rutoken.tech.ui.components.SecondaryButtonBox
 import ru.rutoken.tech.ui.components.alertdialog.AlertDialogWithIcon
 import ru.rutoken.tech.ui.components.alertdialog.ConnectTokenDialog
@@ -108,8 +108,8 @@ private fun PaymentScreen(
 ) {
     Scaffold(
         topBar = {
-            ScreenTopAppBar(
-                screenName = payment.title,
+            RutokenTechLargeTopAppBar(
+                titleText = payment.title,
                 navigationIcon = { AppIcons.Back() },
                 onNavigationIconClick = onNavigateBack,
                 trailingIcon = { AppIcons.Share() },

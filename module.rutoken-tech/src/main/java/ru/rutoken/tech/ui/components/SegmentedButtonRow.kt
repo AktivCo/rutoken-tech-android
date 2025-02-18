@@ -24,10 +24,11 @@ fun SegmentedButtonRow(
     onRightSectionClicked: () -> Unit,
     isLeftSectionSelected: Boolean,
     leftSectionText: String,
-    rightSectionText: String
+    rightSectionText: String,
+    modifier: Modifier = Modifier
 ) {
     var selectedIndex by remember { mutableIntStateOf(if (isLeftSectionSelected) 0 else 1) }
-    SingleChoiceSegmentedButtonRow(modifier = Modifier.fillMaxWidth()) {
+    SingleChoiceSegmentedButtonRow(modifier = modifier.fillMaxWidth()) {
         listOf(leftSectionText, rightSectionText).forEachIndexed { index, label ->
             SegmentedButton(
                 shape = SegmentedButtonDefaults.itemShape(index = index, count = 2),

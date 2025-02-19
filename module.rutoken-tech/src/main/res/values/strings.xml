@@ -120,6 +120,7 @@
     <string name="signatories_button">Подписавшие</string>
     <string name="signed_documents_empty_state_title">Нет подписанных документов</string>
     <string name="documents_to_sign_empty_state_title">Нет документов на подпись</string>
+    <string name="documents_signatories_title">Подписавшие: %d</string>
 
     <!--Related to simple dialogs-->
     <string name="key_pair_generated">Ключевая пара сгенерирована</string>

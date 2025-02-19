@@ -71,6 +71,14 @@ fun DocumentsScreen(
 ) {
     val documents by viewModel.documents.observeAsState(listOf())
     val signedDocuments by viewModel.signedDocuments.observeAsState(listOf())
+    val signatoriesBottomSheetData by viewModel.documentsGroupSignatories.observeAsState(emptyList())
+
+    if (signatoriesBottomSheetData.isNotEmpty()) {
+        DocumentSignatoriesBottomSheet(
+            signatories = signatoriesBottomSheetData,
+            onDismissRequest = viewModel::onSignatoriesBottomSheetClose
+        )
+    }
 
     DocumentsScreen(
         documents = documents,

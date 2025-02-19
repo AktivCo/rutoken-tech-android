@@ -32,13 +32,20 @@ class DocumentsViewModel(
     private val _signedDocuments = MutableLiveData(shiftUserLoginSession.signedDocuments)
     val signedDocuments: LiveData<List<SignedDocumentsGroup>> get() = _signedDocuments
 
+    private val _documentsGroupSignatories = MutableLiveData(emptyList<String>())
+    val documentsGroupSignatories: LiveData<List<String>> get() = _documentsGroupSignatories
+
     fun onShareClicked(documents: SignedDocumentsGroup) {
         //TODO
     }
 
+    fun onSignatoriesBottomSheetClose() {
+        _documentsGroupSignatories.value = emptyList()
+    }
+
     @MainThread
     fun onSignatoriesClicked(documents: SignedDocumentsGroup) {
-        //TODO
+        _documentsGroupSignatories.value = documents.signatories
     }
 
     @MainThread

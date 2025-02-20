@@ -57,7 +57,7 @@ data class Payment(
 
     fun isArchived() = actionTime != null
 
-    fun readFile(context: Context) = context.assets.open(fileName).use { it.readBytes() }
+    fun readFile(context: Context) = context.assets.open("bankdocuments/$fileName").use { it.readBytes() }
 
     fun getActionData(context: Context): Base64String = initialActionData ?: readFile(context).toBase64String()
 

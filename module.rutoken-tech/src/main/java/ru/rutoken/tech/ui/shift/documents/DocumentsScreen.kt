@@ -49,16 +49,15 @@ import androidx.compose.ui.unit.dp
 import ru.rutoken.tech.R
 import ru.rutoken.tech.ui.components.AppIcons.Back
 import ru.rutoken.tech.ui.components.AppIcons.Clear
-import ru.rutoken.tech.ui.components.AppIcons.ExpandData
 import ru.rutoken.tech.ui.components.AppIcons.CollapseData
 import ru.rutoken.tech.ui.components.AppIcons.DocumentToSign
+import ru.rutoken.tech.ui.components.AppIcons.ExpandData
 import ru.rutoken.tech.ui.components.AppIcons.NoFiles
 import ru.rutoken.tech.ui.components.AppIcons.ResetData
 import ru.rutoken.tech.ui.components.AppIcons.SelectedDocument
 import ru.rutoken.tech.ui.components.AppIcons.SignedDocument
-import ru.rutoken.tech.ui.components.NavigationBarSpacer
-import ru.rutoken.tech.ui.components.RutokenTechTopAppBar
 import ru.rutoken.tech.ui.components.RutokenTechLargeTopAppBar
+import ru.rutoken.tech.ui.components.RutokenTechTopAppBar
 import ru.rutoken.tech.ui.components.SecondaryButtonBox
 import ru.rutoken.tech.ui.components.SegmentedButtonRow
 import ru.rutoken.tech.ui.theme.RutokenTechTheme
@@ -72,12 +71,11 @@ import java.time.LocalDate
 fun DocumentsScreen(
     viewModel: DocumentsViewModel,
     onNavigateBack: () -> Unit,
-    onNavigateToDocumentsPreview: () -> Unit,
     isDocumentsToSignSelected: Boolean = true
 ) {
     val documents by viewModel.documents.observeAsState(mapOf())
     val signedDocuments by viewModel.signedDocuments.observeAsState(mapOf())
-    val documentsToSign by viewModel.documentsToSign.observeAsState(setOf())
+    val documentsToSign by viewModel.documentsToSign.observeAsState(emptyList())
     val signatoriesBottomSheetData by viewModel.documentsGroupSignatories.observeAsState(emptyList())
 
     if (signatoriesBottomSheetData.isNotEmpty()) {
@@ -89,8 +87,8 @@ fun DocumentsScreen(
 
     val onDocumentClicked = { document: Document ->
         if (documentsToSign.isEmpty()) {
+            viewModel.onDocumentSelected(document)
             viewModel.onNavigateToPreview()
-            onNavigateToDocumentsPreview()
         } else {
             viewModel.onDocumentSelected(document)
         }
@@ -107,10 +105,7 @@ fun DocumentsScreen(
         onSignatoriesClicked = viewModel::onSignatoriesClicked,
         onLongClickDocument = viewModel::onDocumentSelected,
         onResetSelectedDocumentsClicked = viewModel::onResetSelectedDocumentsClicked,
-        onNavigateToDocumentsPreview = {
-            viewModel.onNavigateToPreview()
-            onNavigateToDocumentsPreview()
-        },
+        onNavigateToDocumentsPreview = viewModel::onNavigateToPreview,
         isDocumentsToSignSelected = isDocumentsToSignSelected,
     )
 }
@@ -119,7 +114,7 @@ fun DocumentsScreen(
 private fun DocumentsScreen(
     documents: Map<LocalDate, List<Document>>,
     signedDocuments: Map<LocalDate, List<SignedDocumentsGroup>>,
-    documentsToSign: Set<Document>,
+    documentsToSign: List<Document>,
     onNavigateBack: () -> Unit,
     onResetDocumentsClicked: () -> Unit,
     onDocumentClicked: (Document) -> Unit,
@@ -214,7 +209,7 @@ private fun DocumentsScreen(
 
 private fun LazyListScope.documentsToSignItems(
     documents: Map<LocalDate, List<Document>>,
-    documentsToSign: Set<Document>,
+    documentsToSign: List<Document>,
     onDocumentClicked: (Document) -> Unit,
     onLongClickDocument: (Document) -> Unit
 ) {
@@ -417,7 +412,7 @@ private fun DocumentsScreenPreview() {
         DocumentsScreen(
             documents = mapOf(Pair(LocalDate.now(), listOf(document1, document2, document2, document1))),
             signedDocuments = emptyMap(),
-            documentsToSign = emptySet(),
+            documentsToSign = emptyList(),
             onNavigateBack = {},
             onResetDocumentsClicked = {},
             onDocumentClicked = {},
@@ -439,7 +434,7 @@ private fun EmptyDocumentsScreenPreview() {
         DocumentsScreen(
             documents = emptyMap(),
             signedDocuments = emptyMap(),
-            documentsToSign = emptySet(),
+            documentsToSign = emptyList(),
             onNavigateBack = {},
             onResetDocumentsClicked = {},
             onDocumentClicked = {},
@@ -486,7 +481,7 @@ private fun SignedDocumentsScreenPreview() {
                     listOf(signedDocumentsGroup1, signedDocumentsGroup1, signedDocumentsGroup2)
                 )
             ),
-            documentsToSign = emptySet(),
+            documentsToSign = emptyList(),
             onNavigateBack = {},
             onResetDocumentsClicked = {},
             onDocumentClicked = {},
@@ -508,7 +503,7 @@ private fun EmptySignedDocumentsScreenPreview() {
         DocumentsScreen(
             documents = emptyMap(),
             signedDocuments = emptyMap(),
-            documentsToSign = emptySet(),
+            documentsToSign = emptyList(),
             onNavigateBack = {},
             onResetDocumentsClicked = {},
             onDocumentClicked = {},
@@ -540,7 +535,7 @@ private fun SelectedDocumentsScreenPreview() {
         DocumentsScreen(
             documents = mapOf(Pair(LocalDate.now(), listOf(document1, document2, document2, document1))),
             signedDocuments = emptyMap(),
-            documentsToSign = setOf(document1),
+            documentsToSign = listOf(document1),
             onNavigateBack = {},
             onResetDocumentsClicked = {},
             onDocumentClicked = {},
@@ -553,5 +548,3 @@ private fun SelectedDocumentsScreenPreview() {
         )
     }
 }
-
-

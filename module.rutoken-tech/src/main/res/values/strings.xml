@@ -124,6 +124,9 @@
     <string name="documents_selected_state_preview">Предпросмотр</string>
     <string name="documents_signatories_title">Подписавшие: %d</string>
 
+    <!--Related to documents preview-->
+    <string name="documents_count">Документов: %d</string>
+
     <!--Related to simple dialogs-->
     <string name="key_pair_generated">Ключевая пара сгенерирована</string>
     <string name="no_key_pairs_without_certificates">На Рутокене нет ключевых пар без\u00A0сертификата</string>

@@ -22,7 +22,8 @@ import java.time.LocalDate
 
 class DocumentsViewModel(
     private val sessionHolder: AppSessionHolder,
-    private val shiftSignedDocumentRepository: ShiftSignedDocumentRepository
+    private val shiftSignedDocumentRepository: ShiftSignedDocumentRepository,
+    private val onNavigateToDocumentsPreview: () -> Unit
 ) : ViewModel() {
     // ShiftUserLoginAppSession instance MUST exist by the time this ViewModel is instantiated
     private val shiftUserLoginSession: ShiftUserLoginAppSession
@@ -35,8 +36,8 @@ class DocumentsViewModel(
     val signedDocuments: LiveData<Map<LocalDate, List<SignedDocumentsGroup>>>
         get() = _signedDocuments
 
-    private val _documentsToSign = MutableLiveData(emptySet<Document>())
-    val documentsToSign: LiveData<Set<Document>> get() = _documentsToSign
+    private val _documentsToSign = MutableLiveData(emptyList<Document>())
+    val documentsToSign: LiveData<List<Document>> get() = _documentsToSign
 
     private val _documentsGroupSignatories = MutableLiveData(emptyList<String>())
     val documentsGroupSignatories: LiveData<List<String>> get() = _documentsGroupSignatories
@@ -45,10 +46,12 @@ class DocumentsViewModel(
         viewModelScope.launch { updateDocumentsFlow() }
     }
 
+    @MainThread
     fun onShareClicked(documents: SignedDocumentsGroup) {
         //TODO
     }
 
+    @MainThread
     fun onSignatoriesBottomSheetClose() {
         _documentsGroupSignatories.value = emptyList()
     }
@@ -58,20 +61,25 @@ class DocumentsViewModel(
         _documentsGroupSignatories.value = documents.signatories
     }
 
+    @MainThread
     fun onDocumentSelected(document: Document) {
         val currentDocumentsToSign = _documentsToSign.value!!
-        _documentsToSign.value = currentDocumentsToSign.toMutableSet().apply {
+        _documentsToSign.value = currentDocumentsToSign.toMutableList().apply {
             if (!currentDocumentsToSign.contains(document)) add(document)
             else remove(document)
         }
     }
 
+    @MainThread
     fun onNavigateToPreview() {
         shiftUserLoginSession.documentsToSign = _documentsToSign.value!!
+        _documentsToSign.value = emptyList()
+        onNavigateToDocumentsPreview()
     }
 
+    @MainThread
     fun onResetSelectedDocumentsClicked() {
-        _documentsToSign.value = emptySet()
+        _documentsToSign.value = emptyList()
     }
 
     @MainThread

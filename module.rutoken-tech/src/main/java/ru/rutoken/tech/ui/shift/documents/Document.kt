@@ -12,8 +12,10 @@ data class Document(
     val title: String,
     val date: LocalDate,
     val organization: String,
-    val signedCms: ByteArray? = null
-)
+    val signedCms: ByteArray? = null,
+) {
+    val assetName: String = "shiftdocuments/$title.pdf"
+}
 
 data class SignedDocumentsGroup(
     val documents: List<Document>,

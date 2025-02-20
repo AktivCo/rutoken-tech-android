@@ -76,5 +76,5 @@ class ShiftUserLoginAppSession(
     var documents: List<Document>,
     var signedDocuments: List<SignedDocumentsGroup>,
     var operationWithToken: (suspend (RtPkcs11Session) -> Unit)? = null,
-    var documentsToSign: Set<Document> = emptySet()
+    var documentsToSign: List<Document> = emptyList()
 ) : AppSession()

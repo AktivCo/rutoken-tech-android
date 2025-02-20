@@ -11,6 +11,7 @@ import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import com.google.accompanist.navigation.material.bottomSheet
 import org.koin.androidx.compose.koinViewModel
+import org.koin.core.parameter.parametersOf
 import ru.rutoken.tech.session.AppSessionHolder
 import ru.rutoken.tech.session.AppSessionType
 import ru.rutoken.tech.ui.main.Destination
@@ -19,6 +20,7 @@ import ru.rutoken.tech.ui.shift.choosecertificate.ChooseNewShiftCertificateScree
 import ru.rutoken.tech.ui.shift.choosecertificate.ChooseNewShiftCertificateViewModel
 import ru.rutoken.tech.ui.shift.documents.DocumentsScreen
 import ru.rutoken.tech.ui.shift.documents.DocumentsViewModel
+import ru.rutoken.tech.ui.shift.documentspreview.DocumentsPreviewScreen
 import ru.rutoken.tech.ui.shift.startscreen.ShiftStartScreen
 import ru.rutoken.tech.ui.shift.startscreen.ShiftStartScreenViewModel
 import ru.rutoken.tech.ui.tokenauth.EnterPinViewModel
@@ -35,7 +37,7 @@ sealed class ShiftDestination(override val route: String) : Destination {
     data object UserOperationTokenAuth : ShiftDestination("shift/UserOperationTokenAuth")
     data object Certificates : ShiftDestination("shift/certificates")
     data object Documents : ShiftDestination("shift/documents")
-    data object Document : ShiftDestination("shift/documents/{documentTitle}")
+    data object DocumentsPreview : ShiftDestination("shift/documents/preview")
 }
 
 fun NavGraphBuilder.addShiftDestinations(
@@ -94,11 +96,14 @@ fun NavGraphBuilder.addShiftDestinations(
 
     composable(ShiftDestination.Documents) {
         DocumentsScreen(
-            viewModel = koinViewModel<DocumentsViewModel>(),
+            viewModel = koinViewModel<DocumentsViewModel>(
+                parameters = { parametersOf({ navController.navigate(ShiftDestination.DocumentsPreview.route) }) }
+            ),
             onNavigateBack = navController::popBackStack,
-            onNavigateToDocumentsPreview = {
-                println("Navigate on document screen")//TODO navigate on document screen
-            }
         )
+    }
+
+    composable(ShiftDestination.DocumentsPreview) {
+        DocumentsPreviewScreen(onNavigateBack = navController::popBackStack)
     }
 }

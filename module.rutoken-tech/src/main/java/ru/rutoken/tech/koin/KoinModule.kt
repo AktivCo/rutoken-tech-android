@@ -9,6 +9,7 @@ package ru.rutoken.tech.koin
 import androidx.room.Room
 import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.viewmodel.dsl.viewModel
+import org.koin.androidx.viewmodel.dsl.viewModelOf
 import org.koin.dsl.bind
 import org.koin.dsl.module
 import ru.rutoken.pkcs11wrapper.main.Pkcs11Module
@@ -17,10 +18,10 @@ import ru.rutoken.tech.pkcs11.Pkcs11Launcher
 import ru.rutoken.tech.pkcs11.RtPkcs11Module
 import ru.rutoken.tech.repository.bank.BankUserRepository
 import ru.rutoken.tech.repository.bank.BankUserRepositoryImpl
-import ru.rutoken.tech.repository.shift.user.ShiftUserRepository
-import ru.rutoken.tech.repository.shift.user.ShiftUserRepositoryImpl
 import ru.rutoken.tech.repository.shift.signeddocument.ShiftSignedDocumentRepository
 import ru.rutoken.tech.repository.shift.signeddocument.ShiftSignedDocumentRepositoryImpl
+import ru.rutoken.tech.repository.shift.user.ShiftUserRepository
+import ru.rutoken.tech.repository.shift.user.ShiftUserRepositoryImpl
 import ru.rutoken.tech.session.AppSessionHolder
 import ru.rutoken.tech.tokenmanager.TokenManager
 import ru.rutoken.tech.ui.bank.choosecertificate.ChooseNewCertificateViewModel
@@ -32,6 +33,7 @@ import ru.rutoken.tech.ui.ca.generateobjects.keypair.GenerateKeyPairViewModel
 import ru.rutoken.tech.ui.ca.tokeninfo.CaTokenInfoViewModel
 import ru.rutoken.tech.ui.shift.choosecertificate.ChooseNewShiftCertificateViewModel
 import ru.rutoken.tech.ui.shift.documents.DocumentsViewModel
+import ru.rutoken.tech.ui.shift.documentspreview.DocumentsPreviewViewModel
 import ru.rutoken.tech.ui.shift.startscreen.ShiftStartScreenViewModel
 import ru.rutoken.tech.ui.tokenauth.EnterPinViewModel
 import ru.rutoken.tech.ui.tokenauth.LoginViewModel
@@ -58,7 +60,8 @@ val koinModule = module {
     viewModel { ShiftStartScreenViewModel(get(), get(), get()) }
     viewModel { ChooseNewCertificateViewModel(get(), get(), get()) }
     viewModel { ChooseNewShiftCertificateViewModel(get(), get()) }
-    viewModel { DocumentsViewModel(get(), get()) }
+    viewModelOf(::DocumentsViewModel)
+    viewModelOf(::DocumentsPreviewViewModel)
     viewModel { PaymentsViewModel(get()) }
     viewModel { PaymentViewModel(get(), get(), get(), get()) }
 }

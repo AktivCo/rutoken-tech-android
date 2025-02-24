@@ -10,11 +10,18 @@ import androidx.annotation.MainThread
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import ru.rutoken.tech.repository.shift.signeddocument.ShiftSignedDocumentRepository
 import ru.rutoken.tech.session.AppSessionHolder
 import ru.rutoken.tech.session.ShiftUserLoginAppSession
 import ru.rutoken.tech.session.requireShiftUserLoginSession
 
-class DocumentsViewModel(private val sessionHolder: AppSessionHolder) : ViewModel() {
+class DocumentsViewModel(
+    private val sessionHolder: AppSessionHolder,
+    private val shiftSignedDocumentRepository: ShiftSignedDocumentRepository
+) : ViewModel() {
     // ShiftUserLoginAppSession instance MUST exist by the time this ViewModel is instantiated
     private val shiftUserLoginSession: ShiftUserLoginAppSession
         get() = sessionHolder.requireShiftUserLoginSession()
@@ -36,6 +43,14 @@ class DocumentsViewModel(private val sessionHolder: AppSessionHolder) : ViewMode
 
     @MainThread
     fun onResetDocumentsClicked() {
-        //TODO
+        viewModelScope.launch(Dispatchers.IO) {
+            shiftSignedDocumentRepository.deleteAllSignedDocumentsBySessionId(shiftUserLoginSession.userId)
+
+            shiftUserLoginSession.documents = initialDocumentsStorage
+            _documents.postValue(shiftUserLoginSession.documents)
+
+            shiftUserLoginSession.signedDocuments = emptyList()
+            _signedDocuments.postValue(shiftUserLoginSession.signedDocuments)
+        }
     }
 }

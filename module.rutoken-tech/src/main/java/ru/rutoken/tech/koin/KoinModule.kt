@@ -58,7 +58,7 @@ val koinModule = module {
     viewModel { ShiftStartScreenViewModel(get(), get(), get()) }
     viewModel { ChooseNewCertificateViewModel(get(), get(), get()) }
     viewModel { ChooseNewShiftCertificateViewModel(get(), get()) }
-    viewModel { DocumentsViewModel(get()) }
+    viewModel { DocumentsViewModel(get(), get()) }
     viewModel { PaymentsViewModel(get()) }
     viewModel { PaymentViewModel(get(), get(), get(), get()) }
 }

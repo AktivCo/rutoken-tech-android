@@ -49,6 +49,9 @@ class ShiftSignedDocumentRepositoryImpl(database: Database) : ShiftSignedDocumen
         }
     }
 
+    override suspend fun deleteAllSignedDocumentsBySessionId(sessionId: Int) =
+        signedDocumentDao.deleteSignedDocumentsBySessionId(sessionId)
+
     private fun makeSignedDocumentsGroup(documentEntities: List<SignedDocumentEntity>): SignedDocumentsGroup {
         val date = documentEntities.first().signTime
 

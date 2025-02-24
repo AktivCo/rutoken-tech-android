@@ -18,4 +18,7 @@ interface SignedDocumentDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun addSignedDocument(document: SignedDocumentEntity)
+
+    @Query("DELETE FROM signed_document WHERE session_id = :sessionId")
+    suspend fun deleteSignedDocumentsBySessionId(sessionId: Int)
 }

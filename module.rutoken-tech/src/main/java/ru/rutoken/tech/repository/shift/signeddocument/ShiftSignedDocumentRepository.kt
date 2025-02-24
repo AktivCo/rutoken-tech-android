@@ -12,4 +12,6 @@ interface ShiftSignedDocumentRepository {
     suspend fun addSignedDocuments(documentsGroup: SignedDocumentsGroup, sessionId: Int)
 
     suspend fun getAllSignedDocumentsBySessionId(sessionId: Int): List<SignedDocumentsGroup>
+
+    suspend fun deleteAllSignedDocumentsBySessionId(sessionId: Int)
 }

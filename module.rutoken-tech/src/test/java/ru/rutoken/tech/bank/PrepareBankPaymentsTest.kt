@@ -24,7 +24,7 @@ import ru.rutoken.tech.utils.base64ToX509CertificateHolder
 class PrepareBankPaymentsTest {
     @Test
     fun signVerifySuccess() {
-        val detachedCms = BouncyCastleCmsOperations.signDetachedGost256(
+        val detachedCms = BouncyCastleCmsOperations.signDetachedGost256Software(
             DATA,
             BANK_PRIVATE_KEY_GOST,
             base64ToX509CertificateHolder(BANK_CERTIFICATE_GOST),
@@ -36,7 +36,7 @@ class PrepareBankPaymentsTest {
 
     @Test
     fun signVerifyCertificateChainNotVerified() {
-        val detachedCms = BouncyCastleCmsOperations.signDetachedGost256(
+        val detachedCms = BouncyCastleCmsOperations.signDetachedGost256Software(
             DATA,
             BANK_PRIVATE_KEY_GOST,
             base64ToX509CertificateHolder(BANK_CERTIFICATE_GOST),
@@ -48,7 +48,7 @@ class PrepareBankPaymentsTest {
 
     @Test
     fun signVerifyInvalidSignature() {
-        val detachedCms = BouncyCastleCmsOperations.signDetachedGost256(
+        val detachedCms = BouncyCastleCmsOperations.signDetachedGost256Software(
             DATA + 1,
             BANK_PRIVATE_KEY_GOST,
             base64ToX509CertificateHolder(BANK_CERTIFICATE_GOST),

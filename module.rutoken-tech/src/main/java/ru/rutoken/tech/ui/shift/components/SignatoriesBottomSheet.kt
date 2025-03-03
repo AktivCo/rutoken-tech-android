@@ -12,6 +12,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.ModalBottomSheetProperties
 import androidx.compose.material3.SheetState
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
@@ -36,6 +37,7 @@ fun SignatoriesBottomSheet(
     onDismissRequest: () -> Unit,
     titleButton: ButtonContent? = null,
     actionButton: ButtonContent? = null,
+    shouldDismissOnBackPress: Boolean = true,
     sheetState: SheetState = rememberModalBottomSheetState(),
 ) {
     ModalBottomSheet(
@@ -45,6 +47,7 @@ fun SignatoriesBottomSheet(
         dragHandle = { BottomSheetDragHandle(sheetState = sheetState) },
         shape = bottomSheetCornerShape(sheetState = sheetState),
         contentWindowInsets = { bottomSheetWindowInsets() },
+        properties = ModalBottomSheetProperties(shouldDismissOnBackPress = shouldDismissOnBackPress)
     ) {
         BottomSheetTitle(
             title = stringResource(id = R.string.documents_signatories_title, signatories.size),

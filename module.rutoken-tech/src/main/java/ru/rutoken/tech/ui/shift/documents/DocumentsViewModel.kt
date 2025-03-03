@@ -42,10 +42,6 @@ class DocumentsViewModel(
     private val _documentsGroupSignatories = MutableLiveData(emptyList<String>())
     val documentsGroupSignatories: LiveData<List<String>> get() = _documentsGroupSignatories
 
-    init {
-        viewModelScope.launch { updateDocumentsFlow() }
-    }
-
     @MainThread
     fun onShareClicked(documents: SignedDocumentsGroup) {
         //TODO
@@ -94,7 +90,7 @@ class DocumentsViewModel(
         }
     }
 
-    private suspend fun updateDocumentsFlow() = withContext(Dispatchers.Default) {
+    suspend fun updateDocumentsFlow() = withContext(Dispatchers.Default) {
         launch {
             shiftUserLoginSession.documents.sortedByDescending { it.date }
                 .groupBy { it.date }

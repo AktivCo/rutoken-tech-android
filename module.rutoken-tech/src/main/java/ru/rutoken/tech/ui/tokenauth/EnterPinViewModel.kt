@@ -122,6 +122,10 @@ class EnterPinViewModel(
         }
     }
 
+    fun clearPinValue() {
+        _pinValue.postValue("")
+    }
+
     private fun hasBiometricPin(context: Context): Boolean {
         val bankUserLoginSession = sessionHolder.bankUserLoginSession ?: return false
 

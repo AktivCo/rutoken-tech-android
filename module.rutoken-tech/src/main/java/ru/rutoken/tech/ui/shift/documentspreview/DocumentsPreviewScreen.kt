@@ -21,6 +21,7 @@ import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults.largeTopAppBarColors
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.rememberCoroutineScope
@@ -29,26 +30,51 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.compose.ui.zIndex
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LifecycleEventEffect
 import com.github.barteksc.pdfviewer.PDFView
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 import ru.rutoken.tech.R
 import ru.rutoken.tech.ui.components.AppIcons
+import ru.rutoken.tech.ui.components.OptionSelectionDialog
 import ru.rutoken.tech.ui.components.RutokenTechLargeTopAppBar
 import ru.rutoken.tech.ui.components.RutokenTechTopAppBar
 import ru.rutoken.tech.ui.components.SecondaryButtonBox
 import ru.rutoken.tech.ui.shift.documents.Document
 
 @Composable
-fun DocumentsPreviewScreen(onNavigateBack: () -> Unit, viewModel: DocumentsPreviewViewModel = koinViewModel()) {
+fun DocumentsPreviewScreen(
+    onNavigateBack: () -> Unit,
+    viewModel: DocumentsPreviewViewModel = koinViewModel(),
+    onSignClick: () -> Unit
+) {
     val documentsToSign by viewModel.documentsToSign.observeAsState(emptyList())
+    val showFinishSigningDialog by viewModel.showFinishSigningDialog.observeAsState(false)
+    val navigateBack by viewModel.navigateBack.observeAsState(false)
+
+    LifecycleEventEffect(Lifecycle.Event.ON_RESUME) { viewModel.updateSignState() }
 
     if (documentsToSign.isNotEmpty()) {
         DocumentsPreviewScreen(
             documentsToSign = documentsToSign,
             onNavigateBack = onNavigateBack,
-            onSignClick = viewModel::onSignClicked
+            onSignClick = onSignClick
         )
+    }
+
+    if (showFinishSigningDialog) {
+        OptionSelectionDialog(
+            text = stringResource(R.string.signing_operation_completed),
+            firstOptionText = stringResource(R.string.share_document),
+            onFirstOptionClick = viewModel::onDocumentShareClick,
+            secondOptionText = stringResource(R.string.navigate_to_documents),
+            onSecondOptionClick = viewModel::hideFinishSigningDialog
+        )
+    }
+
+    LaunchedEffect(navigateBack) {
+        if (navigateBack) onNavigateBack()
     }
 }
 

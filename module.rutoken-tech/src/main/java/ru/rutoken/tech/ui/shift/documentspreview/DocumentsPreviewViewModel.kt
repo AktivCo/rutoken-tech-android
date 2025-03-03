@@ -23,8 +23,27 @@ class DocumentsPreviewViewModel(private val sessionHolder: AppSessionHolder) : V
     private val _documentsToSign = MutableLiveData(shiftUserLoginSession.documentsToSign)
     val documentsToSign: LiveData<List<Document>> get() = _documentsToSign
 
-    @MainThread
-    fun onSignClicked() {
+    private val isDocumentsSignedBefore = isDocumentsSigned()
+    private val _showFinishSigningDialog = MutableLiveData(false)
+    val showFinishSigningDialog: LiveData<Boolean> get() = _showFinishSigningDialog
+
+    private val _navigateBack = MutableLiveData(false)
+    val navigateBack: LiveData<Boolean> get() = _navigateBack
+
+    fun onDocumentShareClick() {
         // TODO: Not yet implemented
     }
+
+    @MainThread
+    fun hideFinishSigningDialog() {
+        _showFinishSigningDialog.value = false
+        _navigateBack.value = true
+    }
+
+    @MainThread
+    fun updateSignState() {
+        _showFinishSigningDialog.value = !isDocumentsSignedBefore && isDocumentsSigned()
+    }
+
+    private fun isDocumentsSigned() = shiftUserLoginSession.documentsToSign.any { it.signedCms != null }
 }

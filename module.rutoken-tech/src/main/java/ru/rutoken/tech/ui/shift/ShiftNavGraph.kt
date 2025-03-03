@@ -22,6 +22,7 @@ import ru.rutoken.tech.ui.shift.documents.DocumentsScreen
 import ru.rutoken.tech.ui.shift.documents.DocumentsViewModel
 import ru.rutoken.tech.ui.shift.documentspreview.DocumentsPreviewScreen
 import ru.rutoken.tech.ui.shift.sign.DocumentsSignScreen
+import ru.rutoken.tech.ui.shift.sign.DocumentsSignViewModel
 import ru.rutoken.tech.ui.shift.startscreen.ShiftStartScreen
 import ru.rutoken.tech.ui.shift.startscreen.ShiftStartScreenViewModel
 import ru.rutoken.tech.ui.tokenauth.EnterPinViewModel
@@ -35,7 +36,6 @@ sealed class ShiftDestination(override val route: String) : Destination {
     data object Start : ShiftDestination("shift/start")
     data object UserAddingTokenAuth : ShiftDestination("shift/userAddingTokenAuth")
     data object UserLoginTokenAuth : ShiftDestination("shift/userLoginTokenAuth")
-    data object UserOperationTokenAuth : ShiftDestination("shift/UserOperationTokenAuth")
     data object Certificates : ShiftDestination("shift/certificates")
     data object Documents : ShiftDestination("shift/documents")
     data object DocumentsPreview : ShiftDestination("shift/documents/preview")
@@ -106,13 +106,17 @@ fun NavGraphBuilder.addShiftDestinations(
     }
 
     composable(ShiftDestination.DocumentsPreview) {
-        DocumentsPreviewScreen(onNavigateBack = navController::popBackStack)
+        DocumentsPreviewScreen(
+            onNavigateBack = navController::popBackStack,
+            onSignClick = { navController.navigate(ShiftDestination.DocumentsSign.route) { launchSingleTop = true } }
+        )
     }
 
     bottomSheet(ShiftDestination.DocumentsSign.route) {
         DocumentsSignScreen(
-            onNavigateBack = navController::popBackStack,
-            onNavigateToDocuments = { navController.popBackStack(ShiftDestination.Documents.route, false) }
+            enterPinViewModel = koinViewModel<EnterPinViewModel>(),
+            signViewModel = koinViewModel<DocumentsSignViewModel>(),
+            onNavigateBack = navController::popBackStack
         )
     }
 }

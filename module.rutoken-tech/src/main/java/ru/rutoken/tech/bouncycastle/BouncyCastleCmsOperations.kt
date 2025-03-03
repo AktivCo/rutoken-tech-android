@@ -50,26 +50,60 @@ import java.security.cert.X509CertSelector
 import java.security.cert.X509Certificate
 
 object BouncyCastleCmsOperations {
-    suspend fun signDetached(
+
+    /**
+     * Generates or updates a CMS (Cryptographic Message Syntax) SignedData structure by adding a signatory.
+     *
+     * This function can operate in two modes:
+     * 1. **Single signature** mode: If [existingCmsBytes] is `null`, it creates a new CMS SignedData structure and
+     *    adds a single signatory (the one specified by [privateKey] and [certificate]).
+     * 2. **Multiple signatures** mode: If [existingCmsBytes] is provided, the function appends the new signature to the
+     *    existing SignedData structure, preserving any previously added signatories.
+     *
+     * Internally, this function uses PKCS#11 operations to sign the provided [data] with the specified GOST3410-2012-256
+     * private key ([privateKey]) within the given [session]. The result is returned as a DER-encoded CMS SignedData [ByteArray].
+     *
+     * @param session A valid PKCS#11 session used to perform cryptographic operations (signing).
+     * @param data The content to be signed.
+     * @param privateKey The GOST3410-2012-256 private key used for signing.
+     * @param certificate The primary X.509 certificate corresponding to the private key.
+     * @param additionalCertificates A list of additional X.509 certificates to be included in the CMS structure.
+     * @param existingCmsBytes An optional CMS SignedData byte array. If provided, the new signature is added
+     *                         alongside any existing signatures; if `null`, a new CMS structure is created.
+     *
+     * @return A [ByteArray] containing the DER-encoded CMS SignedData with the passed signatory.
+     */
+    suspend fun signDetachedGost256Hardware(
         session: Pkcs11Session,
         data: ByteArray,
         privateKey: Pkcs11GostPrivateKeyObject,
         certificate: X509CertificateHolder,
-        additionalCertificates: List<X509CertificateHolder>
+        additionalCertificates: List<X509CertificateHolder> = emptyList(),
+        existingCmsBytes: ByteArray? = null,
     ): ByteArray = withPkcs11CallContext {
-        val signature =
-            makeSignatureByHashOid(privateKey.getGostR3411ParamsAttributeValue(session).byteArrayValue, session)
-        val signer = GostContentSigner(signature).apply { signInit(privateKey) }
         val generator = CMSSignedDataGenerator().apply {
+            existingCmsBytes?.let {
+                val cms = CMSSignedData(CMSProcessableByteArray(data), it)
+                addCertificates(cms.certificates)
+                addSigners(cms.signerInfos)
+            }
+
+            val signature =
+                makeSignatureByHashOid(privateKey.getGostR3411ParamsAttributeValue(session).byteArrayValue, session)
+            val contentSigner = GostContentSigner(signature).apply { signInit(privateKey) }
+
             addCertificate(certificate)
             additionalCertificates.forEach { addCertificate(it) }
-            addSignerInfoGenerator(SignerInfoGeneratorBuilder(signer.getDigestProvider()).build(signer, certificate))
+
+            addSignerInfoGenerator(
+                SignerInfoGeneratorBuilder(contentSigner.getDigestProvider()).build(contentSigner, certificate)
+            )
         }
 
-        generator.generate(CMSProcessableByteArray(data)).getEncoded(ASN1Encoding.DER)
+        generator.generate(CMSProcessableByteArray(data), false).getEncoded(ASN1Encoding.DER)
     }
 
-    fun signDetachedGost256(
+    fun signDetachedGost256Software(
         data: ByteArray,
         privateKey: Base64String,
         certificate: X509CertificateHolder,

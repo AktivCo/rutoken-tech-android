@@ -199,7 +199,7 @@ suspend fun getInitialPaymentsStorage(context: Context, userCertificateHolder: X
                 }
             }
 
-            payment.initialActionData = BouncyCastleCmsOperations.signDetachedGost256(
+            payment.initialActionData = BouncyCastleCmsOperations.signDetachedGost256Software(
                 dataToSign,
                 BANK_PRIVATE_KEY_GOST,
                 base64ToX509CertificateHolder(BANK_CERTIFICATE_GOST),

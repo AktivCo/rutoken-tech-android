@@ -58,7 +58,7 @@ object CmsOperations {
                     .getEncoded(ASN1Encoding.DER)
             }
 
-            CmsOperationProvider.BOUNCY_CASTLE -> BouncyCastleCmsOperations.signDetached(
+            CmsOperationProvider.BOUNCY_CASTLE -> BouncyCastleCmsOperations.signDetachedGost256Hardware(
                 session,
                 data,
                 signerPrivateKey,
@@ -66,6 +66,27 @@ object CmsOperations {
                 additionalCertificates.orEmpty()
             )
         }
+    }
+
+    /**
+     * Method supposes that the user is logged in.
+     */
+    suspend fun signDetachedGost256Hardware(
+        session: Pkcs11Session,
+        privateKey: Pkcs11GostPrivateKeyObject,
+        data: ByteArray,
+        existingCmsBytes: ByteArray?,
+        certificate: X509CertificateHolder,
+        additionalCertificates: List<X509CertificateHolder> = emptyList(),
+    ): ByteArray {
+        return BouncyCastleCmsOperations.signDetachedGost256Hardware(
+            session = session,
+            data = data,
+            privateKey = privateKey,
+            certificate = certificate,
+            additionalCertificates = additionalCertificates,
+            existingCmsBytes = existingCmsBytes,
+        )
     }
 
     /**

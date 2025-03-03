@@ -6,6 +6,9 @@
 
 package ru.rutoken.tech.ui.shift.documents
 
+import android.content.Context
+import ru.rutoken.tech.ui.bank.payments.Base64String
+import ru.rutoken.tech.utils.toBase64String
 import java.time.LocalDate
 
 data class Document(
@@ -16,6 +19,8 @@ data class Document(
     val displayPageIndex: Int = 0,
 ) {
     val assetName: String = "shiftdocuments/$title.pdf"
+
+    fun readFile(context: Context) = context.assets.open(assetName).use { it.readBytes() }
 }
 
 data class SignedDocumentsGroup(

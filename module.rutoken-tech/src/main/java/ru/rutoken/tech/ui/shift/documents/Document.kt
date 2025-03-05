@@ -13,6 +13,7 @@ data class Document(
     val date: LocalDate,
     val organization: String,
     val signedCms: ByteArray? = null,
+    val displayPageIndex: Int = 0,
 ) {
     val assetName: String = "shiftdocuments/$title.pdf"
 }

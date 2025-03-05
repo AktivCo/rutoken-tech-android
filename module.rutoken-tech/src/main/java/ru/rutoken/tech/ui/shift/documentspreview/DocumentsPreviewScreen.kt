@@ -99,7 +99,7 @@ private fun SingleDocumentPreviewScreen(
                 .background(MaterialTheme.colorScheme.surface)
         ) {
             PDFViewer(
-                assetName = documentToSign.assetName,
+                document = documentToSign,
                 modifier = Modifier
                     .fillMaxWidth()
                     .weight(1f),
@@ -174,7 +174,7 @@ private fun MultipleDocumentsPreviewScreen(
                     .weight(1f),
             ) { pageIndex ->
                 PDFViewer(
-                    assetName = documentsToSign[pageIndex].assetName,
+                    document = documentsToSign[pageIndex],
                     modifier = Modifier.fillMaxSize()
                 )
             }
@@ -192,15 +192,15 @@ private fun MultipleDocumentsPreviewScreen(
 }
 
 @Composable
-private fun PDFViewer(assetName: String, modifier: Modifier = Modifier) {
+private fun PDFViewer(document: Document, modifier: Modifier = Modifier) {
     AndroidView(
         modifier = modifier,
         factory = { context ->
             PDFView(context, null).apply {
-                fromAsset(assetName)
+                fromAsset(document.assetName)
+                    .pages(document.displayPageIndex)
                     .enableSwipe(false)
                     .enableDoubletap(false)
-                    .spacing(4)
                     .load()
             }
         }

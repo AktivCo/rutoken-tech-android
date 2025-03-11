@@ -60,6 +60,7 @@ import ru.rutoken.tech.ui.components.RutokenTechLargeTopAppBar
 import ru.rutoken.tech.ui.components.RutokenTechTopAppBar
 import ru.rutoken.tech.ui.components.SecondaryButtonBox
 import ru.rutoken.tech.ui.components.SegmentedButtonRow
+import ru.rutoken.tech.ui.shift.components.SignatoriesBottomSheet
 import ru.rutoken.tech.ui.theme.RutokenTechTheme
 import ru.rutoken.tech.ui.utils.PreviewDark
 import ru.rutoken.tech.ui.utils.PreviewLight
@@ -79,7 +80,7 @@ fun DocumentsScreen(
     val signatoriesBottomSheetData by viewModel.documentsGroupSignatories.observeAsState(emptyList())
 
     if (signatoriesBottomSheetData.isNotEmpty()) {
-        DocumentSignatoriesBottomSheet(
+        SignatoriesBottomSheet(
             signatories = signatoriesBottomSheetData,
             onDismissRequest = viewModel::onSignatoriesBottomSheetClose
         )

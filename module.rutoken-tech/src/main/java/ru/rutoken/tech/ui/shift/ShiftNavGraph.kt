@@ -21,6 +21,7 @@ import ru.rutoken.tech.ui.shift.choosecertificate.ChooseNewShiftCertificateViewM
 import ru.rutoken.tech.ui.shift.documents.DocumentsScreen
 import ru.rutoken.tech.ui.shift.documents.DocumentsViewModel
 import ru.rutoken.tech.ui.shift.documentspreview.DocumentsPreviewScreen
+import ru.rutoken.tech.ui.shift.sign.DocumentsSignScreen
 import ru.rutoken.tech.ui.shift.startscreen.ShiftStartScreen
 import ru.rutoken.tech.ui.shift.startscreen.ShiftStartScreenViewModel
 import ru.rutoken.tech.ui.tokenauth.EnterPinViewModel
@@ -38,6 +39,7 @@ sealed class ShiftDestination(override val route: String) : Destination {
     data object Certificates : ShiftDestination("shift/certificates")
     data object Documents : ShiftDestination("shift/documents")
     data object DocumentsPreview : ShiftDestination("shift/documents/preview")
+    data object DocumentsSign : ShiftDestination("shift/documents/sign")
 }
 
 fun NavGraphBuilder.addShiftDestinations(
@@ -105,5 +107,12 @@ fun NavGraphBuilder.addShiftDestinations(
 
     composable(ShiftDestination.DocumentsPreview) {
         DocumentsPreviewScreen(onNavigateBack = navController::popBackStack)
+    }
+
+    bottomSheet(ShiftDestination.DocumentsSign.route) {
+        DocumentsSignScreen(
+            onNavigateBack = navController::popBackStack,
+            onNavigateToDocuments = { navController.popBackStack(ShiftDestination.Documents.route, false) }
+        )
     }
 }

@@ -5,6 +5,7 @@
 
     <!--Common strings-->
     <string name="generate">Сгенерировать</string>
+    <string name="sign">Подписать</string>
     <string name="ok">ОК</string>
     <string name="cancel">Отмена</string>
 
@@ -100,7 +101,6 @@
     <string name="archive">Архив</string>
 
     <!--Related to payment screen-->
-    <string name="sign">Подписать</string>
     <string name="verify">Проверить подпись</string>
     <string name="encrypt">Зашифровать</string>
     <string name="decrypt">Расшифровать</string>
@@ -123,6 +123,9 @@
     <string name="documents_selected_state_title">Выбрано: %d</string>
     <string name="documents_selected_state_preview">Предпросмотр</string>
     <string name="documents_signatories_title">Подписавшие: %d</string>
+    <string name="finish_documents_signing">Завершить</string>
+    <string name="signing_operation_completed">Подписание завершено</string>
+    <string name="navigate_to_documents">К документам</string>
 
     <!--Related to documents preview-->
     <string name="documents_count">Документов: %d</string>

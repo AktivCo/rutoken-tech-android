@@ -34,6 +34,7 @@ import ru.rutoken.tech.ui.ca.tokeninfo.CaTokenInfoViewModel
 import ru.rutoken.tech.ui.shift.choosecertificate.ChooseNewShiftCertificateViewModel
 import ru.rutoken.tech.ui.shift.documents.DocumentsViewModel
 import ru.rutoken.tech.ui.shift.documentspreview.DocumentsPreviewViewModel
+import ru.rutoken.tech.ui.shift.sign.DocumentsSignViewModel
 import ru.rutoken.tech.ui.shift.startscreen.ShiftStartScreenViewModel
 import ru.rutoken.tech.ui.tokenauth.EnterPinViewModel
 import ru.rutoken.tech.ui.tokenauth.LoginViewModel
@@ -62,6 +63,7 @@ val koinModule = module {
     viewModel { ChooseNewShiftCertificateViewModel(get(), get()) }
     viewModelOf(::DocumentsViewModel)
     viewModelOf(::DocumentsPreviewViewModel)
+    viewModelOf(::DocumentsSignViewModel)
     viewModel { PaymentsViewModel(get()) }
     viewModel { PaymentViewModel(get(), get(), get(), get()) }
 }

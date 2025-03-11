@@ -11,8 +11,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.imePadding
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -43,7 +41,6 @@ import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
@@ -52,14 +49,13 @@ import ru.rutoken.tech.ui.ca.generateobjects.keypair.CkaID
 import ru.rutoken.tech.ui.ca.generateobjects.keypair.convertToDefaultString
 import ru.rutoken.tech.ui.components.BottomSheetDragHandle
 import ru.rutoken.tech.ui.components.BottomSheetTitle
-import ru.rutoken.tech.ui.components.alertdialog.ConnectTokenDialog
-import ru.rutoken.tech.ui.components.alertdialog.ErrorAlertDialog
-import ru.rutoken.tech.ui.components.NavigationBarSpacer
-import ru.rutoken.tech.ui.components.PrimaryButtonBox
 import ru.rutoken.tech.ui.components.ProgressIndicatorDialog
-import ru.rutoken.tech.ui.components.alertdialog.SimpleAlertDialog
+import ru.rutoken.tech.ui.components.StickyPrimaryButtonBox
 import ru.rutoken.tech.ui.components.TextGroup
 import ru.rutoken.tech.ui.components.TextGroupItem
+import ru.rutoken.tech.ui.components.alertdialog.ConnectTokenDialog
+import ru.rutoken.tech.ui.components.alertdialog.ErrorAlertDialog
+import ru.rutoken.tech.ui.components.alertdialog.SimpleAlertDialog
 import ru.rutoken.tech.ui.components.bottomSheetCornerShape
 import ru.rutoken.tech.ui.theme.RutokenTechTheme
 import ru.rutoken.tech.ui.utils.DialogState
@@ -157,10 +153,11 @@ fun GenerateCertificateBottomSheet(
             CertificateAttributesList()
         }
 
-        StickyGenerationButton(
+        StickyPrimaryButtonBox(
+            text = stringResource(R.string.generate),
             offset = { IntOffset(x = 0, y = -sheetState.requireOffset().toInt()) },
             buttonEnabled = buttonEnabled,
-            onGenerationButtonClicked = {
+            onClick = {
                 hideKeyboardAction()
                 onGenerationButtonClicked(selectedKeyPair, owner)
             }
@@ -235,28 +232,6 @@ private fun CertificateAttributesList() {
     val values = stringArrayResource(id = R.array.certificate_attributes_values)
 
     TextGroup(items = titles.zip(values).map { TextGroupItem(title = it.first, value = it.second) })
-}
-
-@Composable
-private fun StickyGenerationButton(
-    offset: Density.() -> IntOffset,
-    buttonEnabled: Boolean,
-    onGenerationButtonClicked: () -> Unit
-) {
-    Column(
-        modifier = Modifier
-            .offset(offset)
-            .background(MaterialTheme.colorScheme.surfaceContainerLow)
-            .imePadding()
-    ) {
-        PrimaryButtonBox(
-            text = stringResource(R.string.generate),
-            enabled = buttonEnabled,
-            onClick = onGenerationButtonClicked
-        )
-
-        NavigationBarSpacer()
-    }
 }
 
 @Composable

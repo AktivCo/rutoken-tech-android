@@ -33,11 +33,12 @@ data class TextGroupItem(val title: String, val value: String? = null)
 @Composable
 fun TextGroupBox(
     items: List<TextGroupItem>,
+    modifier: Modifier = Modifier,
     padding: PaddingValues = PaddingValues(16.dp),
     backgroundColor: Color = MaterialTheme.colorScheme.surfaceContainerHigh,
     alphaTint: Float = 1f
 ) {
-    Box(Modifier.padding(padding)) {
+    Box(modifier.padding(padding)) {
         TextGroup(items, backgroundColor, alphaTint)
     }
 }

@@ -6,11 +6,14 @@
 
 package ru.rutoken.tech.ui.components
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -19,10 +22,31 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.Density
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import ru.rutoken.tech.ui.theme.RutokenTechTheme
 import ru.rutoken.tech.ui.utils.PreviewDark
 import ru.rutoken.tech.ui.utils.PreviewLight
+
+@Composable
+fun StickyPrimaryButtonBox(
+    text: String,
+    onClick: () -> Unit,
+    offset: Density.() -> IntOffset,
+    buttonEnabled: Boolean = true,
+) {
+    Column(
+        modifier = Modifier
+            .offset(offset)
+            .background(MaterialTheme.colorScheme.surfaceContainer)
+            .imePadding()
+    ) {
+        PrimaryButtonBox(text = text, enabled = buttonEnabled, onClick = onClick)
+
+        NavigationBarSpacer()
+    }
+}
 
 @Composable
 fun PrimaryButtonBox(

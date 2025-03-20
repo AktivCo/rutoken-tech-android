@@ -8,8 +8,8 @@ package ru.rutoken.tech.repository.shift.signeddocument
 
 import ru.rutoken.tech.database.Database
 import ru.rutoken.tech.database.shift.document.SignedDocumentEntity
-import ru.rutoken.tech.ui.shift.documents.Document
 import ru.rutoken.tech.ui.shift.documents.SignedDocumentsGroup
+import ru.rutoken.tech.ui.shift.documents.initialDocumentsStorage
 import java.util.UUID
 
 class ShiftSignedDocumentRepositoryImpl(database: Database) : ShiftSignedDocumentRepository {
@@ -56,12 +56,9 @@ class ShiftSignedDocumentRepositoryImpl(database: Database) : ShiftSignedDocumen
         val date = documentEntities.first().signTime
 
         val documents = documentEntities.map { entity ->
-            Document(
-                title = entity.fileName,
-                date = date,
-                organization = entity.organization,
-                signedCms = entity.signedCms
-            )
+            initialDocumentsStorage
+                .first { it.title == entity.fileName }
+                .copy(signedCms = entity.signedCms, date = date)
         }
 
         return SignedDocumentsGroup(

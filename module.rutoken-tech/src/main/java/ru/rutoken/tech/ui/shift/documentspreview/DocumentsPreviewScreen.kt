@@ -50,6 +50,7 @@ fun DocumentsPreviewScreen(
     onSignClick: () -> Unit
 ) {
     val documentsToSign by viewModel.documentsToSign.observeAsState(emptyList())
+    val showSignButton by viewModel.showSignButton.observeAsState(false)
     val showFinishSigningDialog by viewModel.showFinishSigningDialog.observeAsState(false)
     val navigateBack by viewModel.navigateBack.observeAsState(false)
 
@@ -58,6 +59,7 @@ fun DocumentsPreviewScreen(
     if (documentsToSign.isNotEmpty()) {
         DocumentsPreviewScreen(
             documentsToSign = documentsToSign,
+            showSignButton = showSignButton,
             onNavigateBack = onNavigateBack,
             onSignClick = onSignClick
         )
@@ -81,18 +83,21 @@ fun DocumentsPreviewScreen(
 @Composable
 private fun DocumentsPreviewScreen(
     documentsToSign: List<Document>,
+    showSignButton: Boolean,
     onNavigateBack: () -> Unit,
     onSignClick: () -> Unit
 ) {
     if (documentsToSign.size == 1) {
         SingleDocumentPreviewScreen(
             documentToSign = documentsToSign.first(),
+            showSignButton = showSignButton,
             onNavigateBack = onNavigateBack,
             onSignClick = onSignClick
         )
     } else {
         MultipleDocumentsPreviewScreen(
             documentsToSign = documentsToSign,
+            showSignButton = showSignButton,
             onNavigateBack = onNavigateBack,
             onSignClick = onSignClick
         )
@@ -102,6 +107,7 @@ private fun DocumentsPreviewScreen(
 @Composable
 private fun SingleDocumentPreviewScreen(
     documentToSign: Document,
+    showSignButton: Boolean,
     onNavigateBack: () -> Unit,
     onSignClick: () -> Unit
 ) {
@@ -131,14 +137,16 @@ private fun SingleDocumentPreviewScreen(
                     .weight(1f),
             )
 
-            SecondaryButtonBox(
-                modifier = Modifier
-                    .background(MaterialTheme.colorScheme.surface)
-                    .fillMaxWidth()
-                    .padding(bottom = innerPadding.calculateBottomPadding()),
-                text = stringResource(R.string.sign),
-                onClick = onSignClick
-            )
+            if (showSignButton) {
+                SecondaryButtonBox(
+                    modifier = Modifier
+                        .background(MaterialTheme.colorScheme.surface)
+                        .fillMaxWidth()
+                        .padding(bottom = innerPadding.calculateBottomPadding()),
+                    text = stringResource(R.string.sign),
+                    onClick = onSignClick
+                )
+            }
         }
     }
 }
@@ -146,6 +154,7 @@ private fun SingleDocumentPreviewScreen(
 @Composable
 private fun MultipleDocumentsPreviewScreen(
     documentsToSign: List<Document>,
+    showSignButton: Boolean,
     onNavigateBack: () -> Unit,
     onSignClick: () -> Unit
 ) {
@@ -205,14 +214,16 @@ private fun MultipleDocumentsPreviewScreen(
                 )
             }
 
-            SecondaryButtonBox(
-                modifier = Modifier
-                    .background(MaterialTheme.colorScheme.surface)
-                    .fillMaxWidth()
-                    .padding(bottom = innerPadding.calculateBottomPadding()),
-                text = stringResource(R.string.sign),
-                onClick = onSignClick
-            )
+            if (showSignButton) {
+                SecondaryButtonBox(
+                    modifier = Modifier
+                        .background(MaterialTheme.colorScheme.surface)
+                        .fillMaxWidth()
+                        .padding(bottom = innerPadding.calculateBottomPadding()),
+                    text = stringResource(R.string.sign),
+                    onClick = onSignClick
+                )
+            }
         }
     }
 }

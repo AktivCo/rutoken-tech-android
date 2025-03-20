@@ -24,6 +24,10 @@ class DocumentsPreviewViewModel(private val sessionHolder: AppSessionHolder) : V
     val documentsToSign: LiveData<List<Document>> get() = _documentsToSign
 
     private val isDocumentsSignedBefore = isDocumentsSigned()
+
+    private val _showSignButton = MutableLiveData(!isDocumentsSignedBefore)
+    val showSignButton: LiveData<Boolean> get() = _showSignButton
+
     private val _showFinishSigningDialog = MutableLiveData(false)
     val showFinishSigningDialog: LiveData<Boolean> get() = _showFinishSigningDialog
 
@@ -42,7 +46,10 @@ class DocumentsPreviewViewModel(private val sessionHolder: AppSessionHolder) : V
 
     @MainThread
     fun updateSignState() {
-        _showFinishSigningDialog.value = !isDocumentsSignedBefore && isDocumentsSigned()
+        val isDocumentsSignedNow = isDocumentsSigned()
+
+        _showSignButton.value = !isDocumentsSignedBefore && !isDocumentsSignedNow
+        _showFinishSigningDialog.value = !isDocumentsSignedBefore && isDocumentsSignedNow
     }
 
     private fun isDocumentsSigned() = shiftUserLoginSession.documentsToSign.any { it.signedCms != null }

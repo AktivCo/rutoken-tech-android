@@ -76,5 +76,7 @@ class ShiftUserLoginAppSession(
     var documents: List<Document>,
     var signedDocuments: List<SignedDocumentsGroup>,
     var operationWithToken: (suspend (RtPkcs11Session) -> Unit)? = null,
-    var documentsToSign: List<Document> = emptyList()
+    var chosenDocuments: DocumentsPreviewInfo = DocumentsPreviewInfo()
 ) : AppSession()
+
+class DocumentsPreviewInfo(val documents: List<Document> = emptyList(), val startDocument: Int = 0)

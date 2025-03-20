@@ -11,17 +11,17 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import ru.rutoken.tech.session.AppSessionHolder
+import ru.rutoken.tech.session.DocumentsPreviewInfo
 import ru.rutoken.tech.session.ShiftUserLoginAppSession
 import ru.rutoken.tech.session.requireShiftUserLoginSession
-import ru.rutoken.tech.ui.shift.documents.Document
 
 class DocumentsPreviewViewModel(private val sessionHolder: AppSessionHolder) : ViewModel() {
     // ShiftUserLoginAppSession instance MUST exist by the time this ViewModel is instantiated
     private val shiftUserLoginSession: ShiftUserLoginAppSession
         get() = sessionHolder.requireShiftUserLoginSession()
 
-    private val _documentsToSign = MutableLiveData(shiftUserLoginSession.documentsToSign)
-    val documentsToSign: LiveData<List<Document>> get() = _documentsToSign
+    private val _documents = MutableLiveData(shiftUserLoginSession.chosenDocuments)
+    val documents: LiveData<DocumentsPreviewInfo> get() = _documents
 
     private val isDocumentsSignedBefore = isDocumentsSigned()
 
@@ -52,5 +52,5 @@ class DocumentsPreviewViewModel(private val sessionHolder: AppSessionHolder) : V
         _showFinishSigningDialog.value = !isDocumentsSignedBefore && isDocumentsSignedNow
     }
 
-    private fun isDocumentsSigned() = shiftUserLoginSession.documentsToSign.any { it.signedCms != null }
+    private fun isDocumentsSigned() = shiftUserLoginSession.chosenDocuments.documents.any { it.signedCms != null }
 }

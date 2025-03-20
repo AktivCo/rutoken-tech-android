@@ -16,6 +16,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import ru.rutoken.tech.repository.shift.signeddocument.ShiftSignedDocumentRepository
 import ru.rutoken.tech.session.AppSessionHolder
+import ru.rutoken.tech.session.DocumentsPreviewInfo
 import ru.rutoken.tech.session.ShiftUserLoginAppSession
 import ru.rutoken.tech.session.requireShiftUserLoginSession
 import java.time.LocalDate
@@ -67,8 +68,16 @@ class DocumentsViewModel(
     }
 
     @MainThread
+    fun onSignedDocumentClicked(document: Document, documentsGroup: SignedDocumentsGroup) {
+        with(documentsGroup.documents) {
+            shiftUserLoginSession.chosenDocuments = DocumentsPreviewInfo(this, indexOf(document))
+        }
+        onNavigateToDocumentsPreview()
+    }
+
+    @MainThread
     fun onNavigateToPreview() {
-        shiftUserLoginSession.documentsToSign = _documentsToSign.value!!
+        shiftUserLoginSession.chosenDocuments = DocumentsPreviewInfo(_documentsToSign.value!!)
         _documentsToSign.value = emptyList()
         onNavigateToDocumentsPreview()
     }

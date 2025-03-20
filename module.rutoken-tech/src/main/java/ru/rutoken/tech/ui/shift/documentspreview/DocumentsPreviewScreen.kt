@@ -36,6 +36,7 @@ import com.github.barteksc.pdfviewer.PDFView
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 import ru.rutoken.tech.R
+import ru.rutoken.tech.session.DocumentsPreviewInfo
 import ru.rutoken.tech.ui.components.AppIcons
 import ru.rutoken.tech.ui.components.OptionSelectionDialog
 import ru.rutoken.tech.ui.components.RutokenTechLargeTopAppBar
@@ -49,16 +50,17 @@ fun DocumentsPreviewScreen(
     viewModel: DocumentsPreviewViewModel = koinViewModel(),
     onSignClick: () -> Unit
 ) {
-    val documentsToSign by viewModel.documentsToSign.observeAsState(emptyList())
+    val documentsInfo by viewModel.documents.observeAsState(DocumentsPreviewInfo())
     val showSignButton by viewModel.showSignButton.observeAsState(false)
     val showFinishSigningDialog by viewModel.showFinishSigningDialog.observeAsState(false)
     val navigateBack by viewModel.navigateBack.observeAsState(false)
 
     LifecycleEventEffect(Lifecycle.Event.ON_RESUME) { viewModel.updateSignState() }
 
-    if (documentsToSign.isNotEmpty()) {
+    if (documentsInfo.documents.isNotEmpty()) {
         DocumentsPreviewScreen(
-            documentsToSign = documentsToSign,
+            documentsInfo = documentsInfo.documents,
+            startPreviewIndex = documentsInfo.startDocument,
             showSignButton = showSignButton,
             onNavigateBack = onNavigateBack,
             onSignClick = onSignClick
@@ -82,21 +84,23 @@ fun DocumentsPreviewScreen(
 
 @Composable
 private fun DocumentsPreviewScreen(
-    documentsToSign: List<Document>,
+    documentsInfo: List<Document>,
+    startPreviewIndex: Int,
     showSignButton: Boolean,
     onNavigateBack: () -> Unit,
     onSignClick: () -> Unit
 ) {
-    if (documentsToSign.size == 1) {
+    if (documentsInfo.size == 1) {
         SingleDocumentPreviewScreen(
-            documentToSign = documentsToSign.first(),
+            document = documentsInfo.first(),
             showSignButton = showSignButton,
             onNavigateBack = onNavigateBack,
             onSignClick = onSignClick
         )
     } else {
         MultipleDocumentsPreviewScreen(
-            documentsToSign = documentsToSign,
+            documents = documentsInfo,
+            startPreviewIndex = startPreviewIndex,
             showSignButton = showSignButton,
             onNavigateBack = onNavigateBack,
             onSignClick = onSignClick
@@ -106,7 +110,7 @@ private fun DocumentsPreviewScreen(
 
 @Composable
 private fun SingleDocumentPreviewScreen(
-    documentToSign: Document,
+    document: Document,
     showSignButton: Boolean,
     onNavigateBack: () -> Unit,
     onSignClick: () -> Unit
@@ -114,7 +118,7 @@ private fun SingleDocumentPreviewScreen(
     Scaffold(
         topBar = {
             RutokenTechLargeTopAppBar(
-                titleText = documentToSign.title,
+                titleText = document.title,
                 navigationIcon = { AppIcons.Back() },
                 onNavigationIconClick = onNavigateBack,
                 colors = largeTopAppBarColors(
@@ -131,7 +135,7 @@ private fun SingleDocumentPreviewScreen(
                 .background(MaterialTheme.colorScheme.surface)
         ) {
             PDFViewer(
-                document = documentToSign,
+                document = document,
                 modifier = Modifier
                     .fillMaxWidth()
                     .weight(1f),
@@ -153,14 +157,15 @@ private fun SingleDocumentPreviewScreen(
 
 @Composable
 private fun MultipleDocumentsPreviewScreen(
-    documentsToSign: List<Document>,
+    documents: List<Document>,
+    startPreviewIndex: Int,
     showSignButton: Boolean,
     onNavigateBack: () -> Unit,
     onSignClick: () -> Unit
 ) {
     Scaffold(topBar = {
         RutokenTechTopAppBar(
-            titleText = stringResource(R.string.documents_count, documentsToSign.size),
+            titleText = stringResource(R.string.documents_count, documents.size),
             navigationIcon = { AppIcons.Back() },
             onNavigationIconClick = onNavigateBack,
             colors = largeTopAppBarColors(
@@ -175,7 +180,7 @@ private fun MultipleDocumentsPreviewScreen(
                 .padding(top = innerPadding.calculateTopPadding())
         ) {
             val scope = rememberCoroutineScope()
-            val pagerState = rememberPagerState(pageCount = { documentsToSign.size })
+            val pagerState = rememberPagerState(initialPage = startPreviewIndex, pageCount = { documents.size })
             PrimaryScrollableTabRow(
                 selectedTabIndex = pagerState.currentPage,
                 modifier = Modifier
@@ -186,7 +191,7 @@ private fun MultipleDocumentsPreviewScreen(
                 edgePadding = 0.dp,
                 containerColor = MaterialTheme.colorScheme.surfaceContainer,
             ) {
-                documentsToSign.forEachIndexed { index, document ->
+                documents.forEachIndexed { index, document ->
                     Tab(
                         selected = pagerState.currentPage == index,
                         onClick = {
@@ -209,7 +214,7 @@ private fun MultipleDocumentsPreviewScreen(
                     .weight(1f),
             ) { pageIndex ->
                 PDFViewer(
-                    document = documentsToSign[pageIndex],
+                    document = documents[pageIndex],
                     modifier = Modifier.fillMaxSize()
                 )
             }

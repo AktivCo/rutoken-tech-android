@@ -7,8 +7,6 @@
 package ru.rutoken.tech.ui.shift.documents
 
 import android.content.Context
-import ru.rutoken.tech.ui.bank.payments.Base64String
-import ru.rutoken.tech.utils.toBase64String
 import java.time.LocalDate
 
 data class Document(

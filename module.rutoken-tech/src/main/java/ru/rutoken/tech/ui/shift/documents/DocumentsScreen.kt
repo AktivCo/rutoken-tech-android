@@ -105,6 +105,7 @@ fun DocumentsScreen(
         onNavigateBack = onNavigateBack,
         onResetDocumentsClicked = viewModel::onResetDocumentsClicked,
         onDocumentClicked = onDocumentClicked,
+        onSignedDocumentClicked = viewModel::onSignedDocumentClicked,
         onShareClicked = viewModel::onShareClicked,
         onSignatoriesClicked = viewModel::onSignatoriesClicked,
         onLongClickDocument = viewModel::onDocumentSelected,
@@ -122,6 +123,7 @@ private fun DocumentsScreen(
     onNavigateBack: () -> Unit,
     onResetDocumentsClicked: () -> Unit,
     onDocumentClicked: (Document) -> Unit,
+    onSignedDocumentClicked: (Document, SignedDocumentsGroup) -> Unit,
     onShareClicked: (SignedDocumentsGroup) -> Unit,
     onSignatoriesClicked: (SignedDocumentsGroup) -> Unit,
     onLongClickDocument: (Document) -> Unit,
@@ -183,7 +185,7 @@ private fun DocumentsScreen(
                         } else {
                             signedDocumentsItems(
                                 signedDocuments,
-                                onDocumentClicked,
+                                onSignedDocumentClicked,
                                 onShareClicked,
                                 onSignatoriesClicked
                             )
@@ -252,7 +254,7 @@ private fun LazyListScope.documentsToSignItems(
 
 private fun LazyListScope.signedDocumentsItems(
     signedDocuments: Map<LocalDate, List<SignedDocumentsGroup>>,
-    onDocumentClicked: (Document) -> Unit,
+    onDocumentClicked: (Document, SignedDocumentsGroup) -> Unit,
     onShareClicked: (SignedDocumentsGroup) -> Unit,
     onSignatoriesClicked: (SignedDocumentsGroup) -> Unit
 ) {
@@ -277,7 +279,7 @@ private fun LazyListScope.signedDocumentsItems(
 @Composable
 private fun ExpandableDocumentsSection(
     signedDocumentsGroup: SignedDocumentsGroup,
-    onDocumentClicked: (Document) -> Unit,
+    onDocumentClicked: (Document, SignedDocumentsGroup) -> Unit,
     onShareClicked: (SignedDocumentsGroup) -> Unit,
     onSignatoriesClicked: (SignedDocumentsGroup) -> Unit
 ) {
@@ -312,7 +314,11 @@ private fun ExpandableDocumentsSection(
         }
         if (isExpanded) {
             signedDocumentsGroup.documents.forEachIndexed { index, doc ->
-                DocumentCard(document = doc, icon = { SignedDocument() }, onClick = { onDocumentClicked(doc) })
+                DocumentCard(
+                    document = doc,
+                    icon = { SignedDocument() },
+                    onClick = { onDocumentClicked(doc, signedDocumentsGroup) }
+                )
                 if (index != signedDocumentsGroup.documents.lastIndex)
                     HorizontalDivider(Modifier.padding(horizontal = 16.dp))
             }
@@ -420,6 +426,7 @@ private fun DocumentsScreenPreview() {
             onNavigateBack = {},
             onResetDocumentsClicked = {},
             onDocumentClicked = {},
+            onSignedDocumentClicked = { _, _ -> },
             isDocumentsToSignSelected = true,
             onShareClicked = {},
             onLongClickDocument = {},
@@ -442,6 +449,7 @@ private fun EmptyDocumentsScreenPreview() {
             onNavigateBack = {},
             onResetDocumentsClicked = {},
             onDocumentClicked = {},
+            onSignedDocumentClicked = { _, _ -> },
             isDocumentsToSignSelected = true,
             onShareClicked = {},
             onLongClickDocument = {},
@@ -489,6 +497,7 @@ private fun SignedDocumentsScreenPreview() {
             onNavigateBack = {},
             onResetDocumentsClicked = {},
             onDocumentClicked = {},
+            onSignedDocumentClicked = { _, _ -> },
             isDocumentsToSignSelected = false,
             onShareClicked = {},
             onLongClickDocument = {},
@@ -511,6 +520,7 @@ private fun EmptySignedDocumentsScreenPreview() {
             onNavigateBack = {},
             onResetDocumentsClicked = {},
             onDocumentClicked = {},
+            onSignedDocumentClicked = { _, _ -> },
             isDocumentsToSignSelected = false,
             onShareClicked = {},
             onLongClickDocument = {},
@@ -543,6 +553,7 @@ private fun SelectedDocumentsScreenPreview() {
             onNavigateBack = {},
             onResetDocumentsClicked = {},
             onDocumentClicked = {},
+            onSignedDocumentClicked = { _, _ -> },
             isDocumentsToSignSelected = true,
             onShareClicked = {},
             onLongClickDocument = {},

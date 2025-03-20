@@ -24,6 +24,7 @@ import ru.rutoken.tech.pkcs11.findobjects.findGost256CertificateAndKeyContainers
 import ru.rutoken.tech.pkcs11.serialNumberTrimmed
 import ru.rutoken.tech.repository.shift.signeddocument.ShiftSignedDocumentRepository
 import ru.rutoken.tech.session.AppSessionHolder
+import ru.rutoken.tech.session.DocumentsPreviewInfo
 import ru.rutoken.tech.session.ShiftUserLoginAppSession
 import ru.rutoken.tech.session.requireShiftUserLoginSession
 import ru.rutoken.tech.tokenmanager.TokenManager
@@ -68,7 +69,7 @@ class DocumentsSignViewModel(
     private val _navigateBack = MutableLiveData(false)
     val navigateBack: LiveData<Boolean> get() = _navigateBack
 
-    private var documentsToSign = shiftUserLoginSession.documentsToSign
+    private var documentsToSign = shiftUserLoginSession.chosenDocuments.documents
 
     @MainThread
     fun onFinishSigningClick() {
@@ -94,7 +95,9 @@ class DocumentsSignViewModel(
                     !newSignedDocuments.documents.any { signedDocument -> document.title == signedDocument.title }
                 }
 
-            shiftUserLoginSession.documentsToSign = documentsToSign
+            with(shiftUserLoginSession.chosenDocuments) {
+                shiftUserLoginSession.chosenDocuments = DocumentsPreviewInfo(documentsToSign, startDocument)
+            }
 
             _navigateBack.value = true
         }

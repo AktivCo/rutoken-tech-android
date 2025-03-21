@@ -45,6 +45,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import ru.rutoken.tech.R
@@ -66,6 +67,7 @@ import ru.rutoken.tech.ui.theme.RutokenTechTheme
 import ru.rutoken.tech.ui.utils.PreviewDark
 import ru.rutoken.tech.ui.utils.PreviewLight
 import ru.rutoken.tech.ui.utils.figmaPadding
+import ru.rutoken.tech.ui.utils.startShareChooser
 import ru.rutoken.tech.utils.toDateString
 import java.time.LocalDate
 
@@ -75,6 +77,7 @@ fun DocumentsScreen(
     onNavigateBack: () -> Unit,
     isDocumentsToSignSelected: Boolean = true
 ) {
+    val context = LocalContext.current
     val documents by viewModel.documents.observeAsState(mapOf())
     val signedDocuments by viewModel.signedDocuments.observeAsState(mapOf())
     val documentsToSign by viewModel.documentsToSign.observeAsState(emptyList())
@@ -106,7 +109,7 @@ fun DocumentsScreen(
         onResetDocumentsClicked = viewModel::onResetDocumentsClicked,
         onDocumentClicked = onDocumentClicked,
         onSignedDocumentClicked = viewModel::onSignedDocumentClicked,
-        onShareClicked = viewModel::onShareClicked,
+        onShareClicked = { viewModel.onShareClicked(it, context::startShareChooser) },
         onSignatoriesClicked = viewModel::onSignatoriesClicked,
         onLongClickDocument = viewModel::onDocumentSelected,
         onResetSelectedDocumentsClicked = viewModel::onResetSelectedDocumentsClicked,

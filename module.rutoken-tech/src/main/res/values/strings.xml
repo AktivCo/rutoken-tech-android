@@ -126,6 +126,7 @@
     <string name="finish_documents_signing">Завершить</string>
     <string name="signing_operation_completed">Подписание завершено</string>
     <string name="navigate_to_documents">К документам</string>
+    <string name="shared_documents_zip_file_name">Подписанные документы %s.zip</string>
 
     <!--Related to documents preview-->
     <string name="documents_count">Документов: %d</string>

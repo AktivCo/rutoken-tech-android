@@ -16,6 +16,10 @@ import java.io.File
 
 private const val PROVIDER_AUTHORITY = "ru.rutoken.tech.fileprovider"
 
+/**
+ * This function calls the [android.app.Activity.startActivity] method under the hood and must be called from the
+ * Activity context in order not to cause AndroidRuntimeException.
+ */
 fun Context.startShareChooser(sharedFiles: List<File>) {
     val shareIntentBuilder = ShareCompat.IntentBuilder(this)
         .setType("*/*")

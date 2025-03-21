@@ -10,10 +10,13 @@ import androidx.room.Room
 import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.androidx.viewmodel.dsl.viewModelOf
+import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.bind
 import org.koin.dsl.module
 import ru.rutoken.pkcs11wrapper.main.Pkcs11Module
 import ru.rutoken.tech.database.Database
+import ru.rutoken.tech.helpers.AssetsHelper
+import ru.rutoken.tech.helpers.FilesHelper
 import ru.rutoken.tech.pkcs11.Pkcs11Launcher
 import ru.rutoken.tech.pkcs11.RtPkcs11Module
 import ru.rutoken.tech.repository.bank.BankUserRepository
@@ -51,6 +54,8 @@ val koinModule = module {
     single<ShiftSignedDocumentRepository> { ShiftSignedDocumentRepositoryImpl(get()) }
     single { TokenManager() }
     single { AppSessionHolder() }
+    singleOf(::AssetsHelper)
+    singleOf(::FilesHelper)
 
     viewModel { LoginViewModel(androidContext(), get(), get(), get(), get(), get()) }
     viewModel { CaTokenInfoViewModel(androidContext(), get()) }

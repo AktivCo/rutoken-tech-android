@@ -15,11 +15,15 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import org.bouncycastle.cert.X509CertificateHolder
 import ru.rutoken.pkcs11wrapper.constant.standard.Pkcs11UserType
 import ru.rutoken.pkcs11wrapper.datatype.Pkcs11TokenInfo
+import ru.rutoken.pkcs11wrapper.`object`.key.Pkcs11GostPrivateKeyObject
 import ru.rutoken.pkcs11wrapper.rutoken.main.RtPkcs11Session
 import ru.rutoken.pkcs11wrapper.rutoken.main.RtPkcs11Token
 import ru.rutoken.tech.R
+import ru.rutoken.tech.ca.LocalCA
+import ru.rutoken.tech.helpers.AssetsHelper
 import ru.rutoken.tech.pkcs11.findobjects.findGost256CertificateAndKeyContainers
 import ru.rutoken.tech.pkcs11.serialNumberTrimmed
 import ru.rutoken.tech.repository.shift.signeddocument.ShiftSignedDocumentRepository
@@ -28,12 +32,14 @@ import ru.rutoken.tech.session.DocumentsPreviewInfo
 import ru.rutoken.tech.session.ShiftUserLoginAppSession
 import ru.rutoken.tech.session.requireShiftUserLoginSession
 import ru.rutoken.tech.tokenmanager.TokenManager
+import ru.rutoken.tech.ui.shift.documents.Document
 import ru.rutoken.tech.ui.shift.documents.SignedDocumentsGroup
 import ru.rutoken.tech.ui.tokenconnector.TokenConnector
 import ru.rutoken.tech.ui.utils.DialogState
 import ru.rutoken.tech.ui.utils.ErrorDialogData
 import ru.rutoken.tech.ui.utils.callPkcs11Operation
 import ru.rutoken.tech.ui.utils.toErrorDialogData
+import ru.rutoken.tech.usecase.CmsOperations
 import ru.rutoken.tech.utils.BusinessRuleCase.IncorrectPin
 import ru.rutoken.tech.utils.BusinessRuleCase.PinLocked
 import ru.rutoken.tech.utils.BusinessRuleException
@@ -48,6 +54,7 @@ class DocumentsSignViewModel(
     private val tokenManager: TokenManager,
     private val sessionHolder: AppSessionHolder,
     private val applicationContext: Context,
+    private val assetsHelper: AssetsHelper,
 ) : ViewModel() {
     val tokenConnector = TokenConnector(viewModelScope)
 
@@ -124,8 +131,7 @@ class DocumentsSignViewModel(
                         val firstContainer = tokenContainers.getOrNull(0)
                         if (firstContainer != null) {
                             documentsToSign = session.signDocuments(
-                                documentsToSign,
-                                applicationContext = applicationContext,
+                                documents = documentsToSign,
                                 certificate = firstContainer.certificate,
                                 privateKey = firstContainer.keyPair.privateKey,
                             )
@@ -201,6 +207,25 @@ class DocumentsSignViewModel(
                     block(session)
                 }
             }
+        }
+    }
+
+    private suspend fun RtPkcs11Session.signDocuments(
+        documents: List<Document>,
+        certificate: X509CertificateHolder,
+        privateKey: Pkcs11GostPrivateKeyObject,
+    ): List<Document> {
+        return documents.map { document ->
+            document.copy(
+                signedCms = CmsOperations.signDetachedGost256Hardware(
+                    session = this@signDocuments,
+                    data = assetsHelper.loadAsset(document.assetName),
+                    existingCmsBytes = document.signedCms,
+                    privateKey = privateKey,
+                    certificate = certificate,
+                    additionalCertificates = listOf(X509CertificateHolder(LocalCA.caCertificate))
+                )
+            )
         }
     }
 }

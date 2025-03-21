@@ -25,7 +25,9 @@ fun RutokenTechTopAppBar(
     titleText: String,
     navigationIcon: @Composable () -> Unit,
     onNavigationIconClick: () -> Unit,
-    colors: TopAppBarColors = TopAppBarDefaults.mediumTopAppBarColors()
+    trailingIcon: (@Composable () -> Unit)? = null,
+    onTrailingIconClick: () -> Unit = {},
+    colors: TopAppBarColors = TopAppBarDefaults.mediumTopAppBarColors(),
 ) {
     TopAppBar(
         title = {
@@ -37,6 +39,11 @@ fun RutokenTechTopAppBar(
         },
         navigationIcon = {
             IconButton(onClick = onNavigationIconClick, modifier = Modifiers.appBarIconSize, content = navigationIcon)
+        },
+        actions = {
+            if (trailingIcon != null) {
+                IconButton(onClick = onTrailingIconClick, modifier = Modifiers.appBarIconSize, content = trailingIcon)
+            }
         },
         windowInsets = WindowInsets.systemBarsIgnoringVisibility.only(WindowInsetsSides.Top),
         colors = colors

@@ -10,12 +10,20 @@ import androidx.annotation.MainThread
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.launch
+import ru.rutoken.tech.helpers.FilesHelper
 import ru.rutoken.tech.session.AppSessionHolder
 import ru.rutoken.tech.session.DocumentsPreviewInfo
 import ru.rutoken.tech.session.ShiftUserLoginAppSession
 import ru.rutoken.tech.session.requireShiftUserLoginSession
+import ru.rutoken.tech.ui.shift.utils.shareSignedDocumentsZip
+import java.io.File
 
-class DocumentsPreviewViewModel(private val sessionHolder: AppSessionHolder) : ViewModel() {
+class DocumentsPreviewViewModel(
+    private val sessionHolder: AppSessionHolder,
+    private val filesHelper: FilesHelper,
+) : ViewModel() {
     // ShiftUserLoginAppSession instance MUST exist by the time this ViewModel is instantiated
     private val shiftUserLoginSession: ShiftUserLoginAppSession
         get() = sessionHolder.requireShiftUserLoginSession()
@@ -23,10 +31,10 @@ class DocumentsPreviewViewModel(private val sessionHolder: AppSessionHolder) : V
     private val _documents = MutableLiveData(shiftUserLoginSession.chosenDocuments)
     val documents: LiveData<DocumentsPreviewInfo> get() = _documents
 
-    private val isDocumentsSignedBefore = isDocumentsSigned()
+    private val areDocumentsSignedBefore = checkDocumentsSignaturePresent()
 
-    private val _showSignButton = MutableLiveData(!isDocumentsSignedBefore)
-    val showSignButton: LiveData<Boolean> get() = _showSignButton
+    private val _areDocumentsSigned = MutableLiveData(areDocumentsSignedBefore)
+    val areDocumentsSigned: LiveData<Boolean> get() = _areDocumentsSigned
 
     private val _showFinishSigningDialog = MutableLiveData(false)
     val showFinishSigningDialog: LiveData<Boolean> get() = _showFinishSigningDialog
@@ -34,8 +42,11 @@ class DocumentsPreviewViewModel(private val sessionHolder: AppSessionHolder) : V
     private val _navigateBack = MutableLiveData(false)
     val navigateBack: LiveData<Boolean> get() = _navigateBack
 
-    fun onDocumentShareClick() {
-        // TODO: Not yet implemented
+    @MainThread
+    fun onShareClicked(onSharedFilesReady: (List<File>) -> Unit) {
+        viewModelScope.launch {
+            shareSignedDocumentsZip(filesHelper, shiftUserLoginSession.chosenDocuments.documents, onSharedFilesReady)
+        }
     }
 
     @MainThread
@@ -46,11 +57,12 @@ class DocumentsPreviewViewModel(private val sessionHolder: AppSessionHolder) : V
 
     @MainThread
     fun updateSignState() {
-        val isDocumentsSignedNow = isDocumentsSigned()
+        val areDocumentsSignedNow = checkDocumentsSignaturePresent()
 
-        _showSignButton.value = !isDocumentsSignedBefore && !isDocumentsSignedNow
-        _showFinishSigningDialog.value = !isDocumentsSignedBefore && isDocumentsSignedNow
+        _areDocumentsSigned.value = areDocumentsSignedBefore || areDocumentsSignedNow
+        _showFinishSigningDialog.value = !areDocumentsSignedBefore && areDocumentsSignedNow
     }
 
-    private fun isDocumentsSigned() = shiftUserLoginSession.chosenDocuments.documents.any { it.signedCms != null }
+    private fun checkDocumentsSignaturePresent() =
+        shiftUserLoginSession.chosenDocuments.documents.any { it.signedCms != null }
 }

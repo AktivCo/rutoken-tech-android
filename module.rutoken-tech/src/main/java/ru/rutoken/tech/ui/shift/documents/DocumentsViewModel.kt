@@ -14,17 +14,21 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import ru.rutoken.tech.helpers.FilesHelper
 import ru.rutoken.tech.repository.shift.signeddocument.ShiftSignedDocumentRepository
 import ru.rutoken.tech.session.AppSessionHolder
 import ru.rutoken.tech.session.DocumentsPreviewInfo
 import ru.rutoken.tech.session.ShiftUserLoginAppSession
 import ru.rutoken.tech.session.requireShiftUserLoginSession
+import ru.rutoken.tech.ui.shift.utils.shareSignedDocumentsZip
+import java.io.File
 import java.time.LocalDate
 
 class DocumentsViewModel(
     private val sessionHolder: AppSessionHolder,
     private val shiftSignedDocumentRepository: ShiftSignedDocumentRepository,
-    private val onNavigateToDocumentsPreview: () -> Unit
+    private val filesHelper: FilesHelper,
+    private val onNavigateToDocumentsPreview: () -> Unit,
 ) : ViewModel() {
     // ShiftUserLoginAppSession instance MUST exist by the time this ViewModel is instantiated
     private val shiftUserLoginSession: ShiftUserLoginAppSession
@@ -44,8 +48,10 @@ class DocumentsViewModel(
     val documentsGroupSignatories: LiveData<List<String>> get() = _documentsGroupSignatories
 
     @MainThread
-    fun onShareClicked(documents: SignedDocumentsGroup) {
-        //TODO
+    fun onShareClicked(documents: SignedDocumentsGroup, onSharedFilesReady: (List<File>) -> Unit) {
+        viewModelScope.launch {
+            shareSignedDocumentsZip(filesHelper, documents.documents, onSharedFilesReady)
+        }
     }
 
     @MainThread

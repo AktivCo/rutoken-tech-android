@@ -26,6 +26,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
@@ -43,17 +44,21 @@ import ru.rutoken.tech.ui.components.RutokenTechLargeTopAppBar
 import ru.rutoken.tech.ui.components.RutokenTechTopAppBar
 import ru.rutoken.tech.ui.components.SecondaryButtonBox
 import ru.rutoken.tech.ui.shift.documents.Document
+import ru.rutoken.tech.ui.utils.startShareChooser
 
 @Composable
 fun DocumentsPreviewScreen(
     onNavigateBack: () -> Unit,
     viewModel: DocumentsPreviewViewModel = koinViewModel(),
-    onSignClick: () -> Unit
+    onSignClick: () -> Unit,
 ) {
     val documentsInfo by viewModel.documents.observeAsState(DocumentsPreviewInfo())
-    val showSignButton by viewModel.showSignButton.observeAsState(false)
+    val areDocumentsSigned by viewModel.areDocumentsSigned.observeAsState(false)
     val showFinishSigningDialog by viewModel.showFinishSigningDialog.observeAsState(false)
     val navigateBack by viewModel.navigateBack.observeAsState(false)
+
+    val context = LocalContext.current
+    val onShareClick = { viewModel.onShareClicked(context::startShareChooser) }
 
     LifecycleEventEffect(Lifecycle.Event.ON_RESUME) { viewModel.updateSignState() }
 
@@ -61,9 +66,10 @@ fun DocumentsPreviewScreen(
         DocumentsPreviewScreen(
             documentsInfo = documentsInfo.documents,
             startPreviewIndex = documentsInfo.startDocument,
-            showSignButton = showSignButton,
+            areDocumentsSigned = areDocumentsSigned,
             onNavigateBack = onNavigateBack,
-            onSignClick = onSignClick
+            onSignClick = onSignClick,
+            onShareClick = onShareClick,
         )
     }
 
@@ -71,9 +77,9 @@ fun DocumentsPreviewScreen(
         OptionSelectionDialog(
             text = stringResource(R.string.signing_operation_completed),
             firstOptionText = stringResource(R.string.share_document),
-            onFirstOptionClick = viewModel::onDocumentShareClick,
+            onFirstOptionClick = onShareClick,
             secondOptionText = stringResource(R.string.navigate_to_documents),
-            onSecondOptionClick = viewModel::hideFinishSigningDialog
+            onSecondOptionClick = viewModel::hideFinishSigningDialog,
         )
     }
 
@@ -86,24 +92,27 @@ fun DocumentsPreviewScreen(
 private fun DocumentsPreviewScreen(
     documentsInfo: List<Document>,
     startPreviewIndex: Int,
-    showSignButton: Boolean,
+    areDocumentsSigned: Boolean,
     onNavigateBack: () -> Unit,
-    onSignClick: () -> Unit
+    onSignClick: () -> Unit,
+    onShareClick: () -> Unit,
 ) {
     if (documentsInfo.size == 1) {
         SingleDocumentPreviewScreen(
             document = documentsInfo.first(),
-            showSignButton = showSignButton,
+            areDocumentsSigned = areDocumentsSigned,
             onNavigateBack = onNavigateBack,
-            onSignClick = onSignClick
+            onSignClick = onSignClick,
+            onShareClick = onShareClick,
         )
     } else {
         MultipleDocumentsPreviewScreen(
             documents = documentsInfo,
             startPreviewIndex = startPreviewIndex,
-            showSignButton = showSignButton,
+            areDocumentsSigned = areDocumentsSigned,
             onNavigateBack = onNavigateBack,
-            onSignClick = onSignClick
+            onSignClick = onSignClick,
+            onShareClick = onShareClick,
         )
     }
 }
@@ -111,9 +120,10 @@ private fun DocumentsPreviewScreen(
 @Composable
 private fun SingleDocumentPreviewScreen(
     document: Document,
-    showSignButton: Boolean,
+    areDocumentsSigned: Boolean,
     onNavigateBack: () -> Unit,
-    onSignClick: () -> Unit
+    onSignClick: () -> Unit,
+    onShareClick: () -> Unit,
 ) {
     Scaffold(
         topBar = {
@@ -121,6 +131,16 @@ private fun SingleDocumentPreviewScreen(
                 titleText = document.title,
                 navigationIcon = { AppIcons.Back() },
                 onNavigationIconClick = onNavigateBack,
+                trailingIcon = if (areDocumentsSigned) {
+                    { AppIcons.Share() }
+                } else {
+                    null
+                },
+                onTrailingIconClick = if (areDocumentsSigned) {
+                    onShareClick
+                } else {
+                    { /* Nothing to do */ }
+                },
                 colors = largeTopAppBarColors(
                     containerColor = MaterialTheme.colorScheme.surfaceContainer,
                     navigationIconContentColor = MaterialTheme.colorScheme.onSurfaceVariant
@@ -141,7 +161,7 @@ private fun SingleDocumentPreviewScreen(
                     .weight(1f),
             )
 
-            if (showSignButton) {
+            if (!areDocumentsSigned) {
                 SecondaryButtonBox(
                     modifier = Modifier
                         .background(MaterialTheme.colorScheme.surface)
@@ -159,15 +179,26 @@ private fun SingleDocumentPreviewScreen(
 private fun MultipleDocumentsPreviewScreen(
     documents: List<Document>,
     startPreviewIndex: Int,
-    showSignButton: Boolean,
+    areDocumentsSigned: Boolean,
     onNavigateBack: () -> Unit,
-    onSignClick: () -> Unit
+    onSignClick: () -> Unit,
+    onShareClick: () -> Unit,
 ) {
     Scaffold(topBar = {
         RutokenTechTopAppBar(
             titleText = stringResource(R.string.documents_count, documents.size),
             navigationIcon = { AppIcons.Back() },
             onNavigationIconClick = onNavigateBack,
+            trailingIcon = if (areDocumentsSigned) {
+                { AppIcons.Share() }
+            } else {
+                null
+            },
+            onTrailingIconClick = if (areDocumentsSigned) {
+                onShareClick
+            } else {
+                { /* Nothing to do */ }
+            },
             colors = largeTopAppBarColors(
                 containerColor = MaterialTheme.colorScheme.surfaceContainer,
                 navigationIconContentColor = MaterialTheme.colorScheme.onSurfaceVariant
@@ -219,7 +250,7 @@ private fun MultipleDocumentsPreviewScreen(
                 )
             }
 
-            if (showSignButton) {
+            if (!areDocumentsSigned) {
                 SecondaryButtonBox(
                     modifier = Modifier
                         .background(MaterialTheme.colorScheme.surface)

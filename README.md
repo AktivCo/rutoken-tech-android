@@ -5,13 +5,16 @@
 Rutoken Technologies is an application for demonstrating the capabilities of the Rutoken ECP line on mobile devices
 based on Android 7 and newer.
 
-The application contains two sections:
+The application contains three sections:
 
 * Certification Authority — designed to demonstrate the capabilities of the test certification authority. Here you can
   generate a key pair and issue a test certificate on a mobile device. Created objects can be used in the Bank section.
 * Bank — designed to demonstrate the scenarios of work with Rutoken devices in bank apps. Here you can sign a test
   payment document, check the validity of the electronic signature of incoming documents, encrypt and decrypt a bank
   document.
+* Mobile teams — designed to demonstrate the scenario of a team with multiple Rutoken devices working on the same mobile
+  device. Here you can sign documents with one or multiple electronic signatures, check who has signed the document and
+  share the signed document with others.
 
 The project consists of two Gradle modules:
 
@@ -21,7 +24,7 @@ The project consists of two Gradle modules:
 
 # Requirements
 
-Rutoken Technologies application should be built using Android SDK Platform 34 or newer and launched on devices with
+Rutoken Technologies application should be built using Android SDK Platform 35 or newer and launched on devices with
 Android 7 (API level 24) and newer.
 
 External dependencies required to build the application can be found in
@@ -31,9 +34,9 @@ the [Rutoken SDK](https://www.rutoken.ru/developers/sdk/). Required libraries:
 
 # Preliminary actions
 
-To work in the Bank section, you must have a key pair and a certificate on your Rutoken ECP device. If your device
-doesn't contain a key pair and a certificate, you can create them in the Certification authority section for testing
-purposes. Or follow these steps on your desktop computer:
+To work in the Bank and Mobile teams sections, you must have a key pair and a certificate on your Rutoken ECP device. If
+your device doesn't contain a key pair and a certificate, you can create them in the Certification authority section for
+testing purposes. Or follow these steps on your desktop computer:
 
 1. Download and install [Rutoken Plugin](https://www.rutoken.ru/products/all/rutoken-plugin/) on your computer.
 2. Restart the browser to finish plugin installation.
@@ -63,6 +66,9 @@ purposes. Or follow these steps on your desktop computer:
 
 2. You can build the project in the following ways:
 
+    * Using Android Studio. The build instructions can be found in the
+      article [Build and run your app](https://developer.android.com/studio/run) in Google's Android documentation.
+
     * Using Gradle from terminal. In this case, you should run the command in the terminal:
 
    ```shell
@@ -72,9 +78,6 @@ purposes. Or follow these steps on your desktop computer:
    After that, the apk files of the application can be found in the
    directory `module.rutoken-tech/build/outputs/apk/<build_variant>`, where `<build_variant>` is the build variant
    (debug or release).
-
-    * Using Android Studio. The build instructions can be found in the
-      article [Build and run your app](https://developer.android.com/studio/run) in Google's Android documentation.
 
 # Restrictions
 

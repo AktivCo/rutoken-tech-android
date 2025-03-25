@@ -7,6 +7,8 @@
 package ru.rutoken.tech.ui.bank.payment
 
 import androidx.activity.compose.BackHandler
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -65,26 +67,27 @@ fun PaymentScreen(
     onNavigateBack: (Boolean) -> Unit,
     onNavigateToTokenAuth: () -> Unit
 ) {
+    val context = LocalContext.current
     val payment by viewModel.payment.observeAsState()
     val operationCompleted by viewModel.operationCompleted.observeAsState(false)
-    val sharedFiles by viewModel.sharedFiles.observeAsState(emptyList())
     val navigateToTokenAuth by viewModel.navigateToTokenAuth.observeAsState(false)
+
+    val createDocumentLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.CreateDocument("application/*"),
+        onResult = viewModel::onCreateDocumentResult
+    )
 
     payment?.let {
         PaymentScreen(
             payment = it,
             operationCompleted = operationCompleted,
             onNavigateBack = { onNavigateBack(it.isIncoming()) },
-            onSharePaymentClicked = viewModel::onSharePaymentClicked,
+            onDownloadPaymentClicked = { createDocumentLauncher.launch(viewModel.getSuggestedFileName()) },
+            onSharePaymentClicked = { viewModel.onSharePaymentClicked(context::startShareChooser) },
             onUserActionButtonClicked = viewModel::onUserActionButtonClicked
         )
 
         BackHandler { onNavigateBack(it.isIncoming()) }
-    }
-
-    if (sharedFiles.isNotEmpty()) {
-        LocalContext.current.startShareChooser(sharedFiles)
-        viewModel.resetOnSharePaymentClicked()
     }
 
     if (navigateToTokenAuth) {
@@ -103,6 +106,7 @@ private fun PaymentScreen(
     payment: Payment,
     operationCompleted: Boolean,
     onNavigateBack: () -> Unit,
+    onDownloadPaymentClicked: () -> Unit,
     onSharePaymentClicked: () -> Unit,
     onUserActionButtonClicked: () -> Unit
 ) {
@@ -113,6 +117,10 @@ private fun PaymentScreen(
                 navigationIcon = { AppIcons.Back() },
                 onNavigationIconClick = onNavigateBack,
                 actions = listOf(
+                    RutokenTechTopAppBarAction(
+                        actionContent = { AppIcons.Download() },
+                        onActionClick = onDownloadPaymentClicked
+                    ),
                     RutokenTechTopAppBarAction(
                         actionContent = { AppIcons.Share() },
                         onActionClick = onSharePaymentClicked
@@ -283,6 +291,7 @@ private fun ActivePaymentScreenPreview() {
             payment = payment,
             operationCompleted = false,
             onNavigateBack = {},
+            onDownloadPaymentClicked = {},
             onSharePaymentClicked = {},
             onUserActionButtonClicked = {}
         )
@@ -306,6 +315,7 @@ private fun ArchivedPaymentScreenPreview() {
             payment = payment,
             operationCompleted = true,
             onNavigateBack = {},
+            onDownloadPaymentClicked = {},
             onSharePaymentClicked = {},
             onUserActionButtonClicked = {}
         )

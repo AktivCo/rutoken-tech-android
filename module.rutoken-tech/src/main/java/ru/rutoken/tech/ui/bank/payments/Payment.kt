@@ -44,6 +44,7 @@ data class Payment(
     private val fileName = "$title.pdf"
     private val signedFileName = "$title.sig"
     private val encryptedFileName = "$title.enc"
+    val zipName = "$title.zip"
 
     @Composable
     fun Icon(isArchived: Boolean) = when (userActionType) {

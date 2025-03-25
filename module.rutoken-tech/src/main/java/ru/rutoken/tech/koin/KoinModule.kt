@@ -70,5 +70,5 @@ val koinModule = module {
     viewModelOf(::DocumentsPreviewViewModel)
     viewModelOf(::DocumentsSignViewModel)
     viewModel { PaymentsViewModel(get()) }
-    viewModel { PaymentViewModel(get(), get(), get(), get()) }
+    viewModelOf(::PaymentViewModel)
 }

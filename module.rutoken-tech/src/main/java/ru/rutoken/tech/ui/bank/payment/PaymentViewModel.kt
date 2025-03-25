@@ -7,6 +7,7 @@
 package ru.rutoken.tech.ui.bank.payment
 
 import android.content.Context
+import android.net.Uri
 import androidx.annotation.MainThread
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -17,6 +18,7 @@ import kotlinx.coroutines.launch
 import ru.rutoken.pkcs11wrapper.main.Pkcs11Session
 import ru.rutoken.pkcs11wrapper.rutoken.main.RtPkcs11Session
 import ru.rutoken.tech.R
+import ru.rutoken.tech.helpers.FilesHelper
 import ru.rutoken.tech.session.AppSessionHolder
 import ru.rutoken.tech.session.BankUserLoginAppSession
 import ru.rutoken.tech.session.requireBankUserLoginSession
@@ -34,6 +36,7 @@ import ru.rutoken.tech.usecase.CmsOperationProvider
 import ru.rutoken.tech.utils.VerifyCmsResult
 import ru.rutoken.tech.utils.logd
 import ru.rutoken.tech.utils.loge
+import ru.rutoken.tech.utils.logw
 import java.io.File
 import kotlin.coroutines.cancellation.CancellationException
 
@@ -48,6 +51,7 @@ class PaymentViewModel(
     private val applicationContext: Context,
     private val sessionHolder: AppSessionHolder,
     private val tokenManager: TokenManager,
+    private val filesHelper: FilesHelper,
     private val paymentTitle: String
 ) : ViewModel() {
     val connectTokenDelegate = ConnectTokenDelegate(viewModelScope)
@@ -61,9 +65,6 @@ class PaymentViewModel(
 
     private val _operationCompleted = MutableLiveData(false)
     val operationCompleted: LiveData<Boolean> get() = _operationCompleted
-
-    private val _sharedFiles = MutableLiveData<List<File>>()
-    val sharedFiles: LiveData<List<File>> = _sharedFiles
 
     private val _navigateToTokenAuth = MutableLiveData<Boolean>()
     val navigateToTokenAuth: LiveData<Boolean> = _navigateToTokenAuth
@@ -107,16 +108,41 @@ class PaymentViewModel(
         _operationCompletedDialogState.value = DialogState(showDialog = false)
     }
 
-    @MainThread
-    fun onSharePaymentClicked() {
-        viewModelScope.launch(Dispatchers.IO) {
-            _sharedFiles.postValue(_payment.value!!.getSharedData(applicationContext))
+    fun getSuggestedFileName(): String {
+        return with(_payment.value!!) {
+            val sharedData = getSharedData(applicationContext)
+            if (sharedData.size == 1) {
+                sharedData.first().name
+            } else {
+                zipName
+            }
         }
     }
 
     @MainThread
-    fun resetOnSharePaymentClicked() {
-        _sharedFiles.value = emptyList()
+    fun onCreateDocumentResult(uri: Uri?) {
+        if (uri == null) {
+            logw { "The file could not be saved to the internal storage. The passed URI is null." }
+        } else {
+            viewModelScope.launch(Dispatchers.IO) {
+                with(_payment.value!!) {
+                    val sharedData = getSharedData(applicationContext)
+                    val downloadedFile = if (sharedData.size == 1) {
+                        sharedData.first()
+                    } else {
+                        filesHelper.createZipFileInCache(sharedData, zipName)
+                    }
+                    filesHelper.writeFileByUri(downloadedFile, uri)
+                }
+            }
+        }
+    }
+
+    @MainThread
+    fun onSharePaymentClicked(onSharedFilesReady: (List<File>) -> Unit) {
+        viewModelScope.launch {
+            onSharedFilesReady(_payment.value!!.getSharedData(applicationContext))
+        }
     }
 
     @MainThread

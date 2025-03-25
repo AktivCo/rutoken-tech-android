@@ -21,14 +21,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import ru.rutoken.tech.R
 import ru.rutoken.tech.ui.components.MenuScreenTopAppBar
 import ru.rutoken.tech.ui.components.SecondaryButton
 import ru.rutoken.tech.ui.theme.RutokenTechTheme
 import ru.rutoken.tech.ui.theme.bodyMediumOnSurfaceVariant
-import ru.rutoken.tech.ui.utils.PreviewDark
-import ru.rutoken.tech.ui.utils.PreviewLight
 import ru.rutoken.tech.ui.utils.figmaPadding
 
 @Composable
@@ -75,8 +74,7 @@ fun CaStartScreen(onClickConnectToken: () -> Unit, openDrawer: () -> Unit) {
     }
 }
 
-@PreviewLight
-@PreviewDark
+@PreviewLightDark
 @Composable
 private fun CaStartScreenPreview() {
     RutokenTechTheme {

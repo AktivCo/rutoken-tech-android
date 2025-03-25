@@ -6,32 +6,37 @@
 
 package ru.rutoken.tech.ui.shift.utils
 
+import android.net.Uri
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import ru.rutoken.tech.R
 import ru.rutoken.tech.helpers.FilesHelper
 import ru.rutoken.tech.ui.shift.documents.Document
-import ru.rutoken.tech.utils.toDateString
 import java.io.File
-import java.time.Instant
-import java.util.Date
 
 suspend fun shareSignedDocumentsZip(
     filesHelper: FilesHelper,
     documents: List<Document>,
+    zipName: String,
     onSharedFilesReady: (List<File>) -> Unit,
 ) = withContext(Dispatchers.IO) {
-    val documentsToShare = documents.map { filesHelper.copyAssetToCache(it.assetName, it.fileName) }
-    val signatureFilesToShare =
-        documents.map { filesHelper.createSignatureFile(it.signatureFileName, it.base64SignatureBytes!!) }
-    val currentDate = Date.from(Instant.now()).toDateString()
-    onSharedFilesReady(
-        listOf(
-            filesHelper.createZipFile(
-                documentsToShare + signatureFilesToShare,
-                R.string.shared_documents_zip_file_name,
-                currentDate
-            )
-        )
-    )
+    val signedDocuments = makeSignedDocumentsList(filesHelper, documents)
+    onSharedFilesReady(listOf(filesHelper.createZipFileInCache(signedDocuments, zipName)))
 }
+
+suspend fun saveSignedDocumentsZip(
+    filesHelper: FilesHelper,
+    documents: List<Document>,
+    zipName: String,
+    uri: Uri,
+) = withContext(Dispatchers.IO) {
+    val signedDocuments = makeSignedDocumentsList(filesHelper, documents)
+    filesHelper.writeFileByUri(filesHelper.createZipFileInCache(signedDocuments, zipName), uri)
+}
+
+private suspend fun makeSignedDocumentsList(filesHelper: FilesHelper, documents: List<Document>): List<File> =
+    buildList {
+        documents.forEach {
+            add(filesHelper.copyAssetToCache(it.assetName, it.fileName))
+            add(filesHelper.createSignatureFile(it.signatureFileName, it.base64SignatureBytes!!))
+        }
+    }

@@ -9,17 +9,20 @@ package ru.rutoken.tech.ui.components.alertdialog
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.width
-import androidx.compose.material3.*
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import ru.rutoken.tech.R
 import ru.rutoken.tech.ui.components.AppIcons
 import ru.rutoken.tech.ui.theme.RutokenTechTheme
-import ru.rutoken.tech.ui.utils.PreviewDark
-import ru.rutoken.tech.ui.utils.PreviewLight
 
 @Composable
 fun AlertDialogWithIcon(
@@ -43,8 +46,7 @@ fun AlertDialogWithIcon(
     )
 }
 
-@PreviewLight
-@PreviewDark
+@PreviewLightDark
 @Composable
 private fun AlertDialogWithIconAndTextPreview() {
     RutokenTechTheme {
@@ -59,8 +61,7 @@ private fun AlertDialogWithIconAndTextPreview() {
     }
 }
 
-@PreviewLight
-@PreviewDark
+@PreviewLightDark
 @Composable
 private fun AlertDialogWithIconPreview() {
     RutokenTechTheme {

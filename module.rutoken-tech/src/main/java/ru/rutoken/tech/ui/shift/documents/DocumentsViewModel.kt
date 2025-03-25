@@ -6,6 +6,8 @@
 
 package ru.rutoken.tech.ui.shift.documents
 
+import android.content.Context
+import android.net.Uri
 import androidx.annotation.MainThread
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -14,25 +16,34 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import ru.rutoken.tech.R
 import ru.rutoken.tech.helpers.FilesHelper
 import ru.rutoken.tech.repository.shift.signeddocument.ShiftSignedDocumentRepository
 import ru.rutoken.tech.session.AppSessionHolder
 import ru.rutoken.tech.session.DocumentsPreviewInfo
 import ru.rutoken.tech.session.ShiftUserLoginAppSession
 import ru.rutoken.tech.session.requireShiftUserLoginSession
-import ru.rutoken.tech.ui.shift.utils.shareSignedDocumentsZip
+import ru.rutoken.tech.ui.vmdelegate.SaveFileDelegate
+import ru.rutoken.tech.ui.vmdelegate.ShareFilesDelegate
+import ru.rutoken.tech.utils.toDateString
 import java.io.File
+import java.time.Instant
 import java.time.LocalDate
+import java.util.Date
 
 class DocumentsViewModel(
+    private val appContext: Context,
     private val sessionHolder: AppSessionHolder,
     private val shiftSignedDocumentRepository: ShiftSignedDocumentRepository,
-    private val filesHelper: FilesHelper,
+    filesHelper: FilesHelper,
     private val onNavigateToDocumentsPreview: () -> Unit,
 ) : ViewModel() {
     // ShiftUserLoginAppSession instance MUST exist by the time this ViewModel is instantiated
     private val shiftUserLoginSession: ShiftUserLoginAppSession
         get() = sessionHolder.requireShiftUserLoginSession()
+
+    private val saveFileDelegate = SaveFileDelegate(viewModelScope, filesHelper)
+    private val shareFilesDelegate = ShareFilesDelegate(viewModelScope, filesHelper)
 
     private val _documents = MutableLiveData<Map<LocalDate, List<Document>>>()
     val documents: LiveData<Map<LocalDate, List<Document>>> get() = _documents
@@ -47,11 +58,26 @@ class DocumentsViewModel(
     private val _documentsGroupSignatories = MutableLiveData(emptyList<String>())
     val documentsGroupSignatories: LiveData<List<String>> get() = _documentsGroupSignatories
 
+    private var downloadedDocuments: List<Document>? = null
+
+    private val _shouldLaunchFileProvider = MutableLiveData(false)
+    val shouldLaunchFileProvider: LiveData<Boolean> get() = _shouldLaunchFileProvider
+
+    fun onShareClicked(documents: SignedDocumentsGroup, onSharedFilesReady: (List<File>) -> Unit) =
+        shareFilesDelegate.shareSignedDocumentsZip(documents.documents, getSharedZipName(), onSharedFilesReady)
+
     @MainThread
-    fun onShareClicked(documents: SignedDocumentsGroup, onSharedFilesReady: (List<File>) -> Unit) {
-        viewModelScope.launch {
-            shareSignedDocumentsZip(filesHelper, documents.documents, onSharedFilesReady)
-        }
+    fun setDocumentsToDownload(documents: SignedDocumentsGroup) {
+        downloadedDocuments = documents.documents
+        _shouldLaunchFileProvider.value = true
+    }
+
+    fun saveDocumentsByUriAsZip(uri: Uri?) =
+        saveFileDelegate.saveDocumentsByUriAsZip(uri, getSharedZipName(), downloadedDocuments!!)
+
+    @MainThread
+    fun resetShouldLaunchFileProviderState() {
+        _shouldLaunchFileProvider.value = false
     }
 
     @MainThread
@@ -118,4 +144,7 @@ class DocumentsViewModel(
                 .let { _signedDocuments.postValue(it) }
         }
     }
+
+    fun getSharedZipName(): String =
+        appContext.getString(R.string.shared_documents_zip_file_name, Date.from(Instant.now()).toDateString())
 }

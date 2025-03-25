@@ -16,11 +16,10 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import ru.rutoken.tech.R
 import ru.rutoken.tech.ui.theme.RutokenTechTheme
-import ru.rutoken.tech.ui.utils.PreviewDark
-import ru.rutoken.tech.ui.utils.PreviewLight
 
 @Composable
 fun ErrorAlertDialog(
@@ -42,8 +41,7 @@ fun ErrorAlertDialog(
     )
 }
 
-@PreviewLight
-@PreviewDark
+@PreviewLightDark
 @Composable
 private fun ErrorAlertDialogPreview() {
     RutokenTechTheme {

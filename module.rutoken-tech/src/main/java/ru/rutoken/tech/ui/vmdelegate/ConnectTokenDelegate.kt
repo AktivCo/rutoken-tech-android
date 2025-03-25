@@ -4,7 +4,7 @@
  * All Rights Reserved.
  */
 
-package ru.rutoken.tech.ui.tokenconnector
+package ru.rutoken.tech.ui.vmdelegate
 
 import androidx.annotation.MainThread
 import androidx.lifecycle.LiveData
@@ -20,7 +20,7 @@ import ru.rutoken.tech.utils.BusinessRuleCase
 import ru.rutoken.tech.utils.BusinessRuleException
 import ru.rutoken.tech.utils.SingleThreadCoroutineDispatcherWrapper
 
-class TokenConnector(private val parentCoroutineScope: CoroutineScope) {
+class ConnectTokenDelegate(override val delegateScope: CoroutineScope) : ViewModelDelegate {
     private var dispatcher = SingleThreadCoroutineDispatcherWrapper()
 
     private val _showConnectTokenDialog = MutableLiveData<Boolean>()
@@ -28,7 +28,7 @@ class TokenConnector(private val parentCoroutineScope: CoroutineScope) {
 
     @MainThread
     fun onDismissConnectTokenDialog() {
-        parentCoroutineScope.launch {
+        delegateScope.launch {
             dispatcher.closeAndWaitForTerminating()
             dispatcher = SingleThreadCoroutineDispatcherWrapper()
             _showConnectTokenDialog.value = false

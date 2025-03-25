@@ -30,6 +30,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
 import ru.rutoken.tech.R
@@ -37,8 +38,6 @@ import ru.rutoken.tech.ui.components.BottomSheetTitle
 import ru.rutoken.tech.ui.components.NavigationBarSpacer
 import ru.rutoken.tech.ui.components.PrimaryButtonBox
 import ru.rutoken.tech.ui.theme.RutokenTechTheme
-import ru.rutoken.tech.ui.utils.PreviewDark
-import ru.rutoken.tech.ui.utils.PreviewLight
 import ru.rutoken.tech.ui.utils.bottomSheetWindowInsets
 import ru.rutoken.tech.ui.utils.expandedSheetState
 import ru.rutoken.tech.ui.utils.getHideKeyboardAction
@@ -112,8 +111,7 @@ fun EnterPinBottomSheet(
     }
 }
 
-@PreviewLight
-@PreviewDark
+@PreviewLightDark
 @Composable
 private fun EnterPinBottomSheetSuccess() {
     RutokenTechTheme {
@@ -131,8 +129,7 @@ private fun EnterPinBottomSheetSuccess() {
     }
 }
 
-@PreviewLight
-@PreviewDark
+@PreviewLightDark
 @Composable
 private fun EnterPinBottomSheetError() {
     RutokenTechTheme {

@@ -8,8 +8,14 @@ package ru.rutoken.tech.ui.tokenauth
 
 import androidx.compose.material3.SheetState
 import androidx.compose.material3.rememberModalBottomSheetState
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.fragment.app.FragmentActivity
@@ -108,10 +114,10 @@ private fun BiometryErrorAlertDialog(viewModel: EnterPinViewModel) {
 
 @Composable
 private fun ConnectTokenDialog(viewModel: LoginViewModel) {
-    val showDialog by viewModel.tokenConnector.showConnectTokenDialog.observeAsState(false)
+    val showDialog by viewModel.connectTokenDelegate.showConnectTokenDialog.observeAsState(false)
 
     if (showDialog) {
-        ConnectTokenDialog(onDismissRequest = { viewModel.tokenConnector.onDismissConnectTokenDialog() })
+        ConnectTokenDialog(onDismissRequest = { viewModel.connectTokenDelegate.onDismissConnectTokenDialog() })
     }
 }
 

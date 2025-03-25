@@ -34,11 +34,11 @@ import ru.rutoken.tech.session.requireShiftUserLoginSession
 import ru.rutoken.tech.tokenmanager.TokenManager
 import ru.rutoken.tech.ui.shift.documents.Document
 import ru.rutoken.tech.ui.shift.documents.SignedDocumentsGroup
-import ru.rutoken.tech.ui.tokenconnector.TokenConnector
 import ru.rutoken.tech.ui.utils.DialogState
 import ru.rutoken.tech.ui.utils.ErrorDialogData
 import ru.rutoken.tech.ui.utils.callPkcs11Operation
 import ru.rutoken.tech.ui.utils.toErrorDialogData
+import ru.rutoken.tech.ui.vmdelegate.ConnectTokenDelegate
 import ru.rutoken.tech.usecase.CmsOperations
 import ru.rutoken.tech.utils.BusinessRuleCase.IncorrectPin
 import ru.rutoken.tech.utils.BusinessRuleCase.PinLocked
@@ -56,7 +56,7 @@ class DocumentsSignViewModel(
     private val applicationContext: Context,
     private val assetsHelper: AssetsHelper,
 ) : ViewModel() {
-    val tokenConnector = TokenConnector(viewModelScope)
+    val connectTokenDelegate = ConnectTokenDelegate(viewModelScope)
 
     private val shiftUserLoginSession: ShiftUserLoginAppSession
         get() = sessionHolder.requireShiftUserLoginSession()
@@ -124,7 +124,7 @@ class DocumentsSignViewModel(
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
                 try {
-                    val token = tokenConnector.findFirstToken(tokenManager).token
+                    val token = connectTokenDelegate.findFirstToken(tokenManager).token
 
                     withTokenSession(token, token.tokenInfo, tokenUserPin) { session ->
                         val tokenContainers = session.findGost256CertificateAndKeyContainers()

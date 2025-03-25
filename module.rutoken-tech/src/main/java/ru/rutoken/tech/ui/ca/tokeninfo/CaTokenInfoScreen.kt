@@ -40,17 +40,17 @@ import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import ru.rutoken.tech.R
 import ru.rutoken.tech.ui.components.AppIcons
 import ru.rutoken.tech.ui.components.MenuScreenTopAppBar
+import ru.rutoken.tech.ui.components.RutokenTechTopAppBarAction
 import ru.rutoken.tech.ui.components.TextGroup
 import ru.rutoken.tech.ui.components.TextGroupItem
 import ru.rutoken.tech.ui.components.alertdialog.SimpleAlertDialog
 import ru.rutoken.tech.ui.theme.RutokenTechTheme
 import ru.rutoken.tech.ui.utils.DialogState
-import ru.rutoken.tech.ui.utils.PreviewDark
-import ru.rutoken.tech.ui.utils.PreviewLight
 import ru.rutoken.tech.ui.utils.figmaPadding
 
 @Composable
@@ -93,8 +93,12 @@ private fun TokenInfoScreen(
             MenuScreenTopAppBar(
                 screenName = stringResource(id = R.string.tab_certificate_authority),
                 openDrawer = openDrawer,
-                trailingIcon = { AppIcons.Logout() },
-                onTrailingIconClick = onLogout
+                actions = listOf(
+                    RutokenTechTopAppBarAction(
+                        actionContent = { AppIcons.Logout() },
+                        onActionClick = onLogout
+                    )
+                ),
             )
         }
     ) { innerPadding ->
@@ -203,8 +207,7 @@ private fun NoKeyPairsOnTokenDialog(viewModel: CaTokenInfoViewModel) {
     }
 }
 
-@PreviewLight
-@PreviewDark
+@PreviewLightDark
 @Composable
 private fun UsbTokenInfoScreenPreview() {
     TokenInfoScreenPreview(
@@ -214,8 +217,7 @@ private fun UsbTokenInfoScreenPreview() {
     )
 }
 
-@PreviewLight
-@PreviewDark
+@PreviewLightDark
 @Composable
 private fun NfcTokenInfoScreenPreview() {
     TokenInfoScreenPreview(
@@ -225,8 +227,7 @@ private fun NfcTokenInfoScreenPreview() {
     )
 }
 
-@PreviewLight
-@PreviewDark
+@PreviewLightDark
 @Composable
 private fun UsbNfcTokenInfoScreenPreview() {
     TokenInfoScreenPreview(

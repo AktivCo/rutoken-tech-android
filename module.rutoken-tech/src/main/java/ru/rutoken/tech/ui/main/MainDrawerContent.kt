@@ -20,14 +20,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight.Companion.W500
+import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import ru.rutoken.tech.R
 import ru.rutoken.tech.ui.bank.BankDestination
 import ru.rutoken.tech.ui.components.AppIcons
 import ru.rutoken.tech.ui.components.NavDrawerItem
 import ru.rutoken.tech.ui.theme.RutokenTechTheme
-import ru.rutoken.tech.ui.utils.PreviewDark
-import ru.rutoken.tech.ui.utils.PreviewLight
 
 @Composable
 fun MainDrawerContent(
@@ -116,8 +115,7 @@ fun MainDrawerContent(
     }
 }
 
-@PreviewLight
-@PreviewDark
+@PreviewLightDark
 @Composable
 private fun MainDrawerContentPreview() {
     RutokenTechTheme {

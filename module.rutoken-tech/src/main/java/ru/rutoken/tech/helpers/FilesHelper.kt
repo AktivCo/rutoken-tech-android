@@ -7,7 +7,7 @@
 package ru.rutoken.tech.helpers
 
 import android.content.Context
-import androidx.annotation.StringRes
+import android.net.Uri
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.File
@@ -27,12 +27,8 @@ class FilesHelper(private val context: Context) {
             createCacheFile(fileName, signatureBytes)
         }
 
-    suspend fun createZipFile(
-        files: List<File>,
-        @StringRes zipNameResID: Int,
-        vararg zipNameFormatArgs: Any,
-    ): File = withContext(Dispatchers.IO) {
-        val outputZipFile = File(context.cacheDir, "/${context.getString(zipNameResID, *zipNameFormatArgs)}")
+    suspend fun createZipFileInCache(files: List<File>, zipName: String): File = withContext(Dispatchers.IO) {
+        val outputZipFile = File(context.cacheDir, "/$zipName")
         ZipOutputStream(FileOutputStream(outputZipFile)).use { zipOut ->
             files.forEach { file ->
                 FileInputStream(file).use { inputStream ->
@@ -45,6 +41,12 @@ class FilesHelper(private val context: Context) {
         }
 
         outputZipFile
+    }
+
+    suspend fun writeFileByUri(file: File, uri: Uri) = withContext(Dispatchers.IO) {
+        context.contentResolver.openOutputStream(uri)?.use {
+            it.write(file.readBytes())
+        }
     }
 
     private fun createCacheFile(fileName: String, content: ByteArray): File =

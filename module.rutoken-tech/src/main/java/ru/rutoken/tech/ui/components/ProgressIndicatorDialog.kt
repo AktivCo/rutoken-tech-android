@@ -20,11 +20,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import ru.rutoken.tech.ui.theme.RutokenTechTheme
-import ru.rutoken.tech.ui.utils.PreviewDark
-import ru.rutoken.tech.ui.utils.PreviewLight
 
 @Composable
 fun ProgressIndicatorDialog() {
@@ -58,8 +57,7 @@ fun ProgressIndicatorDialog() {
     }
 }
 
-@PreviewLight
-@PreviewDark
+@PreviewLightDark
 @Composable
 private fun ProgressIndicatorDialogPreview() {
     RutokenTechTheme {

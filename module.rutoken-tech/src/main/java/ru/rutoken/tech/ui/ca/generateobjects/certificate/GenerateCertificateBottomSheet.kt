@@ -41,6 +41,7 @@ import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
@@ -59,8 +60,6 @@ import ru.rutoken.tech.ui.components.alertdialog.SimpleAlertDialog
 import ru.rutoken.tech.ui.components.bottomSheetCornerShape
 import ru.rutoken.tech.ui.theme.RutokenTechTheme
 import ru.rutoken.tech.ui.utils.DialogState
-import ru.rutoken.tech.ui.utils.PreviewDark
-import ru.rutoken.tech.ui.utils.PreviewLight
 import ru.rutoken.tech.ui.utils.bottomSheetWindowInsets
 import ru.rutoken.tech.ui.utils.errorDialogData
 import ru.rutoken.tech.ui.utils.expandedSheetState
@@ -236,10 +235,10 @@ private fun CertificateAttributesList() {
 
 @Composable
 private fun ConnectTokenDialog(viewModel: GenerateCertificateViewModel) {
-    val showDialog by viewModel.tokenConnector.showConnectTokenDialog.observeAsState(false)
+    val showDialog by viewModel.connectTokenDelegate.showConnectTokenDialog.observeAsState(false)
 
     if (showDialog) {
-        ConnectTokenDialog(onDismissRequest = { viewModel.tokenConnector.onDismissConnectTokenDialog() })
+        ConnectTokenDialog(onDismissRequest = { viewModel.connectTokenDelegate.onDismissConnectTokenDialog() })
     }
 }
 
@@ -280,8 +279,7 @@ private fun ErrorDialog(viewModel: GenerateCertificateViewModel) {
     }
 }
 
-@PreviewLight
-@PreviewDark
+@PreviewLightDark
 @Composable
 private fun GenerateCertificateBottomSheetPreview() {
     RutokenTechTheme {

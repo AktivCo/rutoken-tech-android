@@ -28,16 +28,16 @@ import ru.rutoken.tech.pkcs11.findobjects.findGost256CertificateAndKeyContainers
 import ru.rutoken.tech.pkcs11.findobjects.findGost256KeyContainers
 import ru.rutoken.tech.pkcs11.serialNumberTrimmed
 import ru.rutoken.tech.repository.bank.BankUserRepository
-import ru.rutoken.tech.repository.shift.user.ShiftUserRepository
 import ru.rutoken.tech.repository.shift.signeddocument.ShiftSignedDocumentRepository
+import ru.rutoken.tech.repository.shift.user.ShiftUserRepository
 import ru.rutoken.tech.session.AppSession
 import ru.rutoken.tech.session.AppSessionHolder
 import ru.rutoken.tech.session.AppSessionType
 import ru.rutoken.tech.session.AppSessionType.BANK_USER_ADDING_SESSION
 import ru.rutoken.tech.session.AppSessionType.BANK_USER_LOGIN_SESSION
-import ru.rutoken.tech.session.AppSessionType.SHIFT_USER_LOGIN_SESSION
-import ru.rutoken.tech.session.AppSessionType.SHIFT_USER_ADDING_SESSION
 import ru.rutoken.tech.session.AppSessionType.CA_SESSION
+import ru.rutoken.tech.session.AppSessionType.SHIFT_USER_ADDING_SESSION
+import ru.rutoken.tech.session.AppSessionType.SHIFT_USER_LOGIN_SESSION
 import ru.rutoken.tech.session.BankUserAddingAppSession
 import ru.rutoken.tech.session.BankUserLoginAppSession
 import ru.rutoken.tech.session.CaAppSession
@@ -51,11 +51,11 @@ import ru.rutoken.tech.ui.Certificate
 import ru.rutoken.tech.ui.bank.payments.getInitialPaymentsStorage
 import ru.rutoken.tech.ui.ca.generateobjects.keypair.CkaID
 import ru.rutoken.tech.ui.shift.documents.initialDocumentsStorage
-import ru.rutoken.tech.ui.tokenconnector.TokenConnector
 import ru.rutoken.tech.ui.utils.DialogState
 import ru.rutoken.tech.ui.utils.callPkcs11Operation
 import ru.rutoken.tech.ui.utils.getCertificateErrorText
 import ru.rutoken.tech.ui.utils.toErrorDialogData
+import ru.rutoken.tech.ui.vmdelegate.ConnectTokenDelegate
 import ru.rutoken.tech.utils.BusinessRuleCase.IncorrectPin
 import ru.rutoken.tech.utils.BusinessRuleCase.NoSuchCertificate
 import ru.rutoken.tech.utils.BusinessRuleCase.PinLocked
@@ -76,7 +76,7 @@ class LoginViewModel(
     private val shiftUserRepository: ShiftUserRepository,
     private val shiftSignedDocumentRepository: ShiftSignedDocumentRepository
 ) : ViewModel() {
-    val tokenConnector = TokenConnector(viewModelScope)
+    val connectTokenDelegate = ConnectTokenDelegate(viewModelScope)
 
     private val _showProgress: MutableLiveData<Boolean> = MutableLiveData(false)
     val showProgress: LiveData<Boolean> get() = _showProgress
@@ -97,7 +97,7 @@ class LoginViewModel(
             try {
                 val tokenData = when (appSessionType) {
                     BANK_USER_LOGIN_SESSION -> {
-                        tokenConnector.findTokenBySerialNumber(
+                        connectTokenDelegate.findTokenBySerialNumber(
                             tokenManager,
                             sessionHolder.requireBankUserLoginSession().tokenSerial
                         )
@@ -105,7 +105,7 @@ class LoginViewModel(
 
                     else -> {
                         with(tokenManager.getFirstTokenAsync()) {
-                            if (isCompleted) getCompleted() else tokenConnector.findFirstToken(tokenManager)
+                            if (isCompleted) getCompleted() else connectTokenDelegate.findFirstToken(tokenManager)
                         }
                     }
                 }

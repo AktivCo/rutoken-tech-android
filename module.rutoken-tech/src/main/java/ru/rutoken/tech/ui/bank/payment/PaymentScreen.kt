@@ -31,6 +31,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import com.github.barteksc.pdfviewer.PDFView
@@ -42,6 +43,7 @@ import ru.rutoken.tech.ui.components.AppIcons
 import ru.rutoken.tech.ui.components.NavigationBarSpacer
 import ru.rutoken.tech.ui.components.ProgressIndicatorDialog
 import ru.rutoken.tech.ui.components.RutokenTechLargeTopAppBar
+import ru.rutoken.tech.ui.components.RutokenTechTopAppBarAction
 import ru.rutoken.tech.ui.components.SecondaryButtonBox
 import ru.rutoken.tech.ui.components.alertdialog.AlertDialogWithIcon
 import ru.rutoken.tech.ui.components.alertdialog.ConnectTokenDialog
@@ -51,8 +53,6 @@ import ru.rutoken.tech.ui.theme.RutokenTechTheme
 import ru.rutoken.tech.ui.theme.bodyMediumOnSurfaceVariant
 import ru.rutoken.tech.ui.utils.DialogDataWithIcon
 import ru.rutoken.tech.ui.utils.DialogState
-import ru.rutoken.tech.ui.utils.PreviewDark
-import ru.rutoken.tech.ui.utils.PreviewLight
 import ru.rutoken.tech.ui.utils.errorDialogData
 import ru.rutoken.tech.ui.utils.startShareChooser
 import ru.rutoken.tech.utils.decoded
@@ -112,8 +112,12 @@ private fun PaymentScreen(
                 titleText = payment.title,
                 navigationIcon = { AppIcons.Back() },
                 onNavigationIconClick = onNavigateBack,
-                trailingIcon = { AppIcons.Share() },
-                onTrailingIconClick = onSharePaymentClicked,
+                actions = listOf(
+                    RutokenTechTopAppBarAction(
+                        actionContent = { AppIcons.Share() },
+                        onActionClick = onSharePaymentClicked
+                    )
+                ),
                 colors = largeTopAppBarColors(
                     containerColor = MaterialTheme.colorScheme.surfaceContainer,
                     navigationIconContentColor = MaterialTheme.colorScheme.onSurfaceVariant
@@ -213,10 +217,10 @@ private fun Footer(payment: Payment, operationCompleted: Boolean, onUserActionBu
 
 @Composable
 private fun ConnectTokenDialog(viewModel: PaymentViewModel) {
-    val showDialog by viewModel.tokenConnector.showConnectTokenDialog.observeAsState(false)
+    val showDialog by viewModel.connectTokenDelegate.showConnectTokenDialog.observeAsState(false)
 
     if (showDialog)
-        ConnectTokenDialog(onDismissRequest = viewModel.tokenConnector::onDismissConnectTokenDialog)
+        ConnectTokenDialog(onDismissRequest = viewModel.connectTokenDelegate::onDismissConnectTokenDialog)
 }
 
 @Composable
@@ -264,8 +268,7 @@ private fun ErrorDialog(viewModel: PaymentViewModel) {
 }
 
 @Composable
-@PreviewLight
-@PreviewDark
+@PreviewLightDark
 private fun ActivePaymentScreenPreview() {
     RutokenTechTheme {
         val payment = Payment(
@@ -287,8 +290,7 @@ private fun ActivePaymentScreenPreview() {
 }
 
 @Composable
-@PreviewLight
-@PreviewDark
+@PreviewLightDark
 private fun ArchivedPaymentScreenPreview() {
     RutokenTechTheme {
         val payment = Payment(

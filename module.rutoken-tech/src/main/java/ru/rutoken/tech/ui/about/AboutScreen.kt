@@ -39,6 +39,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat.startActivity
 import ru.rutoken.tech.BuildConfig
@@ -47,8 +48,6 @@ import ru.rutoken.tech.ui.components.MenuScreenTopAppBar
 import ru.rutoken.tech.ui.components.TextGroup
 import ru.rutoken.tech.ui.components.TextGroupItem
 import ru.rutoken.tech.ui.theme.RutokenTechTheme
-import ru.rutoken.tech.ui.utils.PreviewDark
-import ru.rutoken.tech.ui.utils.PreviewLight
 import ru.rutoken.tech.ui.utils.launchCustomTabsUrl
 
 private const val PRIVACY_POLICY_URL = "https://www.rutoken.ru/company/policy/rutech-android.html"
@@ -172,8 +171,7 @@ private fun ActionButton() {
     }
 }
 
-@PreviewLight
-@PreviewDark
+@PreviewLightDark
 @Composable
 private fun AboutScreenPreview() {
     RutokenTechTheme {

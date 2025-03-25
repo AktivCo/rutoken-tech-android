@@ -24,11 +24,11 @@ import ru.rutoken.tech.session.AppSessionHolder
 import ru.rutoken.tech.session.requireCaSession
 import ru.rutoken.tech.tokenmanager.TokenManager
 import ru.rutoken.tech.ui.ca.generateobjects.keypair.CkaID
-import ru.rutoken.tech.ui.tokenconnector.TokenConnector
 import ru.rutoken.tech.ui.utils.DialogData
 import ru.rutoken.tech.ui.utils.DialogState
 import ru.rutoken.tech.ui.utils.callPkcs11Operation
 import ru.rutoken.tech.ui.utils.toErrorDialogData
+import ru.rutoken.tech.ui.vmdelegate.ConnectTokenDelegate
 import ru.rutoken.tech.utils.BusinessRuleCase
 import ru.rutoken.tech.utils.BusinessRuleException
 import ru.rutoken.tech.utils.logd
@@ -38,7 +38,7 @@ class GenerateCertificateViewModel(
     private val tokenManager: TokenManager,
     private val sessionHolder: AppSessionHolder
 ) : ViewModel() {
-    val tokenConnector = TokenConnector(viewModelScope)
+    val connectTokenDelegate = ConnectTokenDelegate(viewModelScope)
 
     private val _showProgress = MutableLiveData<Boolean>()
     val showProgress: LiveData<Boolean> = _showProgress
@@ -64,7 +64,7 @@ class GenerateCertificateViewModel(
             try {
                 val caSession = sessionHolder.requireCaSession()
                 val tokenSerial = caSession.tokenSerial
-                val token = tokenConnector.findTokenBySerialNumber(tokenManager, tokenSerial).token
+                val token = connectTokenDelegate.findTokenBySerialNumber(tokenManager, tokenSerial).token
 
                 callPkcs11Operation(_showProgress, tokenManager, tokenSerial) {
                     createGostCertificate(

@@ -20,13 +20,14 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import ru.rutoken.tech.ui.utils.Modifiers
 
+data class RutokenTechTopAppBarAction(val actionContent: @Composable () -> Unit, val onActionClick: () -> Unit)
+
 @Composable
 fun RutokenTechTopAppBar(
     titleText: String,
     navigationIcon: @Composable () -> Unit,
     onNavigationIconClick: () -> Unit,
-    trailingIcon: (@Composable () -> Unit)? = null,
-    onTrailingIconClick: () -> Unit = {},
+    actions: List<RutokenTechTopAppBarAction> = emptyList(),
     colors: TopAppBarColors = TopAppBarDefaults.mediumTopAppBarColors(),
 ) {
     TopAppBar(
@@ -41,8 +42,8 @@ fun RutokenTechTopAppBar(
             IconButton(onClick = onNavigationIconClick, modifier = Modifiers.appBarIconSize, content = navigationIcon)
         },
         actions = {
-            if (trailingIcon != null) {
-                IconButton(onClick = onTrailingIconClick, modifier = Modifiers.appBarIconSize, content = trailingIcon)
+            actions.forEach {
+                IconButton(onClick = it.onActionClick, modifier = Modifiers.appBarIconSize, content = it.actionContent)
             }
         },
         windowInsets = WindowInsets.systemBarsIgnoringVisibility.only(WindowInsetsSides.Top),
@@ -55,8 +56,7 @@ fun RutokenTechLargeTopAppBar(
     titleText: String,
     navigationIcon: @Composable () -> Unit,
     onNavigationIconClick: () -> Unit,
-    trailingIcon: (@Composable () -> Unit)? = null,
-    onTrailingIconClick: () -> Unit = {},
+    actions: List<RutokenTechTopAppBarAction> = emptyList(),
     colors: TopAppBarColors = TopAppBarDefaults.largeTopAppBarColors()
 ) {
     LargeTopAppBar(
@@ -71,8 +71,8 @@ fun RutokenTechLargeTopAppBar(
             IconButton(onClick = onNavigationIconClick, modifier = Modifiers.appBarIconSize, content = navigationIcon)
         },
         actions = {
-            if (trailingIcon != null) {
-                IconButton(onClick = onTrailingIconClick, modifier = Modifiers.appBarIconSize, content = trailingIcon)
+            actions.forEach {
+                IconButton(onClick = it.onActionClick, modifier = Modifiers.appBarIconSize, content = it.actionContent)
             }
         },
         windowInsets = WindowInsets.systemBarsIgnoringVisibility.only(WindowInsetsSides.Top),
@@ -84,14 +84,12 @@ fun RutokenTechLargeTopAppBar(
 fun MenuScreenTopAppBar(
     screenName: String,
     openDrawer: () -> Unit,
-    trailingIcon: (@Composable () -> Unit)? = null,
-    onTrailingIconClick: () -> Unit = {}
+    actions: List<RutokenTechTopAppBarAction> = emptyList(),
 ) {
     RutokenTechLargeTopAppBar(
         titleText = screenName,
         navigationIcon = { AppIcons.Menu() },
         onNavigationIconClick = openDrawer,
-        trailingIcon = trailingIcon,
-        onTrailingIconClick = onTrailingIconClick
+        actions = actions
     )
 }

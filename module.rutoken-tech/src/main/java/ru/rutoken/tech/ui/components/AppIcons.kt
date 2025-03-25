@@ -198,6 +198,15 @@ object AppIcons {
     }
 
     @Composable
+    fun Download() {
+        Icon(
+            painter = painterResource(R.drawable.ic_file_download),
+            contentDescription = "Download Icon",
+            tint = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+    }
+
+    @Composable
     fun ValidSignature() {
         Icon(
             imageVector = Icons.Outlined.CheckCircle,

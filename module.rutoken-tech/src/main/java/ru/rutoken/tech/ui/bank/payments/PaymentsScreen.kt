@@ -37,15 +37,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 import ru.rutoken.tech.R
 import ru.rutoken.tech.ui.components.AppIcons
 import ru.rutoken.tech.ui.components.RutokenTechLargeTopAppBar
+import ru.rutoken.tech.ui.components.RutokenTechTopAppBarAction
 import ru.rutoken.tech.ui.components.SegmentedButtonRow
 import ru.rutoken.tech.ui.theme.RutokenTechTheme
-import ru.rutoken.tech.ui.utils.PreviewDark
-import ru.rutoken.tech.ui.utils.PreviewLight
 import ru.rutoken.tech.ui.utils.figmaPadding
 import ru.rutoken.tech.utils.toDateString
 import java.time.LocalDate
@@ -89,8 +89,12 @@ private fun PaymentsScreen(
                 titleText = stringResource(id = R.string.payments_title),
                 navigationIcon = { AppIcons.Back() },
                 onNavigationIconClick = onNavigateBack,
-                trailingIcon = { AppIcons.ResetData() },
-                onTrailingIconClick = onResetPaymentsClicked
+                actions = listOf(
+                    RutokenTechTopAppBarAction(
+                        actionContent = { AppIcons.ResetData() },
+                        onActionClick = onResetPaymentsClicked
+                    )
+                ),
             )
         }
     ) { innerPadding ->
@@ -208,8 +212,7 @@ private fun PaymentCard(payment: Payment, icon: @Composable () -> Unit, onClick:
 }
 
 @Composable
-@PreviewLight
-@PreviewDark
+@PreviewLightDark
 private fun PaymentsScreenPreview() {
     RutokenTechTheme {
         val payment1 = Payment(

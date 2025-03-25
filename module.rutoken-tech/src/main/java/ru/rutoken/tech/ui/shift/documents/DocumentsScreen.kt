@@ -6,6 +6,8 @@
 
 package ru.rutoken.tech.ui.shift.documents
 
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.LocalOverscrollConfiguration
 import androidx.compose.foundation.background
@@ -15,7 +17,6 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.consumeWindowInsets
@@ -28,10 +29,11 @@ import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
@@ -47,8 +49,10 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import ru.rutoken.tech.R
+import ru.rutoken.tech.ui.components.AppIcons
 import ru.rutoken.tech.ui.components.AppIcons.Back
 import ru.rutoken.tech.ui.components.AppIcons.Clear
 import ru.rutoken.tech.ui.components.AppIcons.CollapseData
@@ -60,12 +64,11 @@ import ru.rutoken.tech.ui.components.AppIcons.SelectedDocument
 import ru.rutoken.tech.ui.components.AppIcons.SignedDocument
 import ru.rutoken.tech.ui.components.RutokenTechLargeTopAppBar
 import ru.rutoken.tech.ui.components.RutokenTechTopAppBar
+import ru.rutoken.tech.ui.components.RutokenTechTopAppBarAction
 import ru.rutoken.tech.ui.components.SecondaryButtonBox
 import ru.rutoken.tech.ui.components.SegmentedButtonRow
 import ru.rutoken.tech.ui.shift.components.SignatoriesBottomSheet
 import ru.rutoken.tech.ui.theme.RutokenTechTheme
-import ru.rutoken.tech.ui.utils.PreviewDark
-import ru.rutoken.tech.ui.utils.PreviewLight
 import ru.rutoken.tech.ui.utils.figmaPadding
 import ru.rutoken.tech.ui.utils.startShareChooser
 import ru.rutoken.tech.utils.toDateString
@@ -82,6 +85,7 @@ fun DocumentsScreen(
     val signedDocuments by viewModel.signedDocuments.observeAsState(mapOf())
     val documentsToSign by viewModel.documentsToSign.observeAsState(emptyList())
     val signatoriesBottomSheetData by viewModel.documentsGroupSignatories.observeAsState(emptyList())
+    val shouldLaunchFileProvider by viewModel.shouldLaunchFileProvider.observeAsState(false)
 
     LaunchedEffect(Unit) { viewModel.updateDocumentsFlow() }
 
@@ -101,6 +105,18 @@ fun DocumentsScreen(
         }
     }
 
+    val createDocumentLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.CreateDocument("application/zip"),
+        onResult = viewModel::saveDocumentsByUriAsZip
+    )
+
+    LaunchedEffect(shouldLaunchFileProvider) {
+        if (shouldLaunchFileProvider) {
+            createDocumentLauncher.launch(viewModel.getSharedZipName())
+            viewModel.resetShouldLaunchFileProviderState()
+        }
+    }
+
     DocumentsScreen(
         documents = documents,
         signedDocuments = signedDocuments,
@@ -109,6 +125,7 @@ fun DocumentsScreen(
         onResetDocumentsClicked = viewModel::onResetDocumentsClicked,
         onDocumentClicked = onDocumentClicked,
         onSignedDocumentClicked = viewModel::onSignedDocumentClicked,
+        onDownloadClicked = viewModel::setDocumentsToDownload,
         onShareClicked = { viewModel.onShareClicked(it, context::startShareChooser) },
         onSignatoriesClicked = viewModel::onSignatoriesClicked,
         onLongClickDocument = viewModel::onDocumentSelected,
@@ -127,6 +144,7 @@ private fun DocumentsScreen(
     onResetDocumentsClicked: () -> Unit,
     onDocumentClicked: (Document) -> Unit,
     onSignedDocumentClicked: (Document, SignedDocumentsGroup) -> Unit,
+    onDownloadClicked: (SignedDocumentsGroup) -> Unit,
     onShareClicked: (SignedDocumentsGroup) -> Unit,
     onSignatoriesClicked: (SignedDocumentsGroup) -> Unit,
     onLongClickDocument: (Document) -> Unit,
@@ -143,8 +161,12 @@ private fun DocumentsScreen(
                     titleText = stringResource(id = R.string.documents_title),
                     navigationIcon = { Back() },
                     onNavigationIconClick = onNavigateBack,
-                    trailingIcon = { ResetData() },
-                    onTrailingIconClick = onResetDocumentsClicked
+                    actions = listOf(
+                        RutokenTechTopAppBarAction(
+                            actionContent = { ResetData() },
+                            onActionClick = onResetDocumentsClicked
+                        )
+                    ),
                 )
             } else {
                 RutokenTechTopAppBar(
@@ -189,6 +211,7 @@ private fun DocumentsScreen(
                             signedDocumentsItems(
                                 signedDocuments,
                                 onSignedDocumentClicked,
+                                onDownloadClicked,
                                 onShareClicked,
                                 onSignatoriesClicked
                             )
@@ -258,6 +281,7 @@ private fun LazyListScope.documentsToSignItems(
 private fun LazyListScope.signedDocumentsItems(
     signedDocuments: Map<LocalDate, List<SignedDocumentsGroup>>,
     onDocumentClicked: (Document, SignedDocumentsGroup) -> Unit,
+    onDownloadClicked: (SignedDocumentsGroup) -> Unit,
     onShareClicked: (SignedDocumentsGroup) -> Unit,
     onSignatoriesClicked: (SignedDocumentsGroup) -> Unit
 ) {
@@ -271,7 +295,13 @@ private fun LazyListScope.signedDocumentsItems(
             )
         }
         items(sections) { signedDocs ->
-            ExpandableDocumentsSection(signedDocs, onDocumentClicked, onShareClicked, onSignatoriesClicked)
+            ExpandableDocumentsSection(
+                signedDocs,
+                onDocumentClicked,
+                onDownloadClicked,
+                onShareClicked,
+                onSignatoriesClicked
+            )
         }
         item {
             Spacer(Modifier.height(8.dp))
@@ -283,6 +313,7 @@ private fun LazyListScope.signedDocumentsItems(
 private fun ExpandableDocumentsSection(
     signedDocumentsGroup: SignedDocumentsGroup,
     onDocumentClicked: (Document, SignedDocumentsGroup) -> Unit,
+    onDownloadClicked: (SignedDocumentsGroup) -> Unit,
     onShareClicked: (SignedDocumentsGroup) -> Unit,
     onSignatoriesClicked: (SignedDocumentsGroup) -> Unit
 ) {
@@ -329,6 +360,7 @@ private fun ExpandableDocumentsSection(
     }
     SignedDocumentsActions(
         signedDocumentsGroup,
+        onDownloadClicked,
         onShareClicked,
         onSignatoriesClicked,
     )
@@ -337,24 +369,33 @@ private fun ExpandableDocumentsSection(
 @Composable
 private fun SignedDocumentsActions(
     signedDocumentsGroup: SignedDocumentsGroup,
+    onDownloadClicked: (SignedDocumentsGroup) -> Unit,
     onShareClicked: (SignedDocumentsGroup) -> Unit,
     onSignatoriesClicked: (SignedDocumentsGroup) -> Unit,
 ) {
-    Row(modifier = Modifier.fillMaxSize(), horizontalArrangement = Arrangement.End) {
-        Box(modifier = Modifier.padding(vertical = 16.dp), contentAlignment = Alignment.Center) {
-            OutlinedButton(
-                onClick = { onSignatoriesClicked(signedDocumentsGroup) },
-                modifier = Modifier.height(40.dp)
-            ) {
-                Text(text = stringResource(R.string.signatories_button), style = MaterialTheme.typography.labelLarge)
+    Row(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(4.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        TextButton(
+            onClick = { onSignatoriesClicked(signedDocumentsGroup) },
+            modifier = Modifier.height(40.dp)
+        ) {
+            Text(text = stringResource(R.string.signatories_button), style = MaterialTheme.typography.labelLarge)
+        }
+
+        Row {
+            IconButton(onClick = { onDownloadClicked(signedDocumentsGroup) }) {
+                AppIcons.Download()
+            }
+
+            IconButton(onClick = { onShareClicked(signedDocumentsGroup) }) {
+                AppIcons.Share()
             }
         }
-        SecondaryButtonBox(
-            modifier = Modifier,
-            text = stringResource(R.string.share_document),
-            padding = PaddingValues(start = 8.dp, top = 16.dp),
-            onClick = { onShareClicked(signedDocumentsGroup) }
-        )
     }
 }
 
@@ -407,8 +448,7 @@ private fun NoDocumentsEmptyState(text: String) {
     }
 }
 
-@PreviewLight
-@PreviewDark
+@PreviewLightDark
 @Composable
 private fun DocumentsScreenPreview() {
     RutokenTechTheme {
@@ -431,6 +471,7 @@ private fun DocumentsScreenPreview() {
             onDocumentClicked = {},
             onSignedDocumentClicked = { _, _ -> },
             isDocumentsToSignSelected = true,
+            onDownloadClicked = {},
             onShareClicked = {},
             onLongClickDocument = {},
             onResetSelectedDocumentsClicked = {},
@@ -440,8 +481,7 @@ private fun DocumentsScreenPreview() {
     }
 }
 
-@PreviewLight
-@PreviewDark
+@PreviewLightDark
 @Composable
 private fun EmptyDocumentsScreenPreview() {
     RutokenTechTheme {
@@ -454,6 +494,7 @@ private fun EmptyDocumentsScreenPreview() {
             onDocumentClicked = {},
             onSignedDocumentClicked = { _, _ -> },
             isDocumentsToSignSelected = true,
+            onDownloadClicked = {},
             onShareClicked = {},
             onLongClickDocument = {},
             onResetSelectedDocumentsClicked = {},
@@ -463,8 +504,7 @@ private fun EmptyDocumentsScreenPreview() {
     }
 }
 
-@PreviewLight
-@PreviewDark
+@PreviewLightDark
 @Composable
 private fun SignedDocumentsScreenPreview() {
     RutokenTechTheme {
@@ -502,6 +542,7 @@ private fun SignedDocumentsScreenPreview() {
             onDocumentClicked = {},
             onSignedDocumentClicked = { _, _ -> },
             isDocumentsToSignSelected = false,
+            onDownloadClicked = {},
             onShareClicked = {},
             onLongClickDocument = {},
             onResetSelectedDocumentsClicked = {},
@@ -511,8 +552,7 @@ private fun SignedDocumentsScreenPreview() {
     }
 }
 
-@PreviewLight
-@PreviewDark
+@PreviewLightDark
 @Composable
 private fun EmptySignedDocumentsScreenPreview() {
     RutokenTechTheme {
@@ -525,6 +565,7 @@ private fun EmptySignedDocumentsScreenPreview() {
             onDocumentClicked = {},
             onSignedDocumentClicked = { _, _ -> },
             isDocumentsToSignSelected = false,
+            onDownloadClicked = {},
             onShareClicked = {},
             onLongClickDocument = {},
             onResetSelectedDocumentsClicked = {},
@@ -534,8 +575,7 @@ private fun EmptySignedDocumentsScreenPreview() {
     }
 }
 
-@PreviewLight
-@PreviewDark
+@PreviewLightDark
 @Composable
 private fun SelectedDocumentsScreenPreview() {
     RutokenTechTheme {
@@ -558,6 +598,7 @@ private fun SelectedDocumentsScreenPreview() {
             onDocumentClicked = {},
             onSignedDocumentClicked = { _, _ -> },
             isDocumentsToSignSelected = true,
+            onDownloadClicked = {},
             onShareClicked = {},
             onLongClickDocument = {},
             onResetSelectedDocumentsClicked = {},

@@ -6,6 +6,8 @@
 
 package ru.rutoken.tech.ui.shift.documentspreview
 
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -42,6 +44,7 @@ import ru.rutoken.tech.ui.components.AppIcons
 import ru.rutoken.tech.ui.components.OptionSelectionDialog
 import ru.rutoken.tech.ui.components.RutokenTechLargeTopAppBar
 import ru.rutoken.tech.ui.components.RutokenTechTopAppBar
+import ru.rutoken.tech.ui.components.RutokenTechTopAppBarAction
 import ru.rutoken.tech.ui.components.SecondaryButtonBox
 import ru.rutoken.tech.ui.shift.documents.Document
 import ru.rutoken.tech.ui.utils.startShareChooser
@@ -60,6 +63,11 @@ fun DocumentsPreviewScreen(
     val context = LocalContext.current
     val onShareClick = { viewModel.onShareClicked(context::startShareChooser) }
 
+    val createDocumentLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.CreateDocument("application/zip"),
+        onResult = viewModel::saveDocumentsByUriAsZip
+    )
+
     LifecycleEventEffect(Lifecycle.Event.ON_RESUME) { viewModel.updateSignState() }
 
     if (documentsInfo.documents.isNotEmpty()) {
@@ -69,6 +77,7 @@ fun DocumentsPreviewScreen(
             areDocumentsSigned = areDocumentsSigned,
             onNavigateBack = onNavigateBack,
             onSignClick = onSignClick,
+            onDownloadClick = { createDocumentLauncher.launch(viewModel.getSharedZipName()) },
             onShareClick = onShareClick,
         )
     }
@@ -95,15 +104,43 @@ private fun DocumentsPreviewScreen(
     areDocumentsSigned: Boolean,
     onNavigateBack: () -> Unit,
     onSignClick: () -> Unit,
+    onDownloadClick: () -> Unit,
     onShareClick: () -> Unit,
 ) {
+    val topAppBarActions = listOf(
+        RutokenTechTopAppBarAction(
+            actionContent = if (areDocumentsSigned) {
+                { AppIcons.Download() }
+            } else {
+                { /* Nothing to show */ }
+            },
+            onActionClick = if (areDocumentsSigned) {
+                onDownloadClick
+            } else {
+                { /* Nothing to do */ }
+            }
+        ),
+        RutokenTechTopAppBarAction(
+            actionContent = if (areDocumentsSigned) {
+                { AppIcons.Share() }
+            } else {
+                { /* Nothing to show */ }
+            },
+            onActionClick = if (areDocumentsSigned) {
+                onShareClick
+            } else {
+                { /* Nothing to do */ }
+            }
+        )
+    )
+
     if (documentsInfo.size == 1) {
         SingleDocumentPreviewScreen(
             document = documentsInfo.first(),
             areDocumentsSigned = areDocumentsSigned,
             onNavigateBack = onNavigateBack,
-            onSignClick = onSignClick,
-            onShareClick = onShareClick,
+            topAppBarActions = topAppBarActions,
+            onSignClick = onSignClick
         )
     } else {
         MultipleDocumentsPreviewScreen(
@@ -111,8 +148,8 @@ private fun DocumentsPreviewScreen(
             startPreviewIndex = startPreviewIndex,
             areDocumentsSigned = areDocumentsSigned,
             onNavigateBack = onNavigateBack,
-            onSignClick = onSignClick,
-            onShareClick = onShareClick,
+            topAppBarActions = topAppBarActions,
+            onSignClick = onSignClick
         )
     }
 }
@@ -122,8 +159,8 @@ private fun SingleDocumentPreviewScreen(
     document: Document,
     areDocumentsSigned: Boolean,
     onNavigateBack: () -> Unit,
+    topAppBarActions: List<RutokenTechTopAppBarAction>,
     onSignClick: () -> Unit,
-    onShareClick: () -> Unit,
 ) {
     Scaffold(
         topBar = {
@@ -131,16 +168,7 @@ private fun SingleDocumentPreviewScreen(
                 titleText = document.title,
                 navigationIcon = { AppIcons.Back() },
                 onNavigationIconClick = onNavigateBack,
-                trailingIcon = if (areDocumentsSigned) {
-                    { AppIcons.Share() }
-                } else {
-                    null
-                },
-                onTrailingIconClick = if (areDocumentsSigned) {
-                    onShareClick
-                } else {
-                    { /* Nothing to do */ }
-                },
+                actions = topAppBarActions,
                 colors = largeTopAppBarColors(
                     containerColor = MaterialTheme.colorScheme.surfaceContainer,
                     navigationIconContentColor = MaterialTheme.colorScheme.onSurfaceVariant
@@ -181,24 +209,15 @@ private fun MultipleDocumentsPreviewScreen(
     startPreviewIndex: Int,
     areDocumentsSigned: Boolean,
     onNavigateBack: () -> Unit,
-    onSignClick: () -> Unit,
-    onShareClick: () -> Unit,
+    topAppBarActions: List<RutokenTechTopAppBarAction>,
+    onSignClick: () -> Unit
 ) {
     Scaffold(topBar = {
         RutokenTechTopAppBar(
             titleText = stringResource(R.string.documents_count, documents.size),
             navigationIcon = { AppIcons.Back() },
             onNavigationIconClick = onNavigateBack,
-            trailingIcon = if (areDocumentsSigned) {
-                { AppIcons.Share() }
-            } else {
-                null
-            },
-            onTrailingIconClick = if (areDocumentsSigned) {
-                onShareClick
-            } else {
-                { /* Nothing to do */ }
-            },
+            actions = topAppBarActions,
             colors = largeTopAppBarColors(
                 containerColor = MaterialTheme.colorScheme.surfaceContainer,
                 navigationIconContentColor = MaterialTheme.colorScheme.onSurfaceVariant

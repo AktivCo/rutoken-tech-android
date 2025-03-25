@@ -11,29 +11,27 @@ import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.SheetState
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.map
 import kotlinx.coroutines.launch
 import ru.rutoken.tech.R
 import ru.rutoken.tech.pkcs11.createobjects.GostKeyPairParams
 import ru.rutoken.tech.ui.components.BottomSheetTitle
-import ru.rutoken.tech.ui.components.alertdialog.ConnectTokenDialog
-import ru.rutoken.tech.ui.components.alertdialog.ErrorAlertDialog
 import ru.rutoken.tech.ui.components.NavigationBarSpacer
 import ru.rutoken.tech.ui.components.PrimaryButtonBox
 import ru.rutoken.tech.ui.components.ProgressIndicatorDialog
-import ru.rutoken.tech.ui.components.alertdialog.SimpleAlertDialog
 import ru.rutoken.tech.ui.components.TextGroupBox
 import ru.rutoken.tech.ui.components.TextGroupItem
+import ru.rutoken.tech.ui.components.alertdialog.ConnectTokenDialog
+import ru.rutoken.tech.ui.components.alertdialog.ErrorAlertDialog
+import ru.rutoken.tech.ui.components.alertdialog.SimpleAlertDialog
 import ru.rutoken.tech.ui.theme.RutokenTechTheme
 import ru.rutoken.tech.ui.utils.DialogState
-import ru.rutoken.tech.ui.utils.PreviewDark
-import ru.rutoken.tech.ui.utils.PreviewLight
 import ru.rutoken.tech.ui.utils.bottomSheetWindowInsets
 import ru.rutoken.tech.ui.utils.errorDialogData
 import ru.rutoken.tech.ui.utils.expandedSheetState
@@ -109,10 +107,10 @@ fun GenerateKeyPairBottomSheet(
 
 @Composable
 private fun ConnectTokenDialog(viewModel: GenerateKeyPairViewModel) {
-    val showDialog by viewModel.tokenConnector.showConnectTokenDialog.observeAsState(false)
+    val showDialog by viewModel.connectTokenDelegate.showConnectTokenDialog.observeAsState(false)
 
     if (showDialog) {
-        ConnectTokenDialog(onDismissRequest = { viewModel.tokenConnector.onDismissConnectTokenDialog() })
+        ConnectTokenDialog(onDismissRequest = { viewModel.connectTokenDelegate.onDismissConnectTokenDialog() })
     }
 }
 
@@ -153,8 +151,7 @@ private fun ErrorDialog(viewModel: GenerateKeyPairViewModel) {
     }
 }
 
-@PreviewLight
-@PreviewDark
+@PreviewLightDark
 @Composable
 private fun GenerateKeyPairBottomSheetPreview() {
     RutokenTechTheme {

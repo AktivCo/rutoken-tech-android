@@ -30,11 +30,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import ru.rutoken.tech.R
 import ru.rutoken.tech.ui.theme.RutokenTechTheme
-import ru.rutoken.tech.ui.utils.PreviewDark
-import ru.rutoken.tech.ui.utils.PreviewLight
 
 data class ButtonContent(val text: String, val onClick: () -> Unit)
 
@@ -96,8 +95,7 @@ fun bottomSheetCornerShape(sheetState: SheetState): Shape {
     return RoundedCornerShape(corners)
 }
 
-@PreviewLight
-@PreviewDark
+@PreviewLightDark
 @Composable
 private fun BottomSheetTitlePreview() {
     RutokenTechTheme {
@@ -107,8 +105,7 @@ private fun BottomSheetTitlePreview() {
     }
 }
 
-@PreviewLight
-@PreviewDark
+@PreviewLightDark
 @Composable
 private fun BottomSheetTitleButtonPreview() {
     RutokenTechTheme {

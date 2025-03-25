@@ -16,21 +16,20 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.PreviewLightDark
 import kotlinx.coroutines.launch
 import ru.rutoken.tech.R
 import ru.rutoken.tech.ui.components.ButtonContent
+import ru.rutoken.tech.ui.components.ProgressIndicatorDialog
+import ru.rutoken.tech.ui.components.alertdialog.ConnectTokenDialog
 import ru.rutoken.tech.ui.components.alertdialog.ErrorAlertDialog
 import ru.rutoken.tech.ui.shift.components.SignatoriesBottomSheet
 import ru.rutoken.tech.ui.theme.RutokenTechTheme
-import ru.rutoken.tech.ui.tokenauth.EnterPinViewModel
-import ru.rutoken.tech.ui.utils.PreviewDark
-import ru.rutoken.tech.ui.utils.PreviewLight
-import ru.rutoken.tech.ui.utils.expandedSheetState
 import ru.rutoken.tech.ui.tokenauth.EnterPinBottomSheet
+import ru.rutoken.tech.ui.tokenauth.EnterPinViewModel
 import ru.rutoken.tech.ui.utils.DialogState
 import ru.rutoken.tech.ui.utils.errorDialogData
-import ru.rutoken.tech.ui.components.ProgressIndicatorDialog
-import ru.rutoken.tech.ui.components.alertdialog.ConnectTokenDialog
+import ru.rutoken.tech.ui.utils.expandedSheetState
 
 @Composable
 fun DocumentsSignScreen(
@@ -106,10 +105,10 @@ private fun DocumentsSignScreen(
 
 @Composable
 private fun ConnectTokenDialog(viewModel: DocumentsSignViewModel) {
-    val showDialog by viewModel.tokenConnector.showConnectTokenDialog.observeAsState(false)
+    val showDialog by viewModel.connectTokenDelegate.showConnectTokenDialog.observeAsState(false)
 
     if (showDialog) {
-        ConnectTokenDialog(onDismissRequest = { viewModel.tokenConnector.onDismissConnectTokenDialog() })
+        ConnectTokenDialog(onDismissRequest = { viewModel.connectTokenDelegate.onDismissConnectTokenDialog() })
     }
 }
 
@@ -160,8 +159,7 @@ private fun EnterPinBottomSheet(
 }
 
 @Composable
-@PreviewLight
-@PreviewDark
+@PreviewLightDark
 private fun DocumentSignatoriesPartiallyExpandedBottomSheetPreview() {
     RutokenTechTheme {
         DocumentsSignScreen(
@@ -181,8 +179,7 @@ private fun DocumentSignatoriesPartiallyExpandedBottomSheetPreview() {
 }
 
 @Composable
-@PreviewLight
-@PreviewDark
+@PreviewLightDark
 private fun DocumentsSignScreenPreview() {
     RutokenTechTheme {
         DocumentsSignScreen(

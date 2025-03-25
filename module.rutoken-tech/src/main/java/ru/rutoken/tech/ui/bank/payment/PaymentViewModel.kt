@@ -24,12 +24,12 @@ import ru.rutoken.tech.tokenmanager.TokenManager
 import ru.rutoken.tech.ui.bank.payments.Payment
 import ru.rutoken.tech.ui.bank.payments.UserActionType
 import ru.rutoken.tech.ui.components.AppIcons
-import ru.rutoken.tech.ui.tokenconnector.TokenConnector
 import ru.rutoken.tech.ui.utils.DialogData
 import ru.rutoken.tech.ui.utils.DialogDataWithIcon
 import ru.rutoken.tech.ui.utils.DialogState
 import ru.rutoken.tech.ui.utils.callPkcs11Operation
 import ru.rutoken.tech.ui.utils.toErrorDialogData
+import ru.rutoken.tech.ui.vmdelegate.ConnectTokenDelegate
 import ru.rutoken.tech.usecase.CmsOperationProvider
 import ru.rutoken.tech.utils.VerifyCmsResult
 import ru.rutoken.tech.utils.logd
@@ -50,7 +50,7 @@ class PaymentViewModel(
     private val tokenManager: TokenManager,
     private val paymentTitle: String
 ) : ViewModel() {
-    val tokenConnector = TokenConnector(viewModelScope)
+    val connectTokenDelegate = ConnectTokenDelegate(viewModelScope)
 
     // BankUserLoginAppSession instance MUST exist by the time this ViewModel is instantiated
     private val bankUserLoginSession: BankUserLoginAppSession
@@ -147,7 +147,7 @@ class PaymentViewModel(
     private suspend fun verifyPaymentSignatureViaPkcs11Wrapper() {
         try {
             val tokenSerial = bankUserLoginSession.tokenSerial
-            val token = tokenConnector.findTokenBySerialNumber(tokenManager, tokenSerial).token
+            val token = connectTokenDelegate.findTokenBySerialNumber(tokenManager, tokenSerial).token
 
             callPkcs11Operation(_showProgress, tokenManager, tokenSerial) {
                 token.openSession(true).use { session ->

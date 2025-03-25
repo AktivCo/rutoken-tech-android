@@ -24,18 +24,18 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import ru.rutoken.tech.R
 import ru.rutoken.tech.ui.User
-import ru.rutoken.tech.ui.components.CertificateCard
 import ru.rutoken.tech.ui.components.AppIcons
+import ru.rutoken.tech.ui.components.CertificateCard
 import ru.rutoken.tech.ui.components.MenuScreenTopAppBar
 import ru.rutoken.tech.ui.components.PrimaryButtonBox
+import ru.rutoken.tech.ui.components.RutokenTechTopAppBarAction
 import ru.rutoken.tech.ui.components.alertdialog.ConfirmationAlertDialog
 import ru.rutoken.tech.ui.theme.RutokenTechTheme
 import ru.rutoken.tech.ui.theme.bodyMediumOnSurfaceVariant
-import ru.rutoken.tech.ui.utils.PreviewDark
-import ru.rutoken.tech.ui.utils.PreviewLight
 
 @Composable
 fun BankStartScreen(
@@ -88,15 +88,21 @@ private fun BankStartScreen(
     onAddUserClicked: () -> Unit,
     openDrawer: () -> Unit
 ) {
-    val trailingIcon = @Composable { AppIcons.Delete() }
-
     Scaffold(
         topBar = {
             MenuScreenTopAppBar(
                 screenName = stringResource(id = R.string.tab_bank),
                 openDrawer = openDrawer,
-                trailingIcon = if (users.isNotEmpty()) trailingIcon else null,
-                onTrailingIconClick = onDeleteUsers
+                actions = listOf(
+                    RutokenTechTopAppBarAction(
+                        actionContent = if (users.isNotEmpty()) {
+                            { AppIcons.Delete() }
+                        } else {
+                            { /* Nothing to show */ }
+                        },
+                        onActionClick = onDeleteUsers
+                    )
+                ),
             )
         }
     ) { innerPadding ->
@@ -149,8 +155,7 @@ private fun UserList(modifier: Modifier, users: List<User>, onUserClicked: (User
 }
 
 @Composable
-@PreviewLight
-@PreviewDark
+@PreviewLightDark
 private fun BankStartScreenWithUsersPreview() {
     val testUsers = listOf(
         User(0, "Иванов Михаил Романович", "Дизайнер", "07.03.2024"),
@@ -171,8 +176,7 @@ private fun BankStartScreenWithUsersPreview() {
 }
 
 @Composable
-@PreviewLight
-@PreviewDark
+@PreviewLightDark
 private fun BankStartScreenNoUsersPreview() {
     RutokenTechTheme {
         BankStartScreen(

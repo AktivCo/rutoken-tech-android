@@ -28,14 +28,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import androidx.fragment.app.FragmentActivity
 import kotlinx.coroutines.launch
 import ru.rutoken.tech.R
 import ru.rutoken.tech.ui.Certificate
-import ru.rutoken.tech.ui.components.CertificateCard
 import ru.rutoken.tech.ui.components.BottomSheetDragHandle
 import ru.rutoken.tech.ui.components.BottomSheetTitle
+import ru.rutoken.tech.ui.components.CertificateCard
 import ru.rutoken.tech.ui.components.NavigationBarSpacer
 import ru.rutoken.tech.ui.components.ProgressIndicatorDialog
 import ru.rutoken.tech.ui.components.alertdialog.ConfirmationAlertDialog
@@ -43,8 +44,6 @@ import ru.rutoken.tech.ui.components.alertdialog.ErrorAlertDialog
 import ru.rutoken.tech.ui.components.bottomSheetCornerShape
 import ru.rutoken.tech.ui.theme.RutokenTechTheme
 import ru.rutoken.tech.ui.utils.DialogState
-import ru.rutoken.tech.ui.utils.PreviewDark
-import ru.rutoken.tech.ui.utils.PreviewLight
 import ru.rutoken.tech.ui.utils.bottomSheetWindowInsets
 import ru.rutoken.tech.ui.utils.errorDialogData
 import ru.rutoken.tech.ui.utils.expandedSheetState
@@ -173,8 +172,7 @@ private fun ProgressIndicatorDialog(viewModel: ChooseNewCertificateViewModel) {
 }
 
 @Composable
-@PreviewLight
-@PreviewDark
+@PreviewLightDark
 private fun ChooseNewCertificateBottomSheetPreview() {
     RutokenTechTheme {
         val name = "Иванов Михаил Романович"

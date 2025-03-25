@@ -35,37 +35,37 @@ val initialDocumentsStorage
             displayPageIndex = 0
         ),
         Document(
-            title = "Наряд-допуск 4",
+            title = "Наряд-допуск №4",
             date = LocalDate.of(2024, 9, 10),
             organization = "ООО “Цмик”",
             displayPageIndex = 0
         ),
         Document(
-            title = "Наряд-допуск 3",
+            title = "Наряд-допуск №3",
             date = LocalDate.of(2024, 11, 19),
             organization = "АО “Кузнец”",
             displayPageIndex = 0
         ),
         Document(
-            title = "Наряд-допуск 2",
+            title = "Наряд-допуск №2",
             date = LocalDate.of(2024, 12, 10),
             organization = "ООО “БИК-Комфорт”",
             displayPageIndex = 0
         ),
         Document(
-            title = "Наряд-допуск 1",
+            title = "Наряд-допуск №1",
             date = LocalDate.of(2024, 12, 15),
             organization = "ООО “Сигма”",
             displayPageIndex = 0
         ),
         Document(
-            title = "Журнал работ 2",
+            title = "Журнал работ №2",
             date = LocalDate.of(2024, 12, 10),
             organization = "ООО “БИК-Комфорт”",
             displayPageIndex = 1
         ),
         Document(
-            title = "Журнал работ 1",
+            title = "Журнал работ №1",
             date = LocalDate.of(2024, 12, 23),
             organization = "АО “СтройМаш”",
             displayPageIndex = 1

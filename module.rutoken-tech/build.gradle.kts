@@ -204,10 +204,14 @@ tasks.named("clean") {
 }
 
 fun getCommitHash(): String {
-    val stdout = ByteArrayOutputStream()
-    exec {
-        commandLine("git", "rev-parse", "--short", "HEAD")
-        standardOutput = stdout
+    try {
+        val stdout = ByteArrayOutputStream()
+        exec {
+            commandLine("git", "rev-parse", "--short", "HEAD")
+            standardOutput = stdout
+        }
+        return stdout.toString().trim()
+    } catch (_: Exception) {
+        return "-------"
     }
-    return stdout.toString().trim()
 }

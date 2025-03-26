@@ -31,7 +31,7 @@ Android 7 и новее.
 Для сборки приложения требуются внешние зависимости, которые можно найти
 в [Рутокен SDK](https://www.rutoken.ru/developers/sdk/). Необходимые библиотеки:
 
-* librtpkcs11ecp.so под архитектуры: `armeabi-v7a` и `arm64-v8a`.
+* librtpkcs11ecp.so под архитектуры: `armv7a` и `arm64`.
 
 # Предварительные действия
 
@@ -51,18 +51,18 @@ Android 7 и новее.
 ## Как собрать
 
 1. Перед сборкой проекта скопируйте скачанные внешние зависимости в
-   директорию `module.rutoken-tech/src/main/jniLibs/<arch>`, где `<arch>` — архитектура библиотеки. Пример расположения
+   директорию `external/pkcs11ecp/android-<arch>/lib/`, где `<arch>` — архитектура библиотеки. Пример расположения
    файлов и директорий показан ниже:
 
     ```Text
-    module.rutoken-tech
-    | - src
-    |   | - main
-    |   |   | - jniLibs
-    |   |   |   | - arm64-v8a
-    |   |   |   |   | - librtpkcs11ecp.so
-    |   |   |   | - armeabi-v7a
-    |   |   |   |   | - librtpkcs11ecp.so
+    external
+    | - pkcs11ecp
+    |   | - android-armv7a
+    |   |   | - lib
+    |   |   |   | - librtpkcs11ecp.so
+    |   | - android-arm64
+    |   |   | - lib
+    |   |   |   | - librtpkcs11ecp.so
     ```
 
 2. Собрать проект можно следующими способами:

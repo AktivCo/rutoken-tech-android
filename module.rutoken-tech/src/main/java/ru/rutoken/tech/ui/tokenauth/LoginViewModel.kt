@@ -103,6 +103,13 @@ class LoginViewModel(
                         )
                     }
 
+                    SHIFT_USER_LOGIN_SESSION -> {
+                        connectTokenDelegate.findTokenBySerialNumber(
+                            tokenManager,
+                            sessionHolder.requireShiftUserLoginSession().tokenSerial
+                        )
+                    }
+
                     else -> {
                         with(tokenManager.getFirstTokenAsync()) {
                             if (isCompleted) getCompleted() else connectTokenDelegate.findFirstToken(tokenManager)

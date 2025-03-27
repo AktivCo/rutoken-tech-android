@@ -22,7 +22,7 @@ import ru.rutoken.tech.utils.loge
  */
 class SlotEventGenerator(
     private val slotEventChannel: SendChannel<SlotEvent>,
-    private val pkcs11Module: IPkcs11Module
+    private val pkcs11Module: IPkcs11Module,
 ) {
     /**
      * Launches blocking calls to C_WaitForSlotEvent and adds events that occur with system slots (connecting and

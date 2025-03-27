@@ -59,7 +59,7 @@ fun CaTokenInfoScreen(
     onNavigateToGenerateKeyPair: () -> Unit,
     onNavigateToGenerateCertificate: () -> Unit,
     onLogout: () -> Unit,
-    openDrawer: () -> Unit
+    openDrawer: () -> Unit,
 ) {
     val tokenInfoUiState by viewModel.uiState.observeAsState()
     val shouldNavigateToCertGeneration by viewModel.navigateToCertGenerationEvent.observeAsState(false)
@@ -86,7 +86,7 @@ private fun TokenInfoScreen(
     onNavigateToGenerateKeyPair: () -> Unit,
     onNavigateToGenerateCertificate: () -> Unit,
     onLogout: () -> Unit,
-    openDrawer: () -> Unit
+    openDrawer: () -> Unit,
 ) {
     Scaffold(
         topBar = {

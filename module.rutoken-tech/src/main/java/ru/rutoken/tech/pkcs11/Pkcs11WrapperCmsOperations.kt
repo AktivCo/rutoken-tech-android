@@ -26,7 +26,7 @@ object Pkcs11WrapperCmsOperations {
         data: ByteArray,
         signerPrivateKey: Pkcs11GostPrivateKeyObject,
         signerCertificate: Pkcs11CertificateObject,
-        additionalCertificates: List<Pkcs11CertificateObject>?
+        additionalCertificates: List<Pkcs11CertificateObject>?,
     ): ByteArray = withPkcs11CallContext {
         session.cmsManager.sign(
             data,
@@ -43,7 +43,7 @@ object Pkcs11WrapperCmsOperations {
         data: ByteArray,
         trustedCertificates: List<ByteArray>,
         certificates: List<ByteArray>?,
-        crls: List<ByteArray>?
+        crls: List<ByteArray>?,
     ): VerifyCmsResult = withPkcs11CallContext {
         val store = VendorX509Store(trustedCertificates, certificates, crls)
         val code =

@@ -65,7 +65,7 @@ import java.time.LocalDateTime
 fun PaymentScreen(
     viewModel: PaymentViewModel,
     onNavigateBack: (Boolean) -> Unit,
-    onNavigateToTokenAuth: () -> Unit
+    onNavigateToTokenAuth: () -> Unit,
 ) {
     val context = LocalContext.current
     val payment by viewModel.payment.observeAsState()
@@ -108,7 +108,7 @@ private fun PaymentScreen(
     onNavigateBack: () -> Unit,
     onDownloadPaymentClicked: () -> Unit,
     onSharePaymentClicked: () -> Unit,
-    onUserActionButtonClicked: () -> Unit
+    onUserActionButtonClicked: () -> Unit,
 ) {
     Scaffold(
         topBar = {

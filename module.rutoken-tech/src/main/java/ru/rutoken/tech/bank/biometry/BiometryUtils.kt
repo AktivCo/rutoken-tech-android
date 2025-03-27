@@ -50,7 +50,7 @@ suspend fun encryptWithBiometricPrompt(
     activity: FragmentActivity,
     data: ByteArray,
     onError: (Int?, String?) -> Unit,
-    onSuccess: (ByteArray, ByteArray) -> Unit
+    onSuccess: (ByteArray, ByteArray) -> Unit,
 ) = performCipherCallWithBiometricPrompt(activity, Cipher.ENCRYPT_MODE, data, null, onError, onSuccess)
 
 suspend fun decryptWithBiometricPrompt(
@@ -58,7 +58,7 @@ suspend fun decryptWithBiometricPrompt(
     data: ByteArray,
     cipherIv: ByteArray,
     onError: (Int?, String?) -> Unit,
-    onSuccess: (ByteArray) -> Unit
+    onSuccess: (ByteArray) -> Unit,
 ) = performCipherCallWithBiometricPrompt(
     activity,
     Cipher.DECRYPT_MODE,
@@ -73,7 +73,7 @@ private suspend fun performCipherCallWithBiometricPrompt(
     data: ByteArray,
     cipherIv: ByteArray?,
     onError: (Int?, String?) -> Unit,
-    onSuccess: (ByteArray, ByteArray) -> Unit
+    onSuccess: (ByteArray, ByteArray) -> Unit,
 ) {
     val secretKey = getSecretKey() ?: generateSecretKey()
     val cipher = getCipher().also {
@@ -120,7 +120,7 @@ private fun Context.getBiometricPromptInfo() = BiometricPrompt.PromptInfo.Builde
 private fun makeAuthenticationCallback(
     dataToCrypt: ByteArray,
     onError: (Int?, String?) -> Unit,
-    onSuccess: (ByteArray, ByteArray) -> Unit
+    onSuccess: (ByteArray, ByteArray) -> Unit,
 ) = object : BiometricPrompt.AuthenticationCallback() {
     override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult) {
         super.onAuthenticationSucceeded(result)

@@ -22,5 +22,5 @@ data class ShiftUserEntity(
     @PrimaryKey(autoGenerate = true) val id: Int = AUTOGENERATE,
     @ColumnInfo(name = "certificate_der_value") val certificateDerValue: ByteArray,
     @ColumnInfo(name = "cka_id") val ckaId: ByteArray,
-    @ColumnInfo(name = "token_serial_number") val tokenSerialNumber: String
+    @ColumnInfo(name = "token_serial_number") val tokenSerialNumber: String,
 )

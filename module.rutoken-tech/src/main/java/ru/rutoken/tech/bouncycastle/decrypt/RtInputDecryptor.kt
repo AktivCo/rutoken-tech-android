@@ -20,7 +20,7 @@ import java.io.InputStream
 class RtInputDecryptor(
     private val session: Pkcs11Session,
     private val key: Pkcs11KeyObject,
-    private val algorithmIdentifier: AlgorithmIdentifier
+    private val algorithmIdentifier: AlgorithmIdentifier,
 ) : InputDecryptor {
     override fun getAlgorithmIdentifier() = algorithmIdentifier
 

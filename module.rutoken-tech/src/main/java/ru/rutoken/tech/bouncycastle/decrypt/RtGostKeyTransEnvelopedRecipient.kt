@@ -39,7 +39,7 @@ class RtGostKeyTransEnvelopedRecipient(
     override fun getRecipientOperator(
         keyEncryptionAlgorithm: AlgorithmIdentifier,
         contentEncryptionAlgorithm: AlgorithmIdentifier,
-        encryptedContentKey: ByteArray
+        encryptedContentKey: ByteArray,
     ): RecipientOperator {
         val transport = GostR3410KeyTransport.getInstance(encryptedContentKey)
         val transportParameters = transport.transportParameters
@@ -74,7 +74,7 @@ class RtGostKeyTransEnvelopedRecipient(
 }
 
 private fun IPkcs11AttributeFactory.makeGost28147SecretKeyTemplate(
-    parameters: GostR3410TransportParameters
+    parameters: GostR3410TransportParameters,
 ): List<Pkcs11Attribute> {
     return listOf(
         makeAttribute(CKA_CLASS, CKO_SECRET_KEY),
@@ -85,7 +85,7 @@ private fun IPkcs11AttributeFactory.makeGost28147SecretKeyTemplate(
 }
 
 private fun IPkcs11AttributeFactory.makeGost28147SessionKeyTemplate(
-    parameters: GOST28147Parameters
+    parameters: GOST28147Parameters,
 ): List<Pkcs11Attribute> {
     return listOf(
         makeAttribute(CKA_CLASS, CKO_SECRET_KEY),

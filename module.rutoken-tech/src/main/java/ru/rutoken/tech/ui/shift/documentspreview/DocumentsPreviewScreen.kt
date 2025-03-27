@@ -210,7 +210,7 @@ private fun MultipleDocumentsPreviewScreen(
     areDocumentsSigned: Boolean,
     onNavigateBack: () -> Unit,
     topAppBarActions: List<RutokenTechTopAppBarAction>,
-    onSignClick: () -> Unit
+    onSignClick: () -> Unit,
 ) {
     Scaffold(topBar = {
         RutokenTechTopAppBar(

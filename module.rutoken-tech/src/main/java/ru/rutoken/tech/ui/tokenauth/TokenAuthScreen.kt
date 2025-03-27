@@ -33,7 +33,7 @@ fun TokenAuthScreen(
     loginViewModel: LoginViewModel,
     appSessionType: AppSessionType,
     onAuthDone: () -> Unit,
-    onNavigateBack: () -> Unit
+    onNavigateBack: () -> Unit,
 ) {
     val enterPinSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     var showEnterPinBottomSheet by remember { mutableStateOf(true) }
@@ -81,7 +81,7 @@ private fun EnterPinBottomSheet(
     sheetState: SheetState,
     onNavigateBack: () -> Unit,
     onButtonClick: (String) -> Unit,
-    onDecryptBiometricPin: () -> Unit
+    onDecryptBiometricPin: () -> Unit,
 ) {
     val pinErrorText by viewModel.pinErrorText.observeAsState("")
     val isButtonEnabled by viewModel.isButtonEnabled.observeAsState(false)

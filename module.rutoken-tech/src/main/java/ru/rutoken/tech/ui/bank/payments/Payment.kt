@@ -39,7 +39,7 @@ data class Payment(
     val userActionType: UserActionType,
     var actionTime: LocalDateTime? = null,
     var initialActionData: Base64String? = null,
-    var actionResultData: Base64String? = null
+    var actionResultData: Base64String? = null,
 ) {
     private val fileName = "$title.pdf"
     private val signedFileName = "$title.sig"

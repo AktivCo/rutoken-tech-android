@@ -56,7 +56,7 @@ fun PaymentsScreen(
     viewModel: PaymentsViewModel,
     onNavigateBack: () -> Unit,
     onPaymentClicked: (Payment) -> Unit,
-    isIncomingPaymentsSelected: Boolean = true
+    isIncomingPaymentsSelected: Boolean = true,
 ) {
     val payments by viewModel.payments.observeAsState(listOf())
 
@@ -75,7 +75,7 @@ private fun PaymentsScreen(
     onNavigateBack: () -> Unit,
     onResetPaymentsClicked: () -> Unit,
     onPaymentClicked: (Payment) -> Unit,
-    isIncomingPaymentsSelected: Boolean = true
+    isIncomingPaymentsSelected: Boolean = true,
 ) {
     val incomingPayments = payments.filter { it.isIncoming() }
     val outgoingPayments = payments.filter { !it.isIncoming() }

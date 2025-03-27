@@ -34,7 +34,7 @@ fun CertificateCard(
     organization: String? = null,
     algorithm: String? = null,
     errorText: String? = null,
-    onClick: () -> Unit
+    onClick: () -> Unit,
 ) {
     val isError = !errorText.isNullOrEmpty()
     val alphaTint = if (isError) 0.5f else 1f

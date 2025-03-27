@@ -26,5 +26,5 @@ data class Document(
 data class SignedDocumentsGroup(
     val documents: List<Document>,
     val date: LocalDate,
-    val signatories: List<String>
+    val signatories: List<String>,
 )

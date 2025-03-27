@@ -25,5 +25,5 @@ data class BankUserEntity(
     @ColumnInfo(name = "token_serial_number") val tokenSerialNumber: String,
     @ColumnInfo(name = "is_biometry_active") val isBiometryActive: Boolean,
     @ColumnInfo(name = "encrypted_pin") val encryptedPin: ByteArray?,
-    @ColumnInfo(name = "cipher_iv") val cipherIv: ByteArray?
+    @ColumnInfo(name = "cipher_iv") val cipherIv: ByteArray?,
 )

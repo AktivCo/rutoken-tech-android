@@ -45,7 +45,7 @@ sealed class ShiftDestination(override val route: String) : Destination {
 fun NavGraphBuilder.addShiftDestinations(
     navController: NavController,
     sessionHolder: AppSessionHolder,
-    openDrawer: () -> Unit
+    openDrawer: () -> Unit,
 ) {
     composable(ShiftDestination.Start) {
         LaunchedEffect(Unit) {

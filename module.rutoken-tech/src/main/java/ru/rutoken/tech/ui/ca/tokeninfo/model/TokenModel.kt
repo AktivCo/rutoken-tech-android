@@ -60,7 +60,7 @@ interface TokenModel {
         internal fun fromTokenInfo(
             tokenInfo: Pkcs11TokenInfo,
             tokenInfoEx: TokenInfoExtended,
-            tokenInfoHwFeatures: TokenInfoHwFeatures?
+            tokenInfoHwFeatures: TokenInfoHwFeatures?,
         ): TokenModel {
             tokenInfoHwFeatures?.getModelByVendorDefinedName()?.let { model ->
                 // Identified TokenModel by vendor model name and current interface from hardware features
@@ -175,7 +175,7 @@ interface TokenModel {
 suspend fun defineTokenModel(
     pkcs11Session: Pkcs11Session,
     tokenInfo: Pkcs11TokenInfo,
-    tokenInfoExtended: TokenInfoExtended
+    tokenInfoExtended: TokenInfoExtended,
 ): TokenModel {
     return withPkcs11CallContext {
         TokenModel.fromTokenInfo(tokenInfo, tokenInfoExtended, pkcs11Session.getTokenInfoHwFeatures())
@@ -221,7 +221,7 @@ private fun Pkcs11StringAttribute.getValueOrNull() = if (this.isPresent && !this
 data class TokenInfoHwFeatures(
     val currentInterface: Long,
     val supportedInterfaces: Long,
-    val vendorModelName: String?
+    val vendorModelName: String?,
 )
 
 val TokenModel.isSupported: Boolean

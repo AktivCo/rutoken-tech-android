@@ -29,7 +29,7 @@ suspend fun callPkcs11Operation(
     showProgress: MutableLiveData<Boolean>,
     tokenManager: TokenManager,
     tokenSerial: SerialHexString,
-    block: suspend () -> Unit
+    block: suspend () -> Unit,
 ) {
     try {
         showProgress.postValue(true)
@@ -63,7 +63,7 @@ private suspend fun checkTokenRemoved(tokenManager: TokenManager, tokenSerial: S
 private suspend fun Pkcs11Exception.asBusinessRuleExceptionOrNull(
     tokenManager: TokenManager,
     tokenSerial: SerialHexString,
-    retryCountLeft: Long?
+    retryCountLeft: Long?,
 ): BusinessRuleException? {
     if (checkTokenRemoved(tokenManager, tokenSerial)) return BusinessRuleException(TokenRemoved)
 

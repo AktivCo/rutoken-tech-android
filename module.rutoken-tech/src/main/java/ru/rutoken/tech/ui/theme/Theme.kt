@@ -91,7 +91,7 @@ private val darkScheme = darkColorScheme(
 @Composable
 fun RutokenTechTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
-    content: @Composable () -> Unit
+    content: @Composable () -> Unit,
 ) {
     MaterialTheme(
         colorScheme = if (darkTheme) darkScheme else lightScheme,

@@ -42,7 +42,7 @@ fun BankStartScreen(
     viewModel: BankStartScreenViewModel,
     onNavigateToUserLogin: () -> Unit,
     onNavigateToUserAdding: () -> Unit,
-    openDrawer: () -> Unit
+    openDrawer: () -> Unit,
 ) {
     val showDeleteUsersDialog by viewModel.showDeleteUsersDialog.observeAsState(false)
     if (showDeleteUsersDialog) {
@@ -86,7 +86,7 @@ private fun BankStartScreen(
     onDeleteUsers: () -> Unit,
     onUserClicked: (User) -> Unit,
     onAddUserClicked: () -> Unit,
-    openDrawer: () -> Unit
+    openDrawer: () -> Unit,
 ) {
     Scaffold(
         topBar = {

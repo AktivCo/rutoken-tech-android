@@ -115,5 +115,5 @@ private data class LocalCAConfig(
     val caPrivateKey: String,
     val privateKeyAlgorithm: String,
     val signatureAlgorithm: String,
-    val issuedCertificateValidityPeriod: Period
+    val issuedCertificateValidityPeriod: Period,
 )

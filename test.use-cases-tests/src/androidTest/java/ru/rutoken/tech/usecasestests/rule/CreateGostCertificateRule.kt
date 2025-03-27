@@ -18,7 +18,7 @@ import ru.rutoken.tech.usecasestests.ID
 
 class CreateGostCertificateRule(
     private val session: RtSessionRule,
-    private val keyPair: GenerateKeyPairRule<Pkcs11GostPublicKeyObject, Pkcs11GostPrivateKeyObject>
+    private val keyPair: GenerateKeyPairRule<Pkcs11GostPublicKeyObject, Pkcs11GostPrivateKeyObject>,
 ) : ExternalResource() {
     private lateinit var _encoded: ByteArray
     private lateinit var _value: Pkcs11CertificateObject

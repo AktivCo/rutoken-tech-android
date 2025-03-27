@@ -29,7 +29,7 @@ fun AlertDialogWithIcon(
     icon: @Composable () -> Unit,
     title: String,
     text: String? = null,
-    onDismissOrConfirm: () -> Unit
+    onDismissOrConfirm: () -> Unit,
 ) {
     AlertDialog(
         onDismissRequest = onDismissOrConfirm,

@@ -24,7 +24,7 @@ import ru.rutoken.tech.ui.theme.RutokenTechTheme
 @Composable
 fun SimpleAlertDialog(
     text: String,
-    onDismissOrConfirm: () -> Unit
+    onDismissOrConfirm: () -> Unit,
 ) {
     AlertDialog(
         onDismissRequest = { onDismissOrConfirm() },

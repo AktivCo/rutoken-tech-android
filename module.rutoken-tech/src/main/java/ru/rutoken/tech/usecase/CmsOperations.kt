@@ -38,7 +38,7 @@ object CmsOperations {
         data: ByteArray,
         signerPrivateKey: Pkcs11GostPrivateKeyObject,
         signerCertificate: Pkcs11CertificateObject,
-        additionalCertificates: List<X509CertificateHolder>? = null
+        additionalCertificates: List<X509CertificateHolder>? = null,
     ): ByteArray {
         val x509CertificateHolder = signerCertificate.toX509CertificateHolder(session)
 
@@ -100,7 +100,7 @@ object CmsOperations {
         session: RtPkcs11Session? = null,
         intermediateCertificates: List<ByteArray>? = null,
         additionalCertificates: List<ByteArray>? = null,
-        crls: List<ByteArray>? = null
+        crls: List<ByteArray>? = null,
     ): VerifyCmsResult {
         return when (provider) {
             CmsOperationProvider.PKCS11_WRAPPER -> {

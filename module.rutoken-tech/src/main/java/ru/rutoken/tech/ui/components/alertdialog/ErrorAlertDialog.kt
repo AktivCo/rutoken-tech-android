@@ -25,7 +25,7 @@ import ru.rutoken.tech.ui.theme.RutokenTechTheme
 fun ErrorAlertDialog(
     title: String,
     text: String,
-    onDismissOrConfirm: () -> Unit
+    onDismissOrConfirm: () -> Unit,
 ) {
     AlertDialog(
         onDismissRequest = { onDismissOrConfirm() },

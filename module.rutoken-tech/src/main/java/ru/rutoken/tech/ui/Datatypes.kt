@@ -13,7 +13,7 @@ class User(
     val name: String,
     val position: String?,
     val certificateExpirationDate: String,
-    val errorText: String? = null
+    val errorText: String? = null,
 )
 
 class Certificate(
@@ -24,5 +24,5 @@ class Certificate(
     val certificateExpirationDate: String,
     val organization: String?,
     @StringRes val algorithm: Int,
-    val errorText: String? = null
+    val errorText: String? = null,
 )

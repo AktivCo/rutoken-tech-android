@@ -38,7 +38,7 @@ import java.time.ZonedDateTime
 
 class GenerateKeyPairViewModel(
     private val tokenManager: TokenManager,
-    private val sessionHolder: AppSessionHolder
+    private val sessionHolder: AppSessionHolder,
 ) : ViewModel() {
     val connectTokenDelegate = ConnectTokenDelegate(viewModelScope)
 
@@ -116,7 +116,7 @@ class GenerateKeyPairViewModel(
         ckaId: ByteArray,
         keyPairParams: GostKeyPairParams,
         keyPairValidityNotBefore: ZonedDateTime,
-        keyPairValidityNotAfter: ZonedDateTime
+        keyPairValidityNotAfter: ZonedDateTime,
     ): GostKeyPair {
         return token.openSession(true).use { session ->
             session.login(CKU_USER, userPin).use {

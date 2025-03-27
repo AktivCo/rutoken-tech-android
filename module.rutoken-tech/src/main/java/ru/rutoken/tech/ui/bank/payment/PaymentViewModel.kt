@@ -52,7 +52,7 @@ class PaymentViewModel(
     private val sessionHolder: AppSessionHolder,
     private val tokenManager: TokenManager,
     private val filesHelper: FilesHelper,
-    private val paymentTitle: String
+    private val paymentTitle: String,
 ) : ViewModel() {
     val connectTokenDelegate = ConnectTokenDelegate(viewModelScope)
 

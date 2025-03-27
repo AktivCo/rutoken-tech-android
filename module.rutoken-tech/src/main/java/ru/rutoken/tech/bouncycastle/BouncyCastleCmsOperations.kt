@@ -107,7 +107,7 @@ object BouncyCastleCmsOperations {
         data: ByteArray,
         privateKey: Base64String,
         certificate: X509CertificateHolder,
-        additionalCertificates: List<X509CertificateHolder>
+        additionalCertificates: List<X509CertificateHolder>,
     ): ByteArray {
         val generator = CMSSignedDataGenerator().apply {
             val signer = JcaContentSignerBuilder("GOST3411WITHECGOST3410-2012-256")
@@ -129,7 +129,7 @@ object BouncyCastleCmsOperations {
         trustedCertificates: List<X509Certificate>,
         intermediateCertificates: List<X509CertificateHolder>,
         additionalCertificates: List<X509CertificateHolder>,
-        crls: List<X509CRLHolder>
+        crls: List<X509CRLHolder>,
     ): VerifyCmsResult {
         try {
             val cmsSignedData = CMSSignedData(CMSProcessableByteArray(data), cms)
@@ -198,7 +198,7 @@ object BouncyCastleCmsOperations {
     fun encrypt(
         data: ByteArray,
         certificateHolder: X509CertificateHolder,
-        contentEncryptionAlgorithm: ASN1ObjectIdentifier
+        contentEncryptionAlgorithm: ASN1ObjectIdentifier,
     ): ByteArray {
         val cmsEnvelopedDataGenerator = CMSEnvelopedDataGenerator().apply {
             addRecipientInfoGenerator(JceKeyTransRecipientInfoGenerator(getX509Certificate(certificateHolder)))
@@ -215,7 +215,7 @@ object BouncyCastleCmsOperations {
         session: Pkcs11Session,
         data: ByteArray,
         possibleRecipientsCertificates: List<X509CertificateHolder>,
-        privateKey: Pkcs11GostPrivateKeyObject
+        privateKey: Pkcs11GostPrivateKeyObject,
     ): ByteArray = withPkcs11CallContext {
         val cms = CMSEnvelopedData(data)
         val recipientsStore = cms.recipientInfos
@@ -238,7 +238,7 @@ private fun matchRecipients(recipientsStore: RecipientInformationStore, possible
 private fun makeKeyTransEnvelopedRecipient(
     session: Pkcs11Session,
     cms: CMSEnvelopedData,
-    privateKey: Pkcs11GostPrivateKeyObject
+    privateKey: Pkcs11GostPrivateKeyObject,
 ): KeyTransRecipient {
     val encryptionAlgorithm = cms.contentEncryptionAlgorithm.algorithm
     if (encryptionAlgorithm != CMSAlgorithm.GOST28147_GCFB)

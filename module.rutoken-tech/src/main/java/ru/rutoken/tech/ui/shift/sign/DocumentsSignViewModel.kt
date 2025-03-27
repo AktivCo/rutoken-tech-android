@@ -203,7 +203,7 @@ class DocumentsSignViewModel(
         token: RtPkcs11Token,
         tokenInfo: Pkcs11TokenInfo,
         tokenUserPin: String,
-        block: suspend (RtPkcs11Session) -> Unit
+        block: suspend (RtPkcs11Session) -> Unit,
     ) {
         callPkcs11Operation(_showProgress, tokenManager, tokenInfo.serialNumberTrimmed) {
             token.openSession(false).use { session ->

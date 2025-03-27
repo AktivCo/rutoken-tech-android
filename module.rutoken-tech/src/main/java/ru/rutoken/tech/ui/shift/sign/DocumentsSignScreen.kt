@@ -86,7 +86,7 @@ private fun DocumentsSignScreen(
     onDismissRequest: () -> Unit,
     onSignClick: () -> Unit,
     onFinishSigningClick: () -> Unit,
-    sheetState: SheetState = rememberModalBottomSheetState()
+    sheetState: SheetState = rememberModalBottomSheetState(),
 ) {
     if (signatories.isNotEmpty()) {
         SignatoriesBottomSheet(
@@ -139,7 +139,7 @@ private fun EnterPinBottomSheet(
     viewModel: EnterPinViewModel,
     sheetState: SheetState,
     onNavigateBack: () -> Unit,
-    onButtonClick: (String) -> Unit
+    onButtonClick: (String) -> Unit,
 ) {
     val pinErrorText by viewModel.pinErrorText.observeAsState("")
     val isButtonEnabled by viewModel.isButtonEnabled.observeAsState(false)

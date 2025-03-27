@@ -74,7 +74,7 @@ class LoginViewModel(
     private val sessionHolder: AppSessionHolder,
     private val bankRepository: BankUserRepository,
     private val shiftUserRepository: ShiftUserRepository,
-    private val shiftSignedDocumentRepository: ShiftSignedDocumentRepository
+    private val shiftSignedDocumentRepository: ShiftSignedDocumentRepository,
 ) : ViewModel() {
     val connectTokenDelegate = ConnectTokenDelegate(viewModelScope)
 
@@ -135,7 +135,7 @@ class LoginViewModel(
     private suspend fun doLogin(
         appSessionType: AppSessionType,
         tokenUserPin: String,
-        tokenData: RtPkcs11TokenData
+        tokenData: RtPkcs11TokenData,
     ): Result<AppSession> {
         return runCatching {
             createAppSession(appSessionType, tokenUserPin, tokenData).also { newSession ->
@@ -147,7 +147,7 @@ class LoginViewModel(
     private suspend fun createAppSession(
         appSessionType: AppSessionType,
         tokenUserPin: String,
-        tokenData: RtPkcs11TokenData
+        tokenData: RtPkcs11TokenData,
     ): AppSession {
         val tokenInfo = withPkcs11CallContext { tokenData.token.tokenInfo }
 
@@ -164,7 +164,7 @@ class LoginViewModel(
         tokenData: RtPkcs11TokenData,
         tokenInfo: Pkcs11TokenInfo,
         tokenUserPin: String,
-        block: suspend (RtPkcs11Session) -> Unit
+        block: suspend (RtPkcs11Session) -> Unit,
     ) {
         callPkcs11Operation(_showProgress, tokenManager, tokenInfo.serialNumberTrimmed) {
             tokenData.token.openSession(false).use { session ->
@@ -178,7 +178,7 @@ class LoginViewModel(
     private suspend fun createCaAppSession(
         tokenUserPin: String,
         tokenData: RtPkcs11TokenData,
-        tokenInfo: Pkcs11TokenInfo
+        tokenInfo: Pkcs11TokenInfo,
     ): CaAppSession {
         var keyPairs: MutableList<CkaID> = mutableListOf()
 
@@ -199,7 +199,7 @@ class LoginViewModel(
     private suspend fun createBankUserAddingAppSession(
         tokenUserPin: String,
         tokenData: RtPkcs11TokenData,
-        tokenInfo: Pkcs11TokenInfo
+        tokenInfo: Pkcs11TokenInfo,
     ): BankUserAddingAppSession {
         var certificates: List<Certificate> = listOf()
 
@@ -220,7 +220,7 @@ class LoginViewModel(
     private suspend fun createShiftUserAddingAppSession(
         tokenUserPin: String,
         tokenData: RtPkcs11TokenData,
-        tokenInfo: Pkcs11TokenInfo
+        tokenInfo: Pkcs11TokenInfo,
     ): ShiftUserAddingAppSession {
         var certificates: List<Certificate> = listOf()
 
@@ -241,7 +241,7 @@ class LoginViewModel(
     private suspend fun updateShiftUserLoginSession(
         tokenUserPin: String,
         tokenData: RtPkcs11TokenData,
-        tokenInfo: Pkcs11TokenInfo
+        tokenInfo: Pkcs11TokenInfo,
     ): ShiftUserLoginAppSession {
         val currentShiftSession = sessionHolder.requireShiftUserLoginSession()
 
@@ -274,7 +274,7 @@ class LoginViewModel(
     private suspend fun updateBankUserLoginSession(
         tokenUserPin: String,
         tokenData: RtPkcs11TokenData,
-        tokenInfo: Pkcs11TokenInfo
+        tokenInfo: Pkcs11TokenInfo,
     ): BankUserLoginAppSession {
         val currentBankSession = sessionHolder.requireBankUserLoginSession()
 
@@ -303,7 +303,7 @@ class LoginViewModel(
     }
 
     private suspend fun Gost256CertificateAndKeyContainer.toDomainCertificate(
-        isShiftCertificate: Boolean = false
+        isShiftCertificate: Boolean = false,
     ): Certificate {
         val certificateEncoded = certificate.encoded
         val certificate = X509CertificateHolder(certificateEncoded).also { it.checkSubjectRdns() }
@@ -326,7 +326,7 @@ class LoginViewModel(
         certificateDerValue: ByteArray,
         certificateNotBefore: Date,
         certificateNotAfter: Date,
-        isShiftCertificate: Boolean
+        isShiftCertificate: Boolean,
     ): String? {
         if ((!isShiftCertificate && bankRepository.findUser(certificateDerValue) != null) ||
             (isShiftCertificate && shiftUserRepository.findUser(certificateDerValue) != null)

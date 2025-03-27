@@ -34,7 +34,7 @@ private val failedBiometryActivationDialogData =
 class EnterPinViewModel(
     applicationContext: Context,
     private val sessionHolder: AppSessionHolder,
-    private val repository: BankUserRepository
+    private val repository: BankUserRepository,
 ) : ViewModel() {
     private val _isButtonEnabled = MutableLiveData(false)
     val isButtonEnabled: LiveData<Boolean> get() = _isButtonEnabled

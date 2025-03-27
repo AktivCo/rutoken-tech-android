@@ -35,7 +35,7 @@ fun MainDrawerContent(
     onNavigateToBank: () -> Unit,
     onNavigateToCa: () -> Unit,
     onNavigateToAbout: () -> Unit,
-    onNavigateToShift: () -> Unit
+    onNavigateToShift: () -> Unit,
 ) {
     Column(modifier = Modifier.padding(12.dp)) {
         Column(

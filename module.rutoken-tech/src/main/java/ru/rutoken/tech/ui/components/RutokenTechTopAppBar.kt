@@ -57,7 +57,7 @@ fun RutokenTechLargeTopAppBar(
     navigationIcon: @Composable () -> Unit,
     onNavigationIconClick: () -> Unit,
     actions: List<RutokenTechTopAppBarAction> = emptyList(),
-    colors: TopAppBarColors = TopAppBarDefaults.largeTopAppBarColors()
+    colors: TopAppBarColors = TopAppBarDefaults.largeTopAppBarColors(),
 ) {
     LargeTopAppBar(
         title = {

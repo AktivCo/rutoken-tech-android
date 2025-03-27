@@ -69,7 +69,7 @@ import ru.rutoken.tech.ui.utils.getHideKeyboardAction
 fun GenerateCertificateScreen(
     viewModel: GenerateCertificateViewModel,
     onNavigateBack: () -> Unit,
-    onLogout: () -> Unit
+    onLogout: () -> Unit,
 ) {
     val keyPairs by viewModel.keyPairs.observeAsState(emptyList())
     val shouldLogout by viewModel.shouldLogout.observeAsState(false)
@@ -108,7 +108,7 @@ fun GenerateCertificateBottomSheet(
     sheetState: SheetState,
     onDismissRequest: () -> Unit,
     keyPairs: List<CkaID>,
-    onGenerationButtonClicked: (CkaID, String) -> Unit
+    onGenerationButtonClicked: (CkaID, String) -> Unit,
 ) {
     ModalBottomSheet(
         onDismissRequest = onDismissRequest,

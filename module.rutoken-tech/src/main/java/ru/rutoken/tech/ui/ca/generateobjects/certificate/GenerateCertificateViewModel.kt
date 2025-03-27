@@ -36,7 +36,7 @@ import ru.rutoken.tech.utils.loge
 
 class GenerateCertificateViewModel(
     private val tokenManager: TokenManager,
-    private val sessionHolder: AppSessionHolder
+    private val sessionHolder: AppSessionHolder,
 ) : ViewModel() {
     val connectTokenDelegate = ConnectTokenDelegate(viewModelScope)
 
@@ -113,7 +113,7 @@ class GenerateCertificateViewModel(
         keyPairCkaId: ByteArray,
         dn: List<String>,
         attributes: List<String>?,
-        extensions: List<String>
+        extensions: List<String>,
     ): Pkcs11CertificateObject {
         return token.openSession(true).use { session ->
             session.login(CKU_USER, userPin).use {

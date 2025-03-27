@@ -12,5 +12,5 @@ import ru.rutoken.pkcs11wrapper.main.Pkcs11Slot
 data class SlotEvent(
     val slot: Pkcs11Slot,
     val slotInfo: Pkcs11SlotInfo,
-    val isFake: Boolean = false
+    val isFake: Boolean = false,
 )

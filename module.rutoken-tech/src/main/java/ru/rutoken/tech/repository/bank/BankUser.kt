@@ -19,7 +19,7 @@ data class BankUser(
     val fullName: String,
     val position: String?,
     val certificateNotBefore: Date,
-    val certificateNotAfter: Date
+    val certificateNotAfter: Date,
 )
 
 fun makeBankUser(userEntity: BankUserEntity): BankUser {

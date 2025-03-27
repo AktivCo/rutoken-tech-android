@@ -88,7 +88,7 @@ fun MainNavHost(navHostController: NavHostController, openDrawer: () -> Unit) {
 fun NavGraphBuilder.composable(
     destination: Destination,
     arguments: List<NamedNavArgument> = emptyList(),
-    content: @Composable AnimatedContentScope.(NavBackStackEntry) -> Unit
+    content: @Composable AnimatedContentScope.(NavBackStackEntry) -> Unit,
 ) {
     composable(
         route = destination.route,
@@ -99,7 +99,7 @@ fun NavGraphBuilder.composable(
 
 fun NavController.navigateSingleTopTo(
     destination: Destination,
-    popUpToInclusive: Boolean = false
+    popUpToInclusive: Boolean = false,
 ) = navigateSingleTopTo(destination.route, popUpToInclusive)
 
 fun NavController.navigateSingleTopTo(route: String, popUpToInclusive: Boolean) =

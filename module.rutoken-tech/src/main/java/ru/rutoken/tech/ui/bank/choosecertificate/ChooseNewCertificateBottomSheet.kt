@@ -52,7 +52,7 @@ import ru.rutoken.tech.ui.utils.expandedSheetState
 fun ChooseNewCertificateScreen(
     viewModel: ChooseNewCertificateViewModel,
     onNavigateToPaymentsScreen: () -> Unit,
-    onNavigateBack: () -> Unit
+    onNavigateBack: () -> Unit,
 ) {
     var showBottomSheet by remember { mutableStateOf(true) }
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
@@ -97,7 +97,7 @@ private fun ChooseNewCertificateBottomSheet(
     certificates: List<Certificate>,
     sheetState: SheetState,
     onCertificateClicked: (Certificate) -> Unit,
-    onDismissRequest: () -> Unit
+    onDismissRequest: () -> Unit,
 ) {
     ModalBottomSheet(
         onDismissRequest = onDismissRequest,

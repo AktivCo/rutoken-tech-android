@@ -35,7 +35,7 @@ fun TextGroupBox(
     modifier: Modifier = Modifier,
     padding: PaddingValues = PaddingValues(16.dp),
     backgroundColor: Color = MaterialTheme.colorScheme.surfaceContainerHigh,
-    alphaTint: Float = 1f
+    alphaTint: Float = 1f,
 ) {
     Box(modifier.padding(padding)) {
         TextGroup(items, backgroundColor, alphaTint)
@@ -46,7 +46,7 @@ fun TextGroupBox(
 fun TextGroup(
     items: List<TextGroupItem>,
     backgroundColor: Color = MaterialTheme.colorScheme.surfaceContainerHigh,
-    alphaTint: Float = 1f
+    alphaTint: Float = 1f,
 ) {
     Column(
         modifier = Modifier

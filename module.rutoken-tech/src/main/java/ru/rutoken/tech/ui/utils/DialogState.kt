@@ -22,20 +22,20 @@ private val UNKNOWN_ERROR_DIALOG_DATA =
 
 class DialogState(
     val showDialog: Boolean = false,
-    val data: DialogData = UNKNOWN_ERROR_DIALOG_DATA
+    val data: DialogData = UNKNOWN_ERROR_DIALOG_DATA,
 )
 
 open class DialogData(@StringRes val text: Int?)
 
 class ErrorDialogData(
     @StringRes val title: Int,
-    @StringRes text: Int
+    @StringRes text: Int,
 ) : DialogData(text)
 
 class DialogDataWithIcon(
     val icon: @Composable () -> Unit,
     @StringRes val title: Int,
-    @StringRes text: Int?
+    @StringRes text: Int?,
 ) : DialogData(text)
 
 val DialogState.errorDialogData get() = data as? ErrorDialogData ?: UNKNOWN_ERROR_DIALOG_DATA

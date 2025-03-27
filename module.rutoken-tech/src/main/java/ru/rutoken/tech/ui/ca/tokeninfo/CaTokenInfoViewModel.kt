@@ -25,7 +25,7 @@ data class CaTokenInfoUiState(
     val tokenType: TokenType,
     val label: String,
     val model: String,
-    val serial: String
+    val serial: String,
 )
 
 enum class TokenType {
@@ -34,7 +34,7 @@ enum class TokenType {
 
 class CaTokenInfoViewModel(
     private val applicationContext: Context,
-    private val sessionHolder: AppSessionHolder
+    private val sessionHolder: AppSessionHolder,
 ) : ViewModel() {
     // CaAppSession instance MUST exist by the time this ViewModel is instantiated
     private val caAppSession: CaAppSession get() = sessionHolder.requireCaSession()

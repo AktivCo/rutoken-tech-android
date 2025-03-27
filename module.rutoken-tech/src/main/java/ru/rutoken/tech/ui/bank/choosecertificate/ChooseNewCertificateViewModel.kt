@@ -34,7 +34,7 @@ import ru.rutoken.tech.ui.utils.ErrorDialogData
 class ChooseNewCertificateViewModel(
     private val applicationContext: Context,
     private val sessionHolder: AppSessionHolder,
-    private val repository: BankUserRepository
+    private val repository: BankUserRepository,
 ) : ViewModel() {
     //    BankUserAddingAppSession instance MUST exist by the time this ViewModel is instantiated
     private val bankUserAddingAppSession: BankUserAddingAppSession

@@ -39,7 +39,7 @@ sealed class CaDestination(override val route: String) : Destination {
 fun NavGraphBuilder.addCaDestinations(
     navController: NavController,
     sessionHolder: AppSessionHolder,
-    openDrawer: () -> Unit
+    openDrawer: () -> Unit,
 ) {
     composable(CaDestination.Start) {
         LaunchedEffect(Unit) {

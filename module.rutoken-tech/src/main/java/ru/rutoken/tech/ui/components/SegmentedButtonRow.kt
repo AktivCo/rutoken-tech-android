@@ -25,7 +25,7 @@ fun SegmentedButtonRow(
     isLeftSectionSelected: Boolean,
     leftSectionText: String,
     rightSectionText: String,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     var selectedIndex by remember { mutableIntStateOf(if (isLeftSectionSelected) 0 else 1) }
     SingleChoiceSegmentedButtonRow(modifier = modifier.fillMaxWidth()) {

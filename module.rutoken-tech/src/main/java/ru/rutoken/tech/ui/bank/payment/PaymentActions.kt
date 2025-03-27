@@ -30,7 +30,7 @@ suspend fun RtPkcs11Session.signPayment(
     payment: Payment,
     certificateCkaId: ByteArray,
     applicationContext: Context,
-    provider: CmsOperationProvider = CmsOperationProvider.PKCS11_WRAPPER
+    provider: CmsOperationProvider = CmsOperationProvider.PKCS11_WRAPPER,
 ) {
     payment.apply {
         actionResultData = CmsOperations.signDetached(
@@ -50,7 +50,7 @@ suspend fun verifyPaymentSignature(
     payment: Payment,
     applicationContext: Context,
     provider: CmsOperationProvider = CmsOperationProvider.PKCS11_WRAPPER,
-    session: RtPkcs11Session? = null
+    session: RtPkcs11Session? = null,
 ): VerifyCmsResult {
     payment.apply {
         val verifyResult = CmsOperations.verifyDetached(
@@ -84,7 +84,7 @@ suspend fun Pkcs11Session.decryptPayment(
     payment: Payment,
     certificateCkaId: ByteArray,
     certificateBytes: ByteArray,
-    applicationContext: Context
+    applicationContext: Context,
 ) {
     payment.apply {
         actionResultData = BouncyCastleCmsOperations.decrypt(

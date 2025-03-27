@@ -78,7 +78,7 @@ import java.time.LocalDate
 fun DocumentsScreen(
     viewModel: DocumentsViewModel,
     onNavigateBack: () -> Unit,
-    isDocumentsToSignSelected: Boolean = true
+    isDocumentsToSignSelected: Boolean = true,
 ) {
     val context = LocalContext.current
     val documents by viewModel.documents.observeAsState(mapOf())
@@ -150,7 +150,7 @@ private fun DocumentsScreen(
     onLongClickDocument: (Document) -> Unit,
     onResetSelectedDocumentsClicked: () -> Unit,
     onNavigateToDocumentsPreview: () -> Unit,
-    isDocumentsToSignSelected: Boolean = true
+    isDocumentsToSignSelected: Boolean = true,
 ) {
     var showDocumentsToSign by rememberSaveable { mutableStateOf(isDocumentsToSignSelected) }
 
@@ -243,7 +243,7 @@ private fun LazyListScope.documentsToSignItems(
     documents: Map<LocalDate, List<Document>>,
     documentsToSign: List<Document>,
     onDocumentClicked: (Document) -> Unit,
-    onLongClickDocument: (Document) -> Unit
+    onLongClickDocument: (Document) -> Unit,
 ) {
     documents.forEach { (date, docsInDate) ->
         item {
@@ -283,7 +283,7 @@ private fun LazyListScope.signedDocumentsItems(
     onDocumentClicked: (Document, SignedDocumentsGroup) -> Unit,
     onDownloadClicked: (SignedDocumentsGroup) -> Unit,
     onShareClicked: (SignedDocumentsGroup) -> Unit,
-    onSignatoriesClicked: (SignedDocumentsGroup) -> Unit
+    onSignatoriesClicked: (SignedDocumentsGroup) -> Unit,
 ) {
     signedDocuments.forEach { (date, sections) ->
         item {
@@ -315,7 +315,7 @@ private fun ExpandableDocumentsSection(
     onDocumentClicked: (Document, SignedDocumentsGroup) -> Unit,
     onDownloadClicked: (SignedDocumentsGroup) -> Unit,
     onShareClicked: (SignedDocumentsGroup) -> Unit,
-    onSignatoriesClicked: (SignedDocumentsGroup) -> Unit
+    onSignatoriesClicked: (SignedDocumentsGroup) -> Unit,
 ) {
     val isExpandable = (signedDocumentsGroup.documents.count() != 1)
     var isExpanded by rememberSaveable { mutableStateOf(!isExpandable) }

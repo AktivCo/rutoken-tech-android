@@ -52,7 +52,7 @@ fun PrimaryButtonBox(
     text: String,
     enabled: Boolean = true,
     padding: PaddingValues = PaddingValues(16.dp),
-    onClick: () -> Unit
+    onClick: () -> Unit,
 ) {
     Box(Modifier.padding(padding)) {
         PrimaryButton(text, enabled = enabled, onClick)
@@ -63,7 +63,7 @@ fun PrimaryButtonBox(
 fun PrimaryButton(
     text: String,
     enabled: Boolean = true,
-    onClick: () -> Unit
+    onClick: () -> Unit,
 ) {
     Button(
         onClick = onClick,

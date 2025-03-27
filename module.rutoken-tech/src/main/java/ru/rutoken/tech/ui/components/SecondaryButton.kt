@@ -27,7 +27,7 @@ fun SecondaryButtonBox(
     modifier: Modifier,
     text: String,
     padding: PaddingValues = PaddingValues(16.dp),
-    onClick: () -> Unit
+    onClick: () -> Unit,
 ) {
     Box(modifier = modifier.padding(padding), contentAlignment = Alignment.Center) {
         SecondaryButton(text, onClick)

@@ -24,7 +24,7 @@ class GenerateKeyPairRule<PublicKey : Pkcs11PublicKeyObject, PrivateKey : Pkcs11
     private val mechanism: Pkcs11Mechanism,
     private val publicKeyTemplate: List<Pkcs11Attribute>,
     private val privateKeyTemplate: List<Pkcs11Attribute>,
-    private val beforeGenerationCheck: ((Pkcs11Session) -> Boolean)? = null
+    private val beforeGenerationCheck: ((Pkcs11Session) -> Boolean)? = null,
 ) : ExternalResource() {
     private lateinit var _value: Pkcs11KeyPair<PublicKey, PrivateKey>
     val value get() = _value

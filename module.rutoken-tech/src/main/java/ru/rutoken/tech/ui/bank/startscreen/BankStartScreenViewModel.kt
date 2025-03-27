@@ -25,7 +25,7 @@ import ru.rutoken.tech.utils.toDateString
 class BankStartScreenViewModel(
     private val applicationContext: Context,
     private val repository: BankUserRepository,
-    private val sessionHolder: AppSessionHolder
+    private val sessionHolder: AppSessionHolder,
 ) : ViewModel() {
     private val _users = MutableLiveData<List<User>>()
     val users: LiveData<List<User>> get() = _users

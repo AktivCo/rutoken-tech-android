@@ -25,7 +25,7 @@ import ru.rutoken.tech.ui.shift.documents.initialDocumentsStorage
 
 class ChooseNewShiftCertificateViewModel(
     private val sessionHolder: AppSessionHolder,
-    private val repository: ShiftUserRepository
+    private val repository: ShiftUserRepository,
 ) : ViewModel() {
     //    ShiftUserAddingAppSession instance MUST exist by the time this ViewModel is instantiated
     private val shiftUserAddingAppSession: ShiftUserAddingAppSession

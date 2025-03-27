@@ -20,7 +20,7 @@ data class ShiftUser(
     val position: String?,
     val organization: String?,
     val certificateNotBefore: Date,
-    val certificateNotAfter: Date
+    val certificateNotAfter: Date,
 )
 
 fun makeShiftUser(userEntity: ShiftUserEntity): ShiftUser {

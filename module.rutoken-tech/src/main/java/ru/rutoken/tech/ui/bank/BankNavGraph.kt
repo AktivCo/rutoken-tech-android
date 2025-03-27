@@ -44,7 +44,7 @@ sealed class BankDestination(override val route: String) : Destination {
 fun NavGraphBuilder.addBankDestinations(
     navController: NavController,
     sessionHolder: AppSessionHolder,
-    openDrawer: () -> Unit
+    openDrawer: () -> Unit,
 ) {
     composable(BankDestination.Start) {
         LaunchedEffect(Unit) {

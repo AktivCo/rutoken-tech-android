@@ -52,7 +52,7 @@ fun EnterPinBottomSheet(
     sheetState: SheetState,
     onDismissRequest: () -> Unit,
     hasBiometricPin: Boolean,
-    onDecryptBiometricPin: () -> Unit
+    onDecryptBiometricPin: () -> Unit,
 ) {
     ModalBottomSheet(
         onDismissRequest = onDismissRequest,

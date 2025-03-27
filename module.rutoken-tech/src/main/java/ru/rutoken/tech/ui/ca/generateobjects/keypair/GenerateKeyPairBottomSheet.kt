@@ -75,7 +75,7 @@ fun GenerateKeyPairBottomSheet(
     keyPairId: String,
     sheetState: SheetState,
     onDismiss: () -> Unit,
-    onGenerationButtonClicked: () -> Unit
+    onGenerationButtonClicked: () -> Unit,
 ) {
     ModalBottomSheet(
         onDismissRequest = onDismiss,

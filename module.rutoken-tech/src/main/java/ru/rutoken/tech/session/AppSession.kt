@@ -33,13 +33,13 @@ data class CaAppSession(
     val tokenSerial: SerialHexString,
     val tokenModel: TokenModel,
     val tokenLabel: String,
-    val keyPairs: MutableList<CkaID>
+    val keyPairs: MutableList<CkaID>,
 ) : AppSession()
 
 data class BankUserAddingAppSession(
     val tokenUserPin: String,
     val tokenSerial: SerialHexString,
-    val certificates: List<Certificate>
+    val certificates: List<Certificate>,
 ) : AppSession()
 
 class BankUserLoginAppSession(
@@ -50,7 +50,7 @@ class BankUserLoginAppSession(
     val isBiometryActive: Boolean,
     var encryptedPinData: EncryptedPinData?,
     var payments: List<Payment>,
-    var operationWithToken: (suspend (RtPkcs11Session) -> Unit)? = null
+    var operationWithToken: (suspend (RtPkcs11Session) -> Unit)? = null,
 ) : AppSession() {
     fun hasPinToDecrypt(context: Context): Boolean {
         if (!isBiometryActive || encryptedPinData == null)
@@ -65,7 +65,7 @@ class BankUserLoginAppSession(
 data class ShiftUserAddingAppSession(
     val tokenUserPin: String,
     val tokenSerial: SerialHexString,
-    val certificates: List<Certificate>
+    val certificates: List<Certificate>,
 ) : AppSession()
 
 class ShiftUserLoginAppSession(
@@ -75,7 +75,7 @@ class ShiftUserLoginAppSession(
     val certificate: ByteArray,
     var documents: List<Document>,
     var signedDocuments: List<SignedDocumentsGroup>,
-    var chosenDocuments: DocumentsPreviewInfo = DocumentsPreviewInfo()
+    var chosenDocuments: DocumentsPreviewInfo = DocumentsPreviewInfo(),
 ) : AppSession()
 
 class DocumentsPreviewInfo(val documents: List<Document> = emptyList(), val startDocument: Int = 0)

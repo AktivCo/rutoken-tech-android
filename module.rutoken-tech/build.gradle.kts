@@ -191,7 +191,7 @@ fun copyFromBinaryDeps(
     projectName: String,
     architecture: String,
     file: String,
-    destinationPath: String
+    destinationPath: String,
 ) {
     val sourcePath = "$rootDir/external/$projectName/$architecture/lib"
     copyFile(file, sourcePath, destinationPath)

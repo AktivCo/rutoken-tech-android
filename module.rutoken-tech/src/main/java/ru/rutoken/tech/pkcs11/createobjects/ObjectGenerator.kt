@@ -51,7 +51,7 @@ suspend fun RtPkcs11Session.createGostCertificate(
     keyPair: GostKeyPair,
     dn: List<String>,
     attributes: List<String>?,
-    extensions: List<String>
+    extensions: List<String>,
 ): Pkcs11CertificateObject = withPkcs11CallContext {
     val ckaId = keyPair.publicKey.getByteArrayAttributeValue(this@createGostCertificate, CKA_ID).byteArrayValue
     val csr = createCsr(keyPair.publicKey, dn, keyPair.privateKey, attributes, extensions)
@@ -70,7 +70,7 @@ suspend fun Pkcs11Session.createGostKeyPair(
     keyPairParams: GostKeyPairParams,
     ckaId: ByteArray,
     privateKeyValidityNotBefore: Pkcs11Date,
-    privateKeyValidityNotAfter: Pkcs11Date
+    privateKeyValidityNotAfter: Pkcs11Date,
 ): GostKeyPair {
     if (!token.isMechanismSupported(keyPairParams.mechanismType))
         throw IllegalStateException("${keyPairParams.mechanismType} not supported by token")
@@ -105,7 +105,7 @@ fun IPkcs11AttributeFactory.makeCertificateTemplate(id: ByteArray, value: ByteAr
 
 fun IPkcs11AttributeFactory.makeGostPublicKeyTemplate(
     keyPairParams: GostKeyPairParams,
-    ckaId: ByteArray
+    ckaId: ByteArray,
 ): List<Pkcs11Attribute> {
     return listOf(
         makeAttribute(CKA_CLASS, CKO_PUBLIC_KEY),
@@ -123,7 +123,7 @@ fun IPkcs11AttributeFactory.makeGostPrivateKeyTemplate(
     keyPairParams: GostKeyPairParams,
     ckaId: ByteArray,
     keyValidityNotBefore: Pkcs11Date,
-    keyValidityNotAfter: Pkcs11Date
+    keyValidityNotAfter: Pkcs11Date,
 ): List<Pkcs11Attribute> {
     return listOf(
         makeAttribute(CKA_CLASS, CKO_PRIVATE_KEY),

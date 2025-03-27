@@ -19,7 +19,7 @@ enum class GostKeyPairParams(
     val mechanismType: IPkcs11MechanismType,
     val keyType: IPkcs11KeyType,
     val paramset3410: ByteArray,
-    val paramset3411: ByteArray
+    val paramset3411: ByteArray,
 ) {
     GOST_2012_256(
         CKM_GOSTR3410_KEY_PAIR_GEN,

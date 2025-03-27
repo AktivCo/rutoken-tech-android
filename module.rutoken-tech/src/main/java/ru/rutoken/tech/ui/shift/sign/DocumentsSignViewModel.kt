@@ -125,6 +125,7 @@ class DocumentsSignViewModel(
             withContext(Dispatchers.IO) {
                 try {
                     val token = connectTokenDelegate.findFirstToken(tokenManager).token
+                    var shouldClosePinBottomSheet = false
 
                     withTokenSession(token, token.tokenInfo, tokenUserPin) { session ->
                         val tokenContainers = session.findGost256CertificateAndKeyContainers()
@@ -141,6 +142,7 @@ class DocumentsSignViewModel(
                                     add(firstContainer.certificate.getFullName())
                                 }
                             )
+                            shouldClosePinBottomSheet = true
                         } else {
                             _errorDialogState.postValue(
                                 DialogState(
@@ -153,7 +155,9 @@ class DocumentsSignViewModel(
                             )
                         }
                     }
-                    onClosePincodeBottomSheet()
+
+                    if (shouldClosePinBottomSheet)
+                        onClosePincodeBottomSheet()
                 } catch (e: CancellationException) {
                     logd(e) { "Connect token dialog was dismissed" }
                 } catch (e: Exception) {

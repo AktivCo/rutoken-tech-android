@@ -75,7 +75,6 @@ class ShiftUserLoginAppSession(
     val certificate: ByteArray,
     var documents: List<Document>,
     var signedDocuments: List<SignedDocumentsGroup>,
-    var operationWithToken: (suspend (RtPkcs11Session) -> Unit)? = null,
     var chosenDocuments: DocumentsPreviewInfo = DocumentsPreviewInfo()
 ) : AppSession()
 

@@ -263,8 +263,6 @@ class LoginViewModel(
                         !signedDocumentsWithoutGroup.any { it.title == document.title }
                     }
                 }
-
-                currentShiftSession.operationWithToken?.let { it(session) }
             } catch (_: IllegalStateException) {
                 throw BusinessRuleException(NoSuchCertificate(isBankUser = false))
             }

@@ -38,6 +38,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.PreviewLightDark
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 import ru.rutoken.tech.R
@@ -102,7 +103,7 @@ private fun PaymentsScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(horizontal = 16.dp)
-                .padding(innerPadding)
+                .padding(top = innerPadding.calculateTopPadding())
                 .consumeWindowInsets(innerPadding)
         ) {
             SegmentedButtonRow(
@@ -122,14 +123,20 @@ private fun PaymentsScreen(
             PaymentsGroup(
                 payments = if (showIncomingPayments) incomingPayments else outgoingPayments,
                 scrollState = scrollState,
-                onPaymentClicked = onPaymentClicked
+                onPaymentClicked = onPaymentClicked,
+                listBottomPadding = innerPadding.calculateBottomPadding()
             )
         }
     }
 }
 
 @Composable
-private fun PaymentsGroup(payments: List<Payment>, scrollState: ScrollState, onPaymentClicked: (Payment) -> Unit) {
+private fun PaymentsGroup(
+    payments: List<Payment>,
+    scrollState: ScrollState,
+    onPaymentClicked: (Payment) -> Unit,
+    listBottomPadding: Dp,
+) {
     CompositionLocalProvider(LocalOverscrollConfiguration provides null) {
         Column(modifier = Modifier.verticalScroll(scrollState)) {
             val archivedPayments = payments.filter { it.isArchived() }
@@ -150,6 +157,7 @@ private fun PaymentsGroup(payments: List<Payment>, scrollState: ScrollState, onP
                 )
                 PaymentsGroup(payments = archivedPayments, forArchive = true, onPaymentClicked = onPaymentClicked)
             }
+            Spacer(Modifier.height(listBottomPadding))
         }
     }
 }

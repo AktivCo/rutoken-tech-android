@@ -132,7 +132,6 @@ dependencies {
     implementation(libs.androidx.core.splashscreen)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.navigation.compose)
-    implementation(libs.android.pdf.viewer)
     implementation(libs.bundles.compose)
     implementation(libs.bundles.room)
     implementation(libs.jna) { artifact { type = "aar" } }

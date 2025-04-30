@@ -6,6 +6,9 @@
 
 package ru.rutoken.tech.ui.shift.documents
 
+import android.content.Context
+import java.io.File
+import java.io.FileOutputStream
 import java.time.LocalDate
 import java.util.Base64
 
@@ -21,6 +24,21 @@ data class Document(
     val assetName: String = "shiftdocuments/$fileName"
 
     val base64SignatureBytes: ByteArray? get() = signedCms?.let { Base64.getEncoder().encode(it) }
+
+    fun getFile(context: Context): File {
+        val file = File(context.cacheDir, "temp_$fileName.pdf")
+
+        if (!file.exists()) {
+            context.assets.open("shiftdocuments/$fileName").use { inputStream ->
+                val byte = inputStream.readBytes()
+                FileOutputStream(file).use { outputStream ->
+                    outputStream.write(byte)
+                }
+            }
+        }
+
+        return file
+    }
 }
 
 data class SignedDocumentsGroup(

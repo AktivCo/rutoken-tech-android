@@ -26,17 +26,21 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.viewinterop.AndroidView
 import androidx.compose.ui.zIndex
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LifecycleEventEffect
-import com.github.barteksc.pdfviewer.PDFView
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.koin.androidx.compose.koinViewModel
 import ru.rutoken.tech.R
 import ru.rutoken.tech.session.DocumentsPreviewInfo
@@ -46,6 +50,8 @@ import ru.rutoken.tech.ui.components.RutokenTechLargeTopAppBar
 import ru.rutoken.tech.ui.components.RutokenTechTopAppBar
 import ru.rutoken.tech.ui.components.RutokenTechTopAppBarAction
 import ru.rutoken.tech.ui.components.SecondaryButtonBox
+import ru.rutoken.tech.ui.pdf.PDFViewer
+import ru.rutoken.tech.ui.pdf.renderPDF
 import ru.rutoken.tech.ui.shift.documents.Document
 import ru.rutoken.tech.ui.utils.startShareChooser
 
@@ -183,7 +189,7 @@ private fun SingleDocumentPreviewScreen(
                 .background(MaterialTheme.colorScheme.surface)
         ) {
             PDFViewer(
-                document = document,
+                pdfFile = document.getFile(LocalContext.current),
                 modifier = Modifier
                     .fillMaxWidth()
                     .weight(1f),
@@ -256,6 +262,15 @@ private fun MultipleDocumentsPreviewScreen(
                     )
                 }
             }
+            val density = LocalDensity.current.density
+            val context = LocalContext.current
+            val bitmaps = remember { mutableStateListOf<List<ImageBitmap>>() }
+
+            LaunchedEffect(documents) {
+                withContext(Dispatchers.Default) {
+                    documents.forEach { bitmaps.add(renderPDF(it.getFile(context), density)) }
+                }
+            }
 
             HorizontalPager(
                 state = pagerState,
@@ -263,10 +278,12 @@ private fun MultipleDocumentsPreviewScreen(
                     .fillMaxWidth()
                     .weight(1f),
             ) { pageIndex ->
-                PDFViewer(
-                    document = documents[pageIndex],
-                    modifier = Modifier.fillMaxSize()
-                )
+                if (bitmaps.getOrNull(pageIndex) != null) {
+                    PDFViewer(
+                        bitmaps = bitmaps[pageIndex],
+                        modifier = Modifier.fillMaxSize()
+                    )
+                }
             }
 
             if (!areDocumentsSigned) {
@@ -281,20 +298,4 @@ private fun MultipleDocumentsPreviewScreen(
             }
         }
     }
-}
-
-@Composable
-private fun PDFViewer(document: Document, modifier: Modifier = Modifier) {
-    AndroidView(
-        modifier = modifier,
-        factory = { context ->
-            PDFView(context, null).apply {
-                fromAsset(document.assetName)
-                    .pages(document.displayPageIndex)
-                    .enableSwipe(false)
-                    .enableDoubletap(false)
-                    .load()
-            }
-        }
-    )
 }

@@ -19,8 +19,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -35,9 +33,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.viewinterop.AndroidView
-import com.github.barteksc.pdfviewer.PDFView
-import com.github.barteksc.pdfviewer.scroll.DefaultScrollHandle
 import ru.rutoken.tech.ui.bank.payments.Base64String
 import ru.rutoken.tech.ui.bank.payments.Payment
 import ru.rutoken.tech.ui.bank.payments.UserActionType
@@ -51,13 +46,13 @@ import ru.rutoken.tech.ui.components.alertdialog.AlertDialogWithIcon
 import ru.rutoken.tech.ui.components.alertdialog.ConnectTokenDialog
 import ru.rutoken.tech.ui.components.alertdialog.ErrorAlertDialog
 import ru.rutoken.tech.ui.components.alertdialog.SimpleAlertDialog
+import ru.rutoken.tech.ui.pdf.PDFViewer
 import ru.rutoken.tech.ui.theme.RutokenTechTheme
 import ru.rutoken.tech.ui.theme.bodyMediumOnSurfaceVariant
 import ru.rutoken.tech.ui.utils.DialogDataWithIcon
 import ru.rutoken.tech.ui.utils.DialogState
 import ru.rutoken.tech.ui.utils.errorDialogData
 import ru.rutoken.tech.ui.utils.startShareChooser
-import ru.rutoken.tech.utils.decoded
 import java.time.LocalDate
 import java.time.LocalDateTime
 
@@ -153,11 +148,12 @@ private fun PaymentScreen(
 
 @Composable
 private fun PaymentView(modifier: Modifier, payment: Payment) {
-    val renderData = payment.getRenderData(LocalContext.current)
+    val context = LocalContext.current
     if (payment.hasEncryptedRenderData()) {
+        val renderData = payment.getRenderData(context)
         EncryptedPaymentView(modifier, renderData)
     } else {
-        PaymentPdfView(modifier, renderData.decoded)
+        PDFViewer(payment.getFile(context), modifier)
     }
 }
 
@@ -177,25 +173,6 @@ private fun EncryptedPaymentView(modifier: Modifier, renderData: Base64String) {
                 )
             }
         }
-    }
-}
-
-@Composable
-private fun PaymentPdfView(modifier: Modifier, renderData: ByteArray) {
-    Column(
-        modifier = modifier
-            .background(color = MaterialTheme.colorScheme.surface)
-            .fillMaxSize()
-            .verticalScroll(rememberScrollState())
-    ) {
-        AndroidView(
-            modifier = modifier.fillMaxSize(),
-            factory = { context ->
-                PDFView(context, null).apply {
-                    fromBytes(renderData).scrollHandle(DefaultScrollHandle(context)).spacing(4).load()
-                }
-            }
-        )
     }
 }
 

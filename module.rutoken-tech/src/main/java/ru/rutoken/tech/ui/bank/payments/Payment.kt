@@ -19,6 +19,7 @@ import ru.rutoken.tech.utils.decoded
 import ru.rutoken.tech.utils.toBase64String
 import ru.rutoken.tech.utils.toDateTimeString
 import java.io.File
+import java.io.FileOutputStream
 import java.time.LocalDate
 import java.time.LocalDateTime
 
@@ -66,6 +67,21 @@ data class Payment(
         SIGN, VERIFY -> readFile(context).toBase64String()
         ENCRYPT -> if (isArchived()) actionResultData!! else readFile(context).toBase64String()
         DECRYPT -> if (isArchived()) actionResultData!! else initialActionData!!
+    }
+
+    fun getFile(context: Context): File {
+        val file = File(context.cacheDir, "temp_$fileName.pdf")
+
+        if (!file.exists()) {
+            context.assets.open("bankdocuments/$fileName").use { inputStream ->
+                val byte = inputStream.readBytes()
+                FileOutputStream(file).use { outputStream ->
+                    outputStream.write(byte)
+                }
+            }
+        }
+
+        return file
     }
 
     fun getSharedData(context: Context): List<File> {

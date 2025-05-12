@@ -47,6 +47,7 @@ import ru.rutoken.tech.utils.getFullName
 import ru.rutoken.tech.utils.logd
 import ru.rutoken.tech.utils.loge
 import java.time.LocalDate
+import java.util.Date
 import kotlin.coroutines.cancellation.CancellationException
 
 class DocumentsSignViewModel(
@@ -129,7 +130,7 @@ class DocumentsSignViewModel(
 
                     withTokenSession(token, token.tokenInfo, tokenUserPin) { session ->
                         val tokenContainers = session.findGost256CertificateAndKeyContainers()
-                        val firstContainer = tokenContainers.getOrNull(0)
+                        val firstContainer = tokenContainers.firstOrNull { it.certificate.isValidOn(Date()) }
                         if (firstContainer != null) {
                             documentsToSign = session.signDocuments(
                                 documents = documentsToSign,

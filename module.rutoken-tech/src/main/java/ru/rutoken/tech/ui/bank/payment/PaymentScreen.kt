@@ -66,9 +66,17 @@ fun PaymentScreen(
     val payment by viewModel.payment.observeAsState()
     val operationCompleted by viewModel.operationCompleted.observeAsState(false)
     val navigateToTokenAuth by viewModel.navigateToTokenAuth.observeAsState(false)
+    val fileName = viewModel.getSuggestedFileName()
+
+    val mimeType = when {
+        fileName.endsWith(".enc") -> "application/octet-stream"
+        fileName.endsWith(".zip") -> "application/zip"
+        fileName.endsWith(".pdf") -> "application/pdf"
+        else -> "application/octet-stream"
+    }
 
     val createDocumentLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.CreateDocument("application/*"),
+        contract = ActivityResultContracts.CreateDocument(mimeType),
         onResult = viewModel::onCreateDocumentResult
     )
 
@@ -77,7 +85,7 @@ fun PaymentScreen(
             payment = it,
             operationCompleted = operationCompleted,
             onNavigateBack = { onNavigateBack(it.isIncoming()) },
-            onDownloadPaymentClicked = { createDocumentLauncher.launch(viewModel.getSuggestedFileName()) },
+            onDownloadPaymentClicked = { createDocumentLauncher.launch(fileName) },
             onSharePaymentClicked = { viewModel.onSharePaymentClicked(context::startShareChooser) },
             onUserActionButtonClicked = viewModel::onUserActionButtonClicked
         )

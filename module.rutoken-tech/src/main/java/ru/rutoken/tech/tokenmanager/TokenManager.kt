@@ -7,6 +7,7 @@
 package ru.rutoken.tech.tokenmanager
 
 import androidx.annotation.MainThread
+import androidx.annotation.OpenForTesting
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
@@ -17,14 +18,15 @@ import ru.rutoken.pkcs11wrapper.main.Pkcs11Token
 import ru.rutoken.pkcs11wrapper.rutoken.main.RtPkcs11Token
 import ru.rutoken.tech.pkcs11.Pkcs11CallScope.withPkcs11CallContext
 import ru.rutoken.tech.pkcs11.Pkcs11Launcher
+import ru.rutoken.tech.pkcs11.createobjects.GostKeyPairParams
 import ru.rutoken.tech.pkcs11.getSerialNumber
 import ru.rutoken.tech.pkcs11.getTokenModel
 import ru.rutoken.tech.session.SerialHexString
 import ru.rutoken.tech.tokenmanager.slotevent.SlotEvent
 import ru.rutoken.tech.tokenmanager.slotevent.SlotEventProvider
 import ru.rutoken.tech.ui.ca.tokeninfo.model.TokenModel
-import ru.rutoken.tech.ui.ca.tokeninfo.model.isSupported
 import ru.rutoken.tech.utils.loge
+import ru.rutoken.tech.utils.logw
 import java.util.Collections
 import java.util.concurrent.atomic.AtomicReference
 
@@ -83,8 +85,12 @@ class TokenManager : SlotEventProvider.Listener, Pkcs11Launcher.Listener {
 
     private suspend fun addTokenIfSupported(token: RtPkcs11Token) {
         try {
+            if (!token.isSupported()) {
+                logw { "Adding a token to the token manager failed - it is not supported" }
+                return
+            }
+
             val tokenModel = token.getTokenModel()
-            if (!tokenModel.isSupported) return
             val tokenData = RtPkcs11TokenData(token, tokenModel)
             tokens[token.getSerialNumber()] = tokenData
             waitTokenDeferred.getAndSet(null)?.complete(tokenData)
@@ -97,3 +103,13 @@ class TokenManager : SlotEventProvider.Listener, Pkcs11Launcher.Listener {
         tokens.values.removeIf { it.token == token }
     }
 }
+
+suspend fun Pkcs11Token.isSupported() =
+    withPkcs11CallContext {
+        val mechanismsRequired = GostKeyPairParams.entries
+        val tokenMechanisms = mechanismList
+
+        mechanismsRequired.all { mechanism ->
+            tokenMechanisms.any { it.asLong == mechanism.mechanismType.asLong }
+        }
+    }

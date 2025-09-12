@@ -8,7 +8,6 @@ package ru.rutoken.tech.pkcs11.createobjects
 
 import ru.rutoken.pkcs11wrapper.attribute.IPkcs11AttributeFactory
 import ru.rutoken.pkcs11wrapper.attribute.Pkcs11Attribute
-import ru.rutoken.pkcs11wrapper.constant.IPkcs11MechanismType
 import ru.rutoken.pkcs11wrapper.constant.standard.Pkcs11AttributeType.CKA_CERTIFICATE_CATEGORY
 import ru.rutoken.pkcs11wrapper.constant.standard.Pkcs11AttributeType.CKA_CERTIFICATE_TYPE
 import ru.rutoken.pkcs11wrapper.constant.standard.Pkcs11AttributeType.CKA_CLASS
@@ -32,7 +31,6 @@ import ru.rutoken.pkcs11wrapper.constant.standard.Pkcs11ObjectClass.CKO_PUBLIC_K
 import ru.rutoken.pkcs11wrapper.datatype.Pkcs11Date
 import ru.rutoken.pkcs11wrapper.datatype.Pkcs11KeyPair
 import ru.rutoken.pkcs11wrapper.main.Pkcs11Session
-import ru.rutoken.pkcs11wrapper.main.Pkcs11Token
 import ru.rutoken.pkcs11wrapper.mechanism.Pkcs11Mechanism
 import ru.rutoken.pkcs11wrapper.`object`.certificate.Pkcs11CertificateObject
 import ru.rutoken.pkcs11wrapper.`object`.key.Pkcs11GostPrivateKeyObject
@@ -40,7 +38,6 @@ import ru.rutoken.pkcs11wrapper.`object`.key.Pkcs11GostPublicKeyObject
 import ru.rutoken.pkcs11wrapper.rutoken.main.RtPkcs11Session
 import ru.rutoken.tech.ca.LocalCA
 import ru.rutoken.tech.pkcs11.Pkcs11CallScope.withPkcs11CallContext
-import kotlin.random.Random
 
 typealias GostKeyPair = Pkcs11KeyPair<Pkcs11GostPublicKeyObject, Pkcs11GostPrivateKeyObject>
 
@@ -72,9 +69,6 @@ suspend fun Pkcs11Session.createGostKeyPair(
     privateKeyValidityNotBefore: Pkcs11Date,
     privateKeyValidityNotAfter: Pkcs11Date,
 ): GostKeyPair {
-    if (!token.isMechanismSupported(keyPairParams.mechanismType))
-        throw IllegalStateException("${keyPairParams.mechanismType} not supported by token")
-
     return withPkcs11CallContext {
         keyManager.generateKeyPair(
             Pkcs11GostPublicKeyObject::class.java,
@@ -87,9 +81,6 @@ suspend fun Pkcs11Session.createGostKeyPair(
         )
     }
 }
-
-suspend fun Pkcs11Token.isMechanismSupported(mechanism: IPkcs11MechanismType) =
-    withPkcs11CallContext { mechanismList.any { it.asLong == mechanism.asLong } }
 
 fun IPkcs11AttributeFactory.makeCertificateTemplate(id: ByteArray, value: ByteArray): List<Pkcs11Attribute> {
     return listOf(

@@ -223,11 +223,3 @@ data class TokenInfoHwFeatures(
     val supportedInterfaces: Long,
     val vendorModelName: String?,
 )
-
-val TokenModel.isSupported: Boolean
-    get() {
-        return when (this) {
-            is UnknownRutoken, is VendorDefinedTokenModel.Unknown -> false
-            else -> true
-        }
-    }

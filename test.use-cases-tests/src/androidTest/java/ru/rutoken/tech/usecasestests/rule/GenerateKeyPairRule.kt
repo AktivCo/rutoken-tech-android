@@ -15,7 +15,7 @@ import ru.rutoken.pkcs11wrapper.main.Pkcs11Session
 import ru.rutoken.pkcs11wrapper.mechanism.Pkcs11Mechanism
 import ru.rutoken.pkcs11wrapper.`object`.key.Pkcs11PrivateKeyObject
 import ru.rutoken.pkcs11wrapper.`object`.key.Pkcs11PublicKeyObject
-import ru.rutoken.tech.pkcs11.createobjects.isMechanismSupported
+import ru.rutoken.tech.tokenmanager.isSupported
 
 class GenerateKeyPairRule<PublicKey : Pkcs11PublicKeyObject, PrivateKey : Pkcs11PrivateKeyObject>(
     private val publicKeyClass: Class<PublicKey>,
@@ -30,7 +30,7 @@ class GenerateKeyPairRule<PublicKey : Pkcs11PublicKeyObject, PrivateKey : Pkcs11
     val value get() = _value
 
     override fun before() {
-        runBlocking { assumeTrue(session.value.token.isMechanismSupported(mechanism.mechanismType)) }
+        runBlocking { assumeTrue(session.value.token.isSupported()) }
         beforeGenerationCheck?.let { assumeTrue(it(session.value)) }
 
         _value = session.value.keyManager.generateKeyPair(

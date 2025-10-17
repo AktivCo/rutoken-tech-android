@@ -55,7 +55,7 @@ data class Payment(
         DECRYPT -> AppIcons.PaymentToDecrypt(isArchived)
     }
 
-    fun isIncoming() = userActionType == VERIFY || userActionType == DECRYPT
+    fun isOutgoing() = userActionType == SIGN || userActionType == ENCRYPT
 
     fun isArchived() = actionTime != null
 

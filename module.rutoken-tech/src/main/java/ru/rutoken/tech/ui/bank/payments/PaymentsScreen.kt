@@ -58,7 +58,7 @@ fun PaymentsScreen(
     viewModel: PaymentsViewModel,
     onNavigateBack: () -> Unit,
     onPaymentClicked: (Payment) -> Unit,
-    isIncomingPaymentsSelected: Boolean = true,
+    isOutgoingPaymentsSelected: Boolean = true,
 ) {
     val payments by viewModel.payments.observeAsState(listOf())
 
@@ -67,7 +67,7 @@ fun PaymentsScreen(
         onNavigateBack = onNavigateBack,
         onResetPaymentsClicked = viewModel::onResetPaymentsClicked,
         onPaymentClicked = onPaymentClicked,
-        isIncomingPaymentsSelected = isIncomingPaymentsSelected
+        isOutgoingPaymentsSelected = isOutgoingPaymentsSelected
     )
 }
 
@@ -77,11 +77,11 @@ private fun PaymentsScreen(
     onNavigateBack: () -> Unit,
     onResetPaymentsClicked: () -> Unit,
     onPaymentClicked: (Payment) -> Unit,
-    isIncomingPaymentsSelected: Boolean = true,
+    isOutgoingPaymentsSelected: Boolean = true,
 ) {
-    val incomingPayments = payments.filter { it.isIncoming() }
-    val outgoingPayments = payments.filter { !it.isIncoming() }
-    var showIncomingPayments by remember { mutableStateOf(isIncomingPaymentsSelected) }
+    val incomingPayments = payments.filter { !it.isOutgoing() }
+    val outgoingPayments = payments.filter { it.isOutgoing() }
+    var showOutgoingPayments by remember { mutableStateOf(isOutgoingPaymentsSelected) }
     val scrollState = rememberScrollState()
     val scope = rememberCoroutineScope()
 
@@ -109,20 +109,20 @@ private fun PaymentsScreen(
         ) {
             SegmentedButtonRow(
                 onLeftSectionClicked = {
-                    showIncomingPayments = true
+                    showOutgoingPayments = true
                     scope.launch { scrollState.scrollTo(0) }
                 },
                 onRightSectionClicked = {
-                    showIncomingPayments = false
+                    showOutgoingPayments = false
                     scope.launch { scrollState.scrollTo(0) }
                 },
-                isLeftSectionSelected = isIncomingPaymentsSelected,
-                leftSectionText = stringResource(R.string.incoming_payments),
-                rightSectionText = stringResource(R.string.outgoing_payments)
+                isLeftSectionSelected = isOutgoingPaymentsSelected,
+                leftSectionText = stringResource(R.string.outgoing_payments),
+                rightSectionText = stringResource(R.string.incoming_payments)
             )
             Spacer(Modifier.height(12.dp))
             PaymentsGroup(
-                payments = if (showIncomingPayments) incomingPayments else outgoingPayments,
+                payments = if (showOutgoingPayments) outgoingPayments else incomingPayments,
                 scrollState = scrollState,
                 onPaymentClicked = onPaymentClicked,
                 listBottomPadding = innerPadding.calculateBottomPadding()
@@ -249,14 +249,14 @@ private fun PaymentsScreenPreview() {
             date = LocalDate.now(),
             amount = "14 500 ₽",
             organization = "ОАО Нефтегаз",
-            userActionType = UserActionType.VERIFY
+            userActionType = UserActionType.SIGN
         )
         val payment2 = Payment(
             title = "Инкассовое поручение №122",
             date = LocalDate.of(2023, 12, 10),
             amount = "4 500 ₽",
             organization = "ОАО Нефтегаз",
-            userActionType = UserActionType.DECRYPT,
+            userActionType = UserActionType.ENCRYPT,
             actionTime = LocalDateTime.now()
         )
 

@@ -21,8 +21,8 @@ android {
         applicationId = "ru.rutoken.tech"
         minSdk = 24
         targetSdk = 35
-        versionCode = 9
-        versionName = "1.2.2"
+        versionCode = 10
+        versionName = "1.2.3"
 
         ndk {
             abiFilters.addAll(listOf("armeabi-v7a", "arm64-v8a"))

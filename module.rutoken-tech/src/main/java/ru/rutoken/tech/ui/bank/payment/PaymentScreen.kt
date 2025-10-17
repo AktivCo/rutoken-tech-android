@@ -84,13 +84,13 @@ fun PaymentScreen(
         PaymentScreen(
             payment = it,
             operationCompleted = operationCompleted,
-            onNavigateBack = { onNavigateBack(it.isIncoming()) },
+            onNavigateBack = { onNavigateBack(it.isOutgoing()) },
             onDownloadPaymentClicked = { createDocumentLauncher.launch(fileName) },
             onSharePaymentClicked = { viewModel.onSharePaymentClicked(context::startShareChooser) },
             onUserActionButtonClicked = viewModel::onUserActionButtonClicked
         )
 
-        BackHandler { onNavigateBack(it.isIncoming()) }
+        BackHandler { onNavigateBack(it.isOutgoing()) }
     }
 
     if (navigateToTokenAuth) {

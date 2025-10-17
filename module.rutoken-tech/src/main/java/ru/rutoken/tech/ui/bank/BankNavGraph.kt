@@ -108,7 +108,7 @@ fun NavGraphBuilder.addBankDestinations(
             onPaymentClicked = {
                 navController.navigate(BankDestination.Payments.route + "/${it.title}") { launchSingleTop = true }
             },
-            isIncomingPaymentsSelected = backStackEntry.savedStateHandle.get<Boolean>("isIncomingPaymentsSelected")
+            isOutgoingPaymentsSelected = backStackEntry.savedStateHandle.get<Boolean>("isOutgoingPaymentsSelected")
                 ?: true
         )
     }
@@ -120,7 +120,7 @@ fun NavGraphBuilder.addBankDestinations(
             ),
             onNavigateBack = {
                 navController.popBackStack()
-                navController.currentBackStackEntry?.savedStateHandle?.set("isIncomingPaymentsSelected", it)
+                navController.currentBackStackEntry?.savedStateHandle?.set("isOutgoingPaymentsSelected", it)
             },
             onNavigateToTokenAuth = {
                 navController.navigate(BankDestination.UserOperationTokenAuth.route) { launchSingleTop = true }

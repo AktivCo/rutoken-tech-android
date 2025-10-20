@@ -42,6 +42,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 import ru.rutoken.tech.R
+import ru.rutoken.tech.ui.bank.payments.UserActionType.SIGN
 import ru.rutoken.tech.ui.components.AppIcons
 import ru.rutoken.tech.ui.components.RutokenTechLargeTopAppBar
 import ru.rutoken.tech.ui.components.RutokenTechTopAppBarAction
@@ -164,7 +165,27 @@ private fun PaymentsGroup(
 
 @Composable
 private fun PaymentsGroup(payments: List<Payment>, forArchive: Boolean, onPaymentClicked: (Payment) -> Unit) {
-    val paymentsMap = payments.sortedByDescending { it.date }.groupBy { it.date }
+    // We need to show payments for sign first
+    val (paymentsToSign, otherPayments) = remember(payments) {
+        payments.partition { it.userActionType == SIGN }.run {
+            val paymentsToSign = first.sortedByDescending { it.date }.groupBy { it.date }
+            val otherPayments = second.sortedByDescending { it.date }.groupBy { it.date }
+            paymentsToSign to otherPayments
+        }
+    }
+    Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+        PaymentsGroup(paymentsMap = paymentsToSign, forArchive = forArchive, onPaymentClicked = onPaymentClicked)
+        PaymentsGroup(paymentsMap = otherPayments, forArchive = forArchive, onPaymentClicked = onPaymentClicked)
+    }
+}
+
+@Composable
+private fun PaymentsGroup(
+    paymentsMap: Map<LocalDate, List<Payment>>,
+    forArchive: Boolean,
+    onPaymentClicked: (Payment) -> Unit,
+) {
+    if (paymentsMap.isEmpty()) return
     Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
         paymentsMap.keys.forEach { date ->
             Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {

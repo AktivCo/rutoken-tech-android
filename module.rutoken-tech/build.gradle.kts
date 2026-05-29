@@ -140,6 +140,8 @@ dependencies {
     implementation(libs.rutoken.pkcs11jna) { isTransitive = false }
     implementation(libs.rutoken.pkcs11wrapper) { isTransitive = false }
     implementation(libs.rutoken.rtpcscbridge)
+    implementation(libs.rutoken.rtpki) { isTransitive = false }
+    implementation(libs.rutoken.rtpki.support)
     implementation(platform(libs.compose.bom))
 
     ksp(libs.room.compiler)

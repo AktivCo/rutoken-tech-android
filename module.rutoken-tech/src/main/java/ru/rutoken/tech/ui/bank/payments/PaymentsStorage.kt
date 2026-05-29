@@ -10,11 +10,12 @@ import android.content.Context
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.bouncycastle.cert.X509CertificateHolder
-import org.bouncycastle.cms.CMSAlgorithm.GOST28147_GCFB
 import ru.rutoken.tech.bank.BANK_CERTIFICATE_GOST
 import ru.rutoken.tech.bank.BANK_PRIVATE_KEY_GOST
 import ru.rutoken.tech.bouncycastle.BouncyCastleCmsOperations
 import ru.rutoken.tech.ca.LocalCA
+import ru.rutoken.tech.rtpki.RtPkiCmsOperations
+import ru.rutoken.tech.session.BankEncryptionAlgorithm
 import ru.rutoken.tech.utils.base64ToX509CertificateHolder
 import ru.rutoken.tech.utils.toBase64String
 import java.time.LocalDate
@@ -166,15 +167,33 @@ private val initialPaymentsStorage
         )
     )
 
-suspend fun getInitialPaymentsStorage(context: Context, userCertificateHolder: X509CertificateHolder): List<Payment> {
+suspend fun getInitialPaymentsStorage(
+    context: Context,
+    encryptionAlgorithm: BankEncryptionAlgorithm,
+    userCertificateHolder: X509CertificateHolder,
+): List<Payment> {
     val paymentsStorage = initialPaymentsStorage
 
     withContext(Dispatchers.IO) {
-        paymentsStorage.filter { it.userActionType == UserActionType.DECRYPT }.forEach { payment ->
-            payment.initialActionData =
-                BouncyCastleCmsOperations.encrypt(payment.readFile(context), userCertificateHolder, GOST28147_GCFB)
-                    .toBase64String()
-        }
+        paymentsStorage
+            .filter { it.userActionType == UserActionType.DECRYPT }
+            .forEach {
+                /*
+                 * BouncyCastleCmsOperations#encrypt method with the GOST28147_GCFB encryption algorithm can be used if
+                 * the GOST 28147-89 encryption algorithm is used throughout the application:
+                 *
+                 * it.initialActionData = BouncyCastleCmsOperations.encrypt(
+                 *     it.readFile(context),
+                 *     userCertificateHolder,
+                 *     GOST28147_GCFB
+                 * ).toBase64String()
+                 */
+                it.initialActionData = RtPkiCmsOperations.encrypt(
+                    it.readFile(context),
+                    listOf(userCertificateHolder),
+                    encryptionAlgorithm.toRtPkiEncryptionAlgorithm()
+                ).toBase64String()
+            }
 
         paymentsStorage.filter { it.userActionType == UserActionType.VERIFY }.forEachIndexed { index, payment ->
             val dataToSign: ByteArray

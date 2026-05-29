@@ -220,7 +220,7 @@ class PaymentViewModel(
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 _showProgress.postValue(true)
-                encryptPayment(_payment.value!!, applicationContext)
+                encryptPayment(_payment.value!!, bankUserLoginSession.encryptionAlgorithm, applicationContext)
                 _operationCompleted.postValue(true)
                 _operationCompletedDialogState.postValue(
                     DialogState(true, DialogData(R.string.encrypt_operation_completed))

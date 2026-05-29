@@ -38,6 +38,7 @@ import ru.rutoken.tech.session.AppSessionType.BANK_USER_LOGIN_SESSION
 import ru.rutoken.tech.session.AppSessionType.CA_SESSION
 import ru.rutoken.tech.session.AppSessionType.SHIFT_USER_ADDING_SESSION
 import ru.rutoken.tech.session.AppSessionType.SHIFT_USER_LOGIN_SESSION
+import ru.rutoken.tech.session.BankEncryptionAlgorithm
 import ru.rutoken.tech.session.BankUserAddingAppSession
 import ru.rutoken.tech.session.BankUserLoginAppSession
 import ru.rutoken.tech.session.CaAppSession
@@ -167,7 +168,7 @@ class LoginViewModel(
         block: suspend (RtPkcs11Session) -> Unit,
     ) {
         callPkcs11Operation(_showProgress, tokenManager, tokenInfo.serialNumberTrimmed) {
-            tokenData.token.openSession(false).use { session ->
+            tokenData.token.openSession(true).use { session ->
                 session.login(Pkcs11UserType.CKU_USER, tokenUserPin).use {
                     block(session)
                 }
@@ -213,7 +214,8 @@ class LoginViewModel(
         return BankUserAddingAppSession(
             tokenUserPin = tokenUserPin,
             tokenSerial = tokenInfo.serialNumberTrimmed,
-            certificates = certificates
+            certificates = certificates,
+            encryptionAlgorithm = BankEncryptionAlgorithm.fromSupportedMechanisms(tokenData.token)
         )
     }
 
@@ -289,6 +291,7 @@ class LoginViewModel(
                 if (currentBankSession.payments.isEmpty()) {
                     currentBankSession.payments = getInitialPaymentsStorage(
                         applicationContext,
+                        currentBankSession.encryptionAlgorithm,
                         X509CertificateHolder(currentBankSession.certificate)
                     )
                 }

@@ -103,11 +103,13 @@ class ChooseNewCertificateViewModel(
             _showProgress.postValue(true)
 
             val tokenSerial = bankUserAddingAppSession.tokenSerial
+            val encryptionAlgorithm = bankUserAddingAppSession.encryptionAlgorithm
             val user = makeBankUser(
                 BankUserEntity(
                     certificateDerValue = chosenCertificate.bytes,
                     ckaId = chosenCertificate.ckaId,
                     tokenSerialNumber = tokenSerial,
+                    encryptionAlgorithm = encryptionAlgorithm,
                     isBiometryActive = encryptedPin != null,
                     encryptedPin = encryptedPin,
                     cipherIv = cipherIv
@@ -116,7 +118,11 @@ class ChooseNewCertificateViewModel(
             repository.addUser(user)
 
             val paymentsStorage =
-                getInitialPaymentsStorage(applicationContext, X509CertificateHolder(chosenCertificate.bytes))
+                getInitialPaymentsStorage(
+                    applicationContext,
+                    encryptionAlgorithm,
+                    X509CertificateHolder(chosenCertificate.bytes)
+                )
             val pinData =
                 if (encryptedPin != null && cipherIv != null)
                     BankUserLoginAppSession.EncryptedPinData(encryptedPin, cipherIv)
@@ -129,6 +135,7 @@ class ChooseNewCertificateViewModel(
                     // don't use it in any Bank scenarios with a logged user, so it doesn't matter.
                     userId = user.userEntity.id,
                     tokenSerial = tokenSerial,
+                    encryptionAlgorithm = encryptionAlgorithm,
                     certificateCkaId = chosenCertificate.ckaId,
                     certificate = chosenCertificate.bytes,
                     isBiometryActive = encryptedPin != null,

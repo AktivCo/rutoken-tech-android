@@ -9,14 +9,14 @@ package ru.rutoken.tech.ui.bank.payment
 import android.content.Context
 import androidx.annotation.WorkerThread
 import org.bouncycastle.cert.X509CertificateHolder
-import org.bouncycastle.cms.CMSAlgorithm.GOST28147_GCFB
 import ru.rutoken.pkcs11wrapper.main.Pkcs11Session
 import ru.rutoken.pkcs11wrapper.rutoken.main.RtPkcs11Session
 import ru.rutoken.tech.bank.BANK_CERTIFICATE_GOST
-import ru.rutoken.tech.bouncycastle.BouncyCastleCmsOperations
 import ru.rutoken.tech.ca.LocalCA
 import ru.rutoken.tech.pkcs11.findobjects.findGost256CertificateByCkaId
 import ru.rutoken.tech.pkcs11.findobjects.findGost256KeyPairByCkaId
+import ru.rutoken.tech.rtpki.RtPkiCmsOperations
+import ru.rutoken.tech.session.BankEncryptionAlgorithm
 import ru.rutoken.tech.ui.bank.payments.Payment
 import ru.rutoken.tech.usecase.CmsOperationProvider
 import ru.rutoken.tech.usecase.CmsOperations
@@ -68,12 +68,22 @@ suspend fun verifyPaymentSignature(
 }
 
 @WorkerThread
-fun encryptPayment(payment: Payment, applicationContext: Context) {
+fun encryptPayment(payment: Payment, encryptionAlgorithm: BankEncryptionAlgorithm, applicationContext: Context) {
     payment.apply {
-        actionResultData = BouncyCastleCmsOperations.encrypt(
+        /*
+         * BouncyCastleCmsOperations#encrypt method with the GOST28147_GCFB encryption algorithm can be used if
+         * the GOST 28147-89 encryption algorithm is used throughout the application:
+         *
+         * actionResultData = BouncyCastleCmsOperations.encrypt(
+         *     readFile(applicationContext),
+         *     base64ToX509CertificateHolder(BANK_CERTIFICATE_GOST),
+         *     GOST28147_GCFB
+         * ).toBase64String()
+         */
+        actionResultData = RtPkiCmsOperations.encrypt(
             readFile(applicationContext),
-            base64ToX509CertificateHolder(BANK_CERTIFICATE_GOST),
-            GOST28147_GCFB
+            listOf(base64ToX509CertificateHolder(BANK_CERTIFICATE_GOST)),
+            encryptionAlgorithm.toRtPkiEncryptionAlgorithm()
         ).toBase64String()
 
         actionTime = LocalDateTime.now()
@@ -87,11 +97,23 @@ suspend fun Pkcs11Session.decryptPayment(
     applicationContext: Context,
 ) {
     payment.apply {
-        actionResultData = BouncyCastleCmsOperations.decrypt(
+        val keyPair = findGost256KeyPairByCkaId(certificateCkaId)
+        /*
+         * BouncyCastleCmsOperations#decrypt method can be used if the GOST 28147-89 encryption algorithm is used
+         * throughout the application:
+         *
+         * actionResultData = BouncyCastleCmsOperations.decrypt(
+         *     session = this@decryptPayment,
+         *     data = getActionData(applicationContext).decoded,
+         *     possibleRecipientsCertificates = listOf(X509CertificateHolder(certificateBytes)),
+         *     privateKey = findGost256KeyPairByCkaId(certificateCkaId).privateKey
+         * ).toBase64String()
+         */
+        actionResultData = RtPkiCmsOperations.decrypt(
             session = this@decryptPayment,
             data = getActionData(applicationContext).decoded,
-            possibleRecipientsCertificates = listOf(X509CertificateHolder(certificateBytes)),
-            privateKey = findGost256KeyPairByCkaId(certificateCkaId).privateKey
+            publicKey = keyPair.publicKey,
+            privateKey = keyPair.privateKey
         ).toBase64String()
 
         actionTime = LocalDateTime.now()

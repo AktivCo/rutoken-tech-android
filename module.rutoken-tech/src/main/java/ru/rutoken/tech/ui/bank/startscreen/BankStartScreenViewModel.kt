@@ -92,6 +92,7 @@ class BankStartScreenViewModel(
                 val userLoginAppSession = BankUserLoginAppSession(
                     id,
                     tokenSerialNumber,
+                    encryptionAlgorithm,
                     ckaId,
                     certificateDerValue,
                     isBiometryActive,

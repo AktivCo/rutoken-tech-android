@@ -12,15 +12,15 @@ import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import ru.rutoken.tech.database.bank.BankUserDao
 import ru.rutoken.tech.database.bank.BankUserEntity
-import ru.rutoken.tech.database.shift.document.SignedDocumentDao
-import ru.rutoken.tech.database.shift.document.SignedDocumentEntity
 import ru.rutoken.tech.database.shift.ShiftUserDao
 import ru.rutoken.tech.database.shift.ShiftUserEntity
+import ru.rutoken.tech.database.shift.document.SignedDocumentDao
+import ru.rutoken.tech.database.shift.document.SignedDocumentEntity
 
 @Database(
     entities = [BankUserEntity::class, ShiftUserEntity::class, SignedDocumentEntity::class],
-    version = 2,
-    autoMigrations = [AutoMigration(from = 1, to = 2)]
+    version = 3,
+    autoMigrations = [AutoMigration(from = 1, to = 2), AutoMigration(from = 2, to = 3)]
 )
 @TypeConverters(Converters::class)
 abstract class Database : RoomDatabase() {

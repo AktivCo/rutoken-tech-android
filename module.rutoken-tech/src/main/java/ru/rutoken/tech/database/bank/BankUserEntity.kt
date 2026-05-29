@@ -11,6 +11,7 @@ import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
 import ru.rutoken.tech.database.AUTOGENERATE
+import ru.rutoken.tech.session.BankEncryptionAlgorithm
 
 @Entity(
     tableName = "bank_users",
@@ -23,6 +24,8 @@ data class BankUserEntity(
     @ColumnInfo(name = "certificate_der_value") val certificateDerValue: ByteArray,
     @ColumnInfo(name = "cka_id") val ckaId: ByteArray,
     @ColumnInfo(name = "token_serial_number") val tokenSerialNumber: String,
+    @ColumnInfo(name = "encryption_algorithm", defaultValue = "'GOST_28147_89'")
+    val encryptionAlgorithm: BankEncryptionAlgorithm,
     @ColumnInfo(name = "is_biometry_active") val isBiometryActive: Boolean,
     @ColumnInfo(name = "encrypted_pin") val encryptedPin: ByteArray?,
     @ColumnInfo(name = "cipher_iv") val cipherIv: ByteArray?,

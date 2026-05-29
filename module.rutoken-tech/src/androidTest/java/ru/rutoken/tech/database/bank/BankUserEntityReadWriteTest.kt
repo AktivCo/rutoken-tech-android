@@ -15,6 +15,7 @@ import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import ru.rutoken.tech.database.Database
+import ru.rutoken.tech.session.BankEncryptionAlgorithm
 
 class BankUserEntityReadWriteTest {
     private lateinit var userDao: BankUserDao
@@ -40,6 +41,7 @@ class BankUserEntityReadWriteTest {
             certificateDerValue = CERTIFICATE_DER_VALUE,
             ckaId = CKA_ID,
             tokenSerialNumber = TOKEN_SERIAL_NUMBER,
+            encryptionAlgorithm = ENCRYPTION_ALGORITHM,
             isBiometryActive = IS_BIOMETRY_ACTIVE,
             encryptedPin = ENCRYPTED_PIN,
             cipherIv = CIPHER_IV
@@ -61,6 +63,7 @@ class BankUserEntityReadWriteTest {
     companion object {
         private const val ID = 1
         private val CERTIFICATE_DER_VALUE = "CERTIFICATE_DER_VALUE".encodeToByteArray()
+        private val ENCRYPTION_ALGORITHM = BankEncryptionAlgorithm.GOST_34_12_2018_MAGMA
         private val CKA_ID = "CKA_ID".encodeToByteArray()
         private const val TOKEN_SERIAL_NUMBER = "TOKEN_SERIAL_NUMBER"
         private const val IS_BIOMETRY_ACTIVE = true

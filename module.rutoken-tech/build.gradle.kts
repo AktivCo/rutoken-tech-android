@@ -15,14 +15,14 @@ base {
 
 android {
     namespace = "ru.rutoken.tech"
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "ru.rutoken.tech"
         minSdk = 24
-        targetSdk = 35
-        versionCode = 10
-        versionName = "1.2.3"
+        targetSdk = 36
+        versionCode = 11
+        versionName = "1.2.5"
 
         ndk {
             abiFilters.addAll(listOf("armeabi-v7a", "arm64-v8a"))
@@ -140,8 +140,9 @@ dependencies {
     implementation(libs.rutoken.pkcs11jna) { isTransitive = false }
     implementation(libs.rutoken.pkcs11wrapper) { isTransitive = false }
     implementation(libs.rutoken.rtpcscbridge)
-    implementation(libs.rutoken.rtpki) { isTransitive = false }
-    implementation(libs.rutoken.rtpki.support)
+    implementation(libs.rutoken.rtpki) {
+        exclude("net.java.dev.jna", "jna")
+    }
     implementation(platform(libs.compose.bom))
 
     ksp(libs.room.compiler)

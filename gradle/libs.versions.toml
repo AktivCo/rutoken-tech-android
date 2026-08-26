@@ -28,7 +28,7 @@ pkcs11jna = "4.0.0"
 pkcs11wrapper = "4.2.0"
 room = "2.6.1"
 rtpcscbridge = "1.4.2"
-rtpki = "0.1.0-ccf293e7" # TODO: Replace with the release version
+rtpki = "0.1.0"
 
 [libraries]
 accompanist-navigation-material = { module = "com.google.accompanist:accompanist-navigation-material", version.ref = "accompanist-navigation-material" }

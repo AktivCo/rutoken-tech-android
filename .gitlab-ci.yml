@@ -3,9 +3,10 @@ stages:
 
 include:
   - project: rutoken/dev/devops/checker/code-quality
-    ref: latest
+    ref: b-1.4.4-cl-17-an-2022.1.1.20-sw-0.53.0
     file: /code-quality.yaml
 
 code_quality:
   stage: analyse
   extends: .code-quality
+  image: "${NEXUS_PREFIX}-code-quality:b-1.4.3-cl-17-an-2022.1.1.20-sw-0.53.0"

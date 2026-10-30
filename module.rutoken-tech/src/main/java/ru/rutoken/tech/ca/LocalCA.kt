@@ -6,6 +6,8 @@
 
 package ru.rutoken.tech.ca
 
+import org.bouncycastle.asn1.rosstandart.RosstandartObjectIdentifiers.id_tc26_gost_3410_12_256
+import org.bouncycastle.asn1.x9.X9ObjectIdentifiers
 import org.bouncycastle.cert.X509CertificateHolder
 import org.bouncycastle.cert.X509v3CertificateBuilder
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder
@@ -64,6 +66,33 @@ private const val CA_CERTIFICATE_GOST = "MIIDMDCCAtugAwIBAgIUE5NIRWvjPZkfh8hLJOn
 private const val CA_PRIVATE_KEY_GOST = "MEACAQAwFwYIKoUDBwEBAQEwCwYJKoUDBwECAQECBCIEIC/mU8VxtwxCevWktjiW" +
         "RXzQ1rxygoHwlz9p1UbYplht"
 
+private const val ROOT_CERTIFICATE_ECDSA = "MIIB9jCCAZ2gAwIBAgIUI2/mipPIHnsPimgFUSvowlRyjxYwCgYIKoZIzj0EAwIw" +
+        "STEjMCEGA1UEAwwaUnV0b2tlbiBUZXN0IEVDRFNBIFJvb3QgQ0ExFTATBgNVBAoM" +
+        "DFJ1dG9rZW4gVGVzdDELMAkGA1UEBhMCUlUwHhcNMjYxMDE4MDc1MDM5WhcNNDUw" +
+        "OTA4MDc1MDM5WjBJMSMwIQYDVQQDDBpSdXRva2VuIFRlc3QgRUNEU0EgUm9vdCBD" +
+        "QTEVMBMGA1UECgwMUnV0b2tlbiBUZXN0MQswCQYDVQQGEwJSVTBZMBMGByqGSM49" +
+        "AgEGCCqGSM49AwEHA0IABD0i6j7rv1eyfQ1TTlYe+awZDWDZYd+g9wxWJVkj1cVY" +
+        "3UpIuUo8uAv5uZViqdaA7JIhRnUAScbniKwr5URwG4ijYzBhMB0GA1UdDgQWBBQB" +
+        "juT63LoJUJA7lE1PlalvUs7iLjAfBgNVHSMEGDAWgBQBjuT63LoJUJA7lE1Plalv" +
+        "Us7iLjAPBgNVHRMBAf8EBTADAQH/MA4GA1UdDwEB/wQEAwIBBjAKBggqhkjOPQQD" +
+        "AgNHADBEAiBEHjerQrbFi9cf1AV3hVStB6xoS0ejiXBxCaoHnqk8MQIgINWUcSt+" +
+        "YVtKT2nS23rrApOzAGW+Z8EyUfY3UlC7oUI="
+
+private const val CA_CERTIFICATE_ECDSA = "MIIB8jCCAZigAwIBAgIUDM/dpOPBB0r02r4LoCIkKawNueIwCgYIKoZIzj0EAwIw" +
+        "STEjMCEGA1UEAwwaUnV0b2tlbiBUZXN0IEVDRFNBIFJvb3QgQ0ExFTATBgNVBAoM" +
+        "DFJ1dG9rZW4gVGVzdDELMAkGA1UEBhMCUlUwHhcNMjYxMDE4MDc1MDM5WhcNNDUw" +
+        "OTA4MDc1MDM5WjBEMR4wHAYDVQQDDBVSdXRva2VuIFRlc3QgRUNEU0EgQ0ExFTAT" +
+        "BgNVBAoMDFJ1dG9rZW4gVGVzdDELMAkGA1UEBhMCUlUwWTATBgcqhkjOPQIBBggq" +
+        "hkjOPQMBBwNCAASFcbqnR1VWdQbj3/t/4rIyb0dJ7uIrmV8CiZvxZDqg1zJhlHYu" +
+        "jUf/rf92e1tuDwJA4Mnr9FhLHP47r0QkFS2Qo2MwYTAPBgNVHRMBAf8EBTADAQH/" +
+        "MA4GA1UdDwEB/wQEAwIBBjAdBgNVHQ4EFgQULiBJRozeHO5fF8KrvLpA8Z+I/S0w" +
+        "HwYDVR0jBBgwFoAUAY7k+ty6CVCQO5RNT5Wpb1LO4i4wCgYIKoZIzj0EAwIDSAAw" +
+        "RQIgYsrHaCzJJK6fUel2Ew5I/jcL3IaJ5hd7RpURjgKN5KoCIQC2+SgNHLdZQOhG" +
+        "gh5zlJiXQAnKuKT0s7DZ+tg7bwksIw=="
+
+private const val CA_PRIVATE_KEY_ECDSA = "MIGHAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBG0wawIBAQQgbcKFOTnA0kFe4wxU" +
+        "5GfKH7YG0twoVVp2WfPqcLvRbMahRANCAASFcbqnR1VWdQbj3/t/4rIyb0dJ7uIr" +
+        "mV8CiZvxZDqg1zJhlHYujUf/rf92e1tuDwJA4Mnr9FhLHP47r0QkFS2Q"
 private val CA_CONFIG_GOST = LocalCAConfig(
     caCertificate = CA_CERTIFICATE_GOST,
     caPrivateKey = CA_PRIVATE_KEY_GOST,
@@ -72,6 +101,13 @@ private val CA_CONFIG_GOST = LocalCAConfig(
     issuedCertificateValidityPeriod = Period.ofYears(1)
 )
 
+private val CA_CONFIG_ECDSA = LocalCAConfig(
+    caCertificate = CA_CERTIFICATE_ECDSA,
+    caPrivateKey = CA_PRIVATE_KEY_ECDSA,
+    privateKeyAlgorithm = "EC",
+    signatureAlgorithm = "SHA256withECDSA",
+    issuedCertificateValidityPeriod = Period.ofYears(1)
+)
 object LocalCA {
     val rootCertificate: ByteArray
         get() = ROOT_CERTIFICATE_GOST.decoded
@@ -79,10 +115,21 @@ object LocalCA {
     val caCertificate: ByteArray
         get() = CA_CONFIG_GOST.caCertificate.decoded
 
+    val rootCertificateEcdsa: ByteArray
+        get() = ROOT_CERTIFICATE_ECDSA.decoded
+
+    val caCertificateEcdsa: ByteArray
+        get() = CA_CONFIG_ECDSA.caCertificate.decoded
     fun issueCertificate(csr: ByteArray): ByteArray {
-        return with(CA_CONFIG_GOST) {
-            val caCertificateHolder = X509CertificateHolder(this@LocalCA.caCertificate)
-            val certificationRequest = PKCS10CertificationRequest(csr)
+        val certificationRequest = PKCS10CertificationRequest(csr)
+        val config = when (val algorithm = certificationRequest.subjectPublicKeyInfo.algorithm.algorithm) {
+            id_tc26_gost_3410_12_256 -> CA_CONFIG_GOST
+            X9ObjectIdentifiers.id_ecPublicKey -> CA_CONFIG_ECDSA
+            else -> throw IllegalArgumentException("Unsupported CSR public key algorithm: $algorithm")
+        }
+
+        return with(config) {
+            val caCertificateHolder = X509CertificateHolder(caCertificate.decoded)
 
             val notBefore = ZonedDateTime.now()
             val notAfter = notBefore + issuedCertificateValidityPeriod

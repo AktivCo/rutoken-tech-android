@@ -18,8 +18,9 @@ import ru.rutoken.pkcs11wrapper.constant.standard.Pkcs11UserType.CKU_USER
 import ru.rutoken.pkcs11wrapper.datatype.Pkcs11Date
 import ru.rutoken.pkcs11wrapper.main.Pkcs11Token
 import ru.rutoken.tech.R
-import ru.rutoken.tech.pkcs11.createobjects.GostKeyPair
+import ru.rutoken.tech.pkcs11.createobjects.EcKeyPairParams
 import ru.rutoken.tech.pkcs11.createobjects.GostKeyPairParams
+import ru.rutoken.tech.pkcs11.createobjects.createEcKeyPair
 import ru.rutoken.tech.pkcs11.createobjects.createGostKeyPair
 import ru.rutoken.tech.session.AppSessionHolder
 import ru.rutoken.tech.session.requireCaSession
@@ -58,9 +59,15 @@ class GenerateKeyPairViewModel(
     private val _shouldLogout = MutableLiveData(false)
     val shouldLogout: LiveData<Boolean> get() = _shouldLogout
 
+    private val _algorithm = MutableLiveData(KeyPairAlgorithm.GOST_2012_256)
+    val algorithm: LiveData<KeyPairAlgorithm> get() = _algorithm
     private var hasPinChanged = false
 
-    fun generateGostKeyPair(keyPairParams: GostKeyPairParams) {
+    fun selectAlgorithm(algorithm: KeyPairAlgorithm) {
+        _algorithm.value = algorithm
+    }
+    fun generateKeyPair() {
+        val algorithm = _algorithm.value!!
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
                 try {
@@ -72,10 +79,11 @@ class GenerateKeyPairViewModel(
                     val token = connectTokenDelegate.findTokenBySerialNumber(tokenManager, tokenSerial).token
 
                     callPkcs11Operation(_showProgress, tokenManager, tokenSerial) {
-                        createGostKeyPair(
+                        createKeyPair(
                             token,
                             caSession.tokenUserPin,
-                            _keyPairId.value!!.rawValue, keyPairParams,
+                            _keyPairId.value!!.rawValue,
+                            algorithm,
                             keyPairValidityNotBefore,
                             keyPairValidityNotAfter
                         )
@@ -110,22 +118,25 @@ class GenerateKeyPairViewModel(
         if (hasPinChanged) _shouldLogout.postValue(true)
     }
 
-    private suspend fun createGostKeyPair(
+    private suspend fun createKeyPair(
         token: Pkcs11Token,
         userPin: String,
         ckaId: ByteArray,
-        keyPairParams: GostKeyPairParams,
+        algorithm: KeyPairAlgorithm,
         keyPairValidityNotBefore: ZonedDateTime,
         keyPairValidityNotAfter: ZonedDateTime,
-    ): GostKeyPair {
-        return token.openSession(true).use { session ->
+    ) {
+        val notBefore = Pkcs11Date(keyPairValidityNotBefore.toLocalDate())
+        val notAfter = Pkcs11Date(keyPairValidityNotAfter.toLocalDate())
+
+        token.openSession(true).use { session ->
             session.login(CKU_USER, userPin).use {
-                session.createGostKeyPair(
-                    keyPairParams,
-                    ckaId,
-                    Pkcs11Date(keyPairValidityNotBefore.toLocalDate()),
-                    Pkcs11Date(keyPairValidityNotAfter.toLocalDate())
-                )
+                when (algorithm) {
+                    KeyPairAlgorithm.GOST_2012_256 ->
+                        session.createGostKeyPair(GostKeyPairParams.GOST_2012_256, ckaId, notBefore, notAfter)
+                    KeyPairAlgorithm.ECDSA_SECP256R1 ->
+                        session.createEcKeyPair(EcKeyPairParams.SECP256R1, ckaId, notBefore, notAfter)
+                }
             }
         }
     }

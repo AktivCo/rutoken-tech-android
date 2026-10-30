@@ -18,7 +18,9 @@ import ru.rutoken.pkcs11wrapper.constant.standard.Pkcs11UserType.CKU_USER
 import ru.rutoken.pkcs11wrapper.`object`.certificate.Pkcs11CertificateObject
 import ru.rutoken.pkcs11wrapper.rutoken.main.RtPkcs11Token
 import ru.rutoken.tech.R
-import ru.rutoken.tech.pkcs11.createobjects.createGostCertificate
+import ru.rutoken.tech.pkcs11.createobjects.createCertificate
+import ru.rutoken.tech.pkcs11.createobjects.createEcCertificate
+import ru.rutoken.tech.pkcs11.findobjects.findEcKeyPairByCkaId
 import ru.rutoken.tech.pkcs11.findobjects.findGost256KeyPairByCkaId
 import ru.rutoken.tech.session.AppSessionHolder
 import ru.rutoken.tech.session.requireCaSession
@@ -59,7 +61,7 @@ class GenerateCertificateViewModel(
 
     private var hasPinChanged = false
 
-    fun generateGostCertificate(keyPairCkaId: CkaID, owner: String) {
+    fun generateCertificate(keyPairCkaId: CkaID, owner: String) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 val caSession = sessionHolder.requireCaSession()
@@ -67,13 +69,12 @@ class GenerateCertificateViewModel(
                 val token = connectTokenDelegate.findTokenBySerialNumber(tokenManager, tokenSerial).token
 
                 callPkcs11Operation(_showProgress, tokenManager, tokenSerial) {
-                    createGostCertificate(
+                    createCertificate(
                         token,
                         caSession.tokenUserPin,
                         keyPairCkaId.rawValue,
                         createDN(owner),
                         null,
-                        EXTENSIONS
                     )
                     caSession.keyPairs.remove(keyPairCkaId)
 
@@ -107,23 +108,31 @@ class GenerateCertificateViewModel(
         if (hasPinChanged) _shouldLogout.postValue(true)
     }
 
-    private suspend fun createGostCertificate(
+    private suspend fun createCertificate(
         token: RtPkcs11Token,
         userPin: String,
         keyPairCkaId: ByteArray,
         dn: List<String>,
         attributes: List<String>?,
-        extensions: List<String>,
-    ): Pkcs11CertificateObject {
+    ) : Pkcs11CertificateObject {
         return token.openSession(true).use { session ->
             session.login(CKU_USER, userPin).use {
-                val keyPair = try {
-                    session.findGost256KeyPairByCkaId(keyPairCkaId)
-                } catch (_: IllegalStateException) {
-                    throw BusinessRuleException(BusinessRuleCase.NoSuchKeyPair)
-                }
-                session.createGostCertificate(keyPair, dn, attributes, extensions)
+                val gostKeyPair = findOrNull { session.findGost256KeyPairByCkaId(keyPairCkaId) }
+                if (gostKeyPair != null)
+                    return@use session.createCertificate(gostKeyPair, dn, attributes, EXTENSIONS)
+
+                val ecKeyPair = findOrNull { session.findEcKeyPairByCkaId(keyPairCkaId) }
+                if (ecKeyPair != null)
+                    return@use session.createEcCertificate(ecKeyPair, dn)
+
+                throw BusinessRuleException(BusinessRuleCase.NoSuchKeyPair)
             }
         }
+    }
+
+    private inline fun <T> findOrNull(block: () -> T): T? = try {
+        block()
+    } catch (_: IllegalStateException) {
+        null
     }
 }

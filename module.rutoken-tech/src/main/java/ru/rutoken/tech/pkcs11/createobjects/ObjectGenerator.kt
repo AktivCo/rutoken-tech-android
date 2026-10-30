@@ -12,6 +12,7 @@ import ru.rutoken.pkcs11wrapper.constant.standard.Pkcs11AttributeType.CKA_CERTIF
 import ru.rutoken.pkcs11wrapper.constant.standard.Pkcs11AttributeType.CKA_CERTIFICATE_TYPE
 import ru.rutoken.pkcs11wrapper.constant.standard.Pkcs11AttributeType.CKA_CLASS
 import ru.rutoken.pkcs11wrapper.constant.standard.Pkcs11AttributeType.CKA_DERIVE
+import ru.rutoken.pkcs11wrapper.constant.standard.Pkcs11AttributeType.CKA_EC_PARAMS
 import ru.rutoken.pkcs11wrapper.constant.standard.Pkcs11AttributeType.CKA_END_DATE
 import ru.rutoken.pkcs11wrapper.constant.standard.Pkcs11AttributeType.CKA_GOSTR3410_PARAMS
 import ru.rutoken.pkcs11wrapper.constant.standard.Pkcs11AttributeType.CKA_GOSTR3411_PARAMS
@@ -33,6 +34,8 @@ import ru.rutoken.pkcs11wrapper.datatype.Pkcs11KeyPair
 import ru.rutoken.pkcs11wrapper.main.Pkcs11Session
 import ru.rutoken.pkcs11wrapper.mechanism.Pkcs11Mechanism
 import ru.rutoken.pkcs11wrapper.`object`.certificate.Pkcs11CertificateObject
+import ru.rutoken.pkcs11wrapper.`object`.key.Pkcs11EcPrivateKeyObject
+import ru.rutoken.pkcs11wrapper.`object`.key.Pkcs11EcPublicKeyObject
 import ru.rutoken.pkcs11wrapper.`object`.key.Pkcs11GostPrivateKeyObject
 import ru.rutoken.pkcs11wrapper.`object`.key.Pkcs11GostPublicKeyObject
 import ru.rutoken.pkcs11wrapper.rutoken.main.RtPkcs11Session
@@ -40,18 +43,33 @@ import ru.rutoken.tech.ca.LocalCA
 import ru.rutoken.tech.pkcs11.Pkcs11CallScope.withPkcs11CallContext
 
 typealias GostKeyPair = Pkcs11KeyPair<Pkcs11GostPublicKeyObject, Pkcs11GostPrivateKeyObject>
+typealias EcKeyPair = Pkcs11KeyPair<Pkcs11EcPublicKeyObject, Pkcs11EcPrivateKeyObject>
 
 /**
  * Method supposes that the user is logged in.
  */
-suspend fun RtPkcs11Session.createGostCertificate(
-    keyPair: GostKeyPair,
+suspend fun RtPkcs11Session.createCertificate(
+    keyPair: Pkcs11KeyPair<*, *>,
     dn: List<String>,
     attributes: List<String>?,
     extensions: List<String>,
 ): Pkcs11CertificateObject = withPkcs11CallContext {
-    val ckaId = keyPair.publicKey.getByteArrayAttributeValue(this@createGostCertificate, CKA_ID).byteArrayValue
+    val ckaId = keyPair.publicKey.getByteArrayAttributeValue(this@createCertificate, CKA_ID).byteArrayValue
     val csr = createCsr(keyPair.publicKey, dn, keyPair.privateKey, attributes, extensions)
+    val encodedCertificate = LocalCA.issueCertificate(csr)
+
+    objectManager.createObject(
+        Pkcs11CertificateObject::class.java,
+        attributeFactory.makeCertificateTemplate(ckaId, encodedCertificate)
+    )
+}
+
+suspend fun RtPkcs11Session.createEcCertificate(
+    keyPair: EcKeyPair,
+    dn: List<String>,
+): Pkcs11CertificateObject = withPkcs11CallContext {
+    val ckaId = keyPair.publicKey.getByteArrayAttributeValue(this@createEcCertificate, CKA_ID).byteArrayValue
+    val csr = createEcCsr(keyPair, dn)
     val encodedCertificate = LocalCA.issueCertificate(csr)
 
     objectManager.createObject(
@@ -82,6 +100,58 @@ suspend fun Pkcs11Session.createGostKeyPair(
     }
 }
 
+suspend fun Pkcs11Session.createEcKeyPair(
+    keyPairParams: EcKeyPairParams,
+    ckaId: ByteArray,
+    privateKeyValidityNotBefore: Pkcs11Date,
+    privateKeyValidityNotAfter: Pkcs11Date,
+): EcKeyPair {
+    return withPkcs11CallContext {
+        keyManager.generateKeyPair(
+            Pkcs11EcPublicKeyObject::class.java,
+            Pkcs11EcPrivateKeyObject::class.java,
+            Pkcs11Mechanism.make(keyPairParams.mechanismType),
+            attributeFactory.makeEcPublicKeyTemplate(keyPairParams, ckaId),
+            attributeFactory.makeEcPrivateKeyTemplate(
+                keyPairParams, ckaId, privateKeyValidityNotBefore, privateKeyValidityNotAfter
+            )
+        )
+    }
+}
+
+fun IPkcs11AttributeFactory.makeEcPublicKeyTemplate(
+    keyPairParams: EcKeyPairParams,
+    ckaId: ByteArray,
+): List<Pkcs11Attribute> {
+    return listOf(
+        makeAttribute(CKA_CLASS, CKO_PUBLIC_KEY),
+        makeAttribute(CKA_KEY_TYPE, keyPairParams.keyType),
+        makeAttribute(CKA_ID, ckaId),
+        makeAttribute(CKA_PRIVATE, false),
+        makeAttribute(CKA_EC_PARAMS, keyPairParams.ecParams),
+        makeAttribute(CKA_TOKEN, true),
+        makeAttribute(CKA_VERIFY, true),
+    )
+}
+
+fun IPkcs11AttributeFactory.makeEcPrivateKeyTemplate(
+    keyPairParams: EcKeyPairParams,
+    ckaId: ByteArray,
+    keyValidityNotBefore: Pkcs11Date,
+    keyValidityNotAfter: Pkcs11Date,
+): List<Pkcs11Attribute> {
+    return listOf(
+        makeAttribute(CKA_CLASS, CKO_PRIVATE_KEY),
+        makeAttribute(CKA_KEY_TYPE, keyPairParams.keyType),
+        makeAttribute(CKA_ID, ckaId),
+        makeAttribute(CKA_PRIVATE, true),
+        makeAttribute(CKA_TOKEN, true),
+        makeAttribute(CKA_SIGN, true),
+        makeAttribute(CKA_DERIVE, true),
+        makeAttribute(CKA_START_DATE, keyValidityNotBefore),
+        makeAttribute(CKA_END_DATE, keyValidityNotAfter)
+    )
+}
 fun IPkcs11AttributeFactory.makeCertificateTemplate(id: ByteArray, value: ByteArray): List<Pkcs11Attribute> {
     return listOf(
         makeAttribute(CKA_CLASS, CKO_CERTIFICATE),
@@ -109,7 +179,6 @@ fun IPkcs11AttributeFactory.makeGostPublicKeyTemplate(
         makeAttribute(CKA_VERIFY, true),
     )
 }
-
 fun IPkcs11AttributeFactory.makeGostPrivateKeyTemplate(
     keyPairParams: GostKeyPairParams,
     ckaId: ByteArray,

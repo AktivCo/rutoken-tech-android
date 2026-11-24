@@ -70,7 +70,7 @@ class VerifyDetachedGostCmsTest {
             provider = provider,
             cms = detachedCms,
             data = DATA,
-            trustedCertificates = listOf(LocalCA.rootCertificate),
+            trustedCertificates = listOf(LocalCA.rootCertificateGost),
             session = session.value,
         )
 

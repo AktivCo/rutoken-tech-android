@@ -109,10 +109,10 @@ private val CA_CONFIG_ECDSA = LocalCAConfig(
     issuedCertificateValidityPeriod = Period.ofYears(1)
 )
 object LocalCA {
-    val rootCertificate: ByteArray
+    val rootCertificateGost: ByteArray
         get() = ROOT_CERTIFICATE_GOST.decoded
 
-    val caCertificate: ByteArray
+    val caCertificateGost: ByteArray
         get() = CA_CONFIG_GOST.caCertificate.decoded
 
     val rootCertificateEcdsa: ByteArray

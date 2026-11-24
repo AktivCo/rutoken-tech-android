@@ -203,7 +203,7 @@ suspend fun getInitialPaymentsStorage(
                 // Make a valid signature and chain
                 0, 1 -> {
                     dataToSign = payment.readFile(context)
-                    additionalCertificates = listOf(X509CertificateHolder(LocalCA.caCertificate))
+                    additionalCertificates = listOf(X509CertificateHolder(LocalCA.caCertificateGost))
                 }
                 // Make a valid signature, but break chain
                 2 -> {

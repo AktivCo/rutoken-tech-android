@@ -15,7 +15,7 @@ import java.io.ByteArrayOutputStream
 import java.math.BigInteger
 import java.security.MessageDigest
 
-class EcdsaContentSigner(private val signHash: (ByteArray) -> ByteArray) : ContentSigner {
+class EcdsaContentSigner(private val signature: EcdsaSignature) : ContentSigner {
     private val stream = ByteArrayOutputStream()
 
     override fun getAlgorithmIdentifier() = AlgorithmIdentifier(X9ObjectIdentifiers.ecdsa_with_SHA256)
@@ -24,7 +24,7 @@ class EcdsaContentSigner(private val signHash: (ByteArray) -> ByteArray) : Conte
 
     override fun getSignature(): ByteArray {
         val hash = MessageDigest.getInstance("SHA-256").digest(stream.toByteArray())
-        return rawEcdsaSignatureToDer(signHash(hash))
+        return rawEcdsaSignatureToDer(signature.sign(hash))
     }
 }
 

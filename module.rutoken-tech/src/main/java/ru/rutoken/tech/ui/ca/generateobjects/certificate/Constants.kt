@@ -39,7 +39,7 @@ fun createDN(owner: String) = listOf(
 /**
  * List of extension fields
  */
-val EXTENSIONS = listOf(
+private fun certificateExtensions(keyUsage: String): List<String> = listOf(
     "1.2.643.100.114", // identification_kind
     "ASN1:INT:0", // personal
     "2.5.29.32", // cert_policies
@@ -49,5 +49,13 @@ val EXTENSIONS = listOf(
     "subjectSignTool",
     "ASN1:UTF8String:Средство электронной подписи: СКЗИ \"Рутокен ЭЦП 3.0\"",
     "keyUsage",
-    "digitalSignature,nonRepudiation,keyEncipherment,dataEncipherment"
+    keyUsage
+)
+
+val EXTENSIONS = certificateExtensions(
+    keyUsage = "digitalSignature,nonRepudiation,keyEncipherment,dataEncipherment"
+)
+
+val EC_EXTENSIONS = certificateExtensions(
+    keyUsage = "digitalSignature,nonRepudiation,keyAgreement"
 )

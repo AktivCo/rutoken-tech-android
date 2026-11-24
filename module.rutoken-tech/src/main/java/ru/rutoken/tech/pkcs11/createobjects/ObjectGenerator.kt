@@ -67,9 +67,11 @@ suspend fun RtPkcs11Session.createCertificate(
 suspend fun RtPkcs11Session.createEcCertificate(
     keyPair: EcKeyPair,
     dn: List<String>,
+    attributes: List<String>?,
+    extensions: List<String>,
 ): Pkcs11CertificateObject = withPkcs11CallContext {
     val ckaId = keyPair.publicKey.getByteArrayAttributeValue(this@createEcCertificate, CKA_ID).byteArrayValue
-    val csr = createEcCsr(keyPair, dn)
+    val csr = createEcCsr(keyPair, dn, attributes, extensions)
     val encodedCertificate = LocalCA.issueCertificate(csr)
 
     objectManager.createObject(

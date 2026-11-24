@@ -28,7 +28,7 @@ class PrepareBankPaymentsTest {
             DATA,
             BANK_PRIVATE_KEY_GOST,
             base64ToX509CertificateHolder(BANK_CERTIFICATE_GOST),
-            listOf(X509CertificateHolder(LocalCA.caCertificate))
+            listOf(X509CertificateHolder(LocalCA.caCertificateGost))
         )
 
         runBlocking { verifyDetached(detachedCms) } shouldBe VerifyCmsResult.SUCCESS
@@ -52,7 +52,7 @@ class PrepareBankPaymentsTest {
             DATA + 1,
             BANK_PRIVATE_KEY_GOST,
             base64ToX509CertificateHolder(BANK_CERTIFICATE_GOST),
-            listOf(X509CertificateHolder(LocalCA.caCertificate))
+            listOf(X509CertificateHolder(LocalCA.caCertificateGost))
         )
 
         runBlocking { verifyDetached(detachedCms) } shouldBe VerifyCmsResult.SIGNATURE_INVALID
@@ -63,7 +63,7 @@ class PrepareBankPaymentsTest {
             provider = CmsOperationProvider.BOUNCY_CASTLE,
             cms = detachedCms,
             data = DATA,
-            trustedCertificates = listOf(LocalCA.rootCertificate),
+            trustedCertificates = listOf(LocalCA.rootCertificateGost),
         )
 
     companion object {

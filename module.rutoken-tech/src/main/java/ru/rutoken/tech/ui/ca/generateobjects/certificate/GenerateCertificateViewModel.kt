@@ -123,7 +123,7 @@ class GenerateCertificateViewModel(
 
                 val ecKeyPair = findOrNull { session.findEcKeyPairByCkaId(keyPairCkaId) }
                 if (ecKeyPair != null)
-                    return@use session.createEcCertificate(ecKeyPair, dn)
+                    return@use session.createEcCertificate(ecKeyPair, dn, attributes, EC_EXTENSIONS)
 
                 throw BusinessRuleException(BusinessRuleCase.NoSuchKeyPair)
             }

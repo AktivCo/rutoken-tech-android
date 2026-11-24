@@ -20,7 +20,7 @@ class CaCertificateRule(private val session: RtSessionRule) : ExternalResource()
 
     override fun before() {
         with(session.value) {
-            _encoded = LocalCA.caCertificate
+            _encoded = LocalCA.caCertificateGost
             _value = objectManager.createObject(
                 Pkcs11CertificateObject::class.java,
                 attributeFactory.makeCertificateTemplate(ID, _encoded)

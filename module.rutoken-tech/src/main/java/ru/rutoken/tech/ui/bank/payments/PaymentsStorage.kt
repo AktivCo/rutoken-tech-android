@@ -19,6 +19,10 @@ import ru.rutoken.tech.session.BankEncryptionAlgorithm
 import ru.rutoken.tech.utils.base64ToX509CertificateHolder
 import ru.rutoken.tech.utils.toBase64String
 import java.time.LocalDate
+import ru.rutoken.tech.bank.BANK_CERTIFICATE_ECDSA
+import ru.rutoken.tech.bank.BANK_PRIVATE_KEY_ECDSA
+import ru.rutoken.tech.bouncycastle.EcCmsOperations
+import ru.rutoken.tech.utils.hasEcPublicKey
 
 private val initialPaymentsStorage
     get() = listOf(
@@ -173,6 +177,7 @@ suspend fun getInitialPaymentsStorage(
     userCertificateHolder: X509CertificateHolder,
 ): List<Payment> {
     val paymentsStorage = initialPaymentsStorage
+    val isEcUser = userCertificateHolder.hasEcPublicKey()
 
     withContext(Dispatchers.IO) {
         paymentsStorage
@@ -188,11 +193,15 @@ suspend fun getInitialPaymentsStorage(
                  *     GOST28147_GCFB
                  * ).toBase64String()
                  */
-                it.initialActionData = RtPkiCmsOperations.encrypt(
-                    it.readFile(context),
-                    listOf(userCertificateHolder),
-                    encryptionAlgorithm.toRtPkiEncryptionAlgorithm()
-                ).toBase64String()
+                it.initialActionData = if (isEcUser) {
+                    EcCmsOperations.encrypt(it.readFile(context), userCertificateHolder).toBase64String()
+                } else {
+                    RtPkiCmsOperations.encrypt(
+                        it.readFile(context),
+                        listOf(userCertificateHolder),
+                        encryptionAlgorithm.toRtPkiEncryptionAlgorithm()
+                    ).toBase64String()
+                }
             }
 
         paymentsStorage.filter { it.userActionType == UserActionType.VERIFY }.forEachIndexed { index, payment ->
@@ -203,7 +212,9 @@ suspend fun getInitialPaymentsStorage(
                 // Make a valid signature and chain
                 0, 1 -> {
                     dataToSign = payment.readFile(context)
-                    additionalCertificates = listOf(X509CertificateHolder(LocalCA.caCertificateGost))
+                    additionalCertificates = listOf(
+                        X509CertificateHolder(if (isEcUser) LocalCA.caCertificateEcdsa else LocalCA.caCertificateGost)
+                    )
                 }
                 // Make a valid signature, but break chain
                 2 -> {
@@ -218,12 +229,21 @@ suspend fun getInitialPaymentsStorage(
                 }
             }
 
-            payment.initialActionData = BouncyCastleCmsOperations.signDetachedGost256Software(
-                dataToSign,
-                BANK_PRIVATE_KEY_GOST,
-                base64ToX509CertificateHolder(BANK_CERTIFICATE_GOST),
-                additionalCertificates
-            ).toBase64String()
+            payment.initialActionData = if (isEcUser) {
+                EcCmsOperations.signDetachedSoftware(
+                    dataToSign,
+                    BANK_PRIVATE_KEY_ECDSA,
+                    base64ToX509CertificateHolder(BANK_CERTIFICATE_ECDSA),
+                    additionalCertificates
+                ).toBase64String()
+            } else {
+                BouncyCastleCmsOperations.signDetachedGost256Software(
+                    dataToSign,
+                    BANK_PRIVATE_KEY_GOST,
+                    base64ToX509CertificateHolder(BANK_CERTIFICATE_GOST),
+                    additionalCertificates
+                ).toBase64String()
+            }
         }
     }
 

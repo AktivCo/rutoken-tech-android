@@ -39,6 +39,7 @@ import ru.rutoken.tech.utils.loge
 import ru.rutoken.tech.utils.logw
 import java.io.File
 import kotlin.coroutines.cancellation.CancellationException
+import ru.rutoken.tech.utils.isEcCertificate
 
 private val verifyValidSignatureDialogData =
     DialogDataWithIcon({ AppIcons.ValidSignature() }, R.string.verify_valid_signature, null)
@@ -88,7 +89,10 @@ class PaymentViewModel(
                 }
 
                 UserActionType.VERIFY -> {
-                    verifyPaymentSignature()
+                    verifyPaymentSignature(
+                        if (isEcCertificate(bankUserLoginSession.certificate)) CmsOperationProvider.BOUNCY_CASTLE
+                        else CmsOperationProvider.PKCS11_WRAPPER
+                    )
                 }
 
                 UserActionType.ENCRYPT -> {
@@ -156,7 +160,12 @@ class PaymentViewModel(
     }
 
     private suspend fun signPaymentOnTokenAuth(session: RtPkcs11Session) {
-        session.signPayment(_payment.value!!, bankUserLoginSession.certificateCkaId, applicationContext)
+        session.signPayment(
+            _payment.value!!,
+            bankUserLoginSession.certificateCkaId,
+            bankUserLoginSession.certificate,
+            applicationContext
+        )
         _operationCompleted.postValue(true)
         _operationCompletedDialogState.postValue(DialogState(true, DialogData(R.string.sign_operation_completed)))
     }
@@ -220,7 +229,12 @@ class PaymentViewModel(
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 _showProgress.postValue(true)
-                encryptPayment(_payment.value!!, bankUserLoginSession.encryptionAlgorithm, applicationContext)
+                encryptPayment(
+                    _payment.value!!,
+                    bankUserLoginSession.encryptionAlgorithm,
+                    bankUserLoginSession.certificate,
+                    applicationContext
+                )
                 _operationCompleted.postValue(true)
                 _operationCompletedDialogState.postValue(
                     DialogState(true, DialogData(R.string.encrypt_operation_completed))

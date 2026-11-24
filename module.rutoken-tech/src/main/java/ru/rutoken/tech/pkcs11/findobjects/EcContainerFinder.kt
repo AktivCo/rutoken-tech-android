@@ -17,6 +17,11 @@ import ru.rutoken.pkcs11wrapper.`object`.key.Pkcs11EcPublicKeyObject
 import ru.rutoken.tech.pkcs11.Pkcs11CallScope.withPkcs11CallContext
 import ru.rutoken.tech.pkcs11.createobjects.EcKeyPair
 import ru.rutoken.tech.pkcs11.createobjects.EcKeyPairParams
+import android.util.Base64
+import org.bouncycastle.asn1.ASN1ObjectIdentifier
+import org.bouncycastle.asn1.x9.X9ObjectIdentifiers
+import org.bouncycastle.cert.X509CertificateHolder
+import ru.rutoken.tech.utils.loge
 
 suspend fun Pkcs11Session.findEcKeyPairByCkaId(
     ckaId: ByteArray,
@@ -65,3 +70,39 @@ suspend fun Pkcs11Session.findEcKeyPairsWithoutCertificate(
         if (hasPrivateKey) ckaId else null
     }
 }
+
+suspend fun Pkcs11Session.findEcCertificateAndKeyContainers(
+    keyPairParams: EcKeyPairParams = EcKeyPairParams.SECP256R1,
+): List<EcCertificateAndKeyContainer> = withPkcs11CallContext {
+    val curveOid = ASN1ObjectIdentifier.getInstance(keyPairParams.ecParams)
+
+    objectManager.findObjectsAtOnce(Pkcs11X509PublicKeyCertificateObject::class.java).mapNotNull { certificate ->
+        val certificateValue = certificate.getValueAttributeValue(this@findEcCertificateAndKeyContainers).byteArrayValue
+        val x509CertificateHolder = try {
+            X509CertificateHolder(certificateValue)
+        } catch (e: Exception) {
+            loge<Container>(e) { "Unable to parse certificate" }
+            loge<Container> { "Unparsed certificate(base64-encoded): ${Base64.encodeToString(certificateValue, Base64.DEFAULT)}" }
+            return@mapNotNull null
+        }
+
+        val algorithm = x509CertificateHolder.subjectPublicKeyInfo.algorithm
+        if (algorithm.algorithm != X9ObjectIdentifiers.id_ecPublicKey || algorithm.parameters != curveOid)
+            return@mapNotNull null
+
+        val ckaId = runCatching {
+            certificate.getIdAttributeValue(this@findEcCertificateAndKeyContainers).byteArrayValue
+        }.getOrNull() ?: return@mapNotNull null
+
+        val keyPair = try {
+            findEcKeyPairByCkaId(ckaId, keyPairParams)
+        } catch (_: IllegalStateException) {
+            return@mapNotNull null
+        }
+
+        EcCertificateAndKeyContainer(ckaId, x509CertificateHolder, keyPair)
+    }
+}
+
+suspend fun Pkcs11Session.findEcCertificateAndKeyContainerByCkaId(ckaId: ByteArray) =
+    findEcCertificateAndKeyContainers().filter { it.ckaId.contentEquals(ckaId) }.singleOrThrow()

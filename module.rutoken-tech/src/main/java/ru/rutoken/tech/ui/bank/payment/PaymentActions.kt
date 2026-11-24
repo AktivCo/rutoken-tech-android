@@ -25,13 +25,28 @@ import ru.rutoken.tech.utils.base64ToX509CertificateHolder
 import ru.rutoken.tech.utils.decoded
 import ru.rutoken.tech.utils.toBase64String
 import java.time.LocalDateTime
+import ru.rutoken.tech.bank.BANK_CERTIFICATE_ECDSA
+import ru.rutoken.tech.bouncycastle.EcCmsOperations
+import ru.rutoken.tech.bouncycastle.signature.EcdsaContentSigner
+import ru.rutoken.tech.bouncycastle.signature.EcdsaSignature
+import ru.rutoken.tech.pkcs11.Pkcs11CallScope.withPkcs11CallContext
+import ru.rutoken.tech.pkcs11.deriveEcdhSharedSecret
+import ru.rutoken.tech.pkcs11.findobjects.findEcCertificateAndKeyContainerByCkaId
+import ru.rutoken.tech.pkcs11.findobjects.findEcKeyPairByCkaId
+import ru.rutoken.tech.utils.isEcCertificate
 
 suspend fun RtPkcs11Session.signPayment(
     payment: Payment,
     certificateCkaId: ByteArray,
+    certificate: ByteArray,
     applicationContext: Context,
     provider: CmsOperationProvider = CmsOperationProvider.PKCS11_WRAPPER,
 ) {
+    if (isEcCertificate(certificate)) {
+        signPaymentEcdsa(payment, certificateCkaId, applicationContext)
+        return
+    }
+
     payment.apply {
         actionResultData = CmsOperations.signDetached(
             provider,
@@ -57,7 +72,10 @@ suspend fun verifyPaymentSignature(
             provider = provider,
             cms = getActionData(applicationContext).decoded,
             data = getRenderData(applicationContext).decoded,
-            trustedCertificates = listOf(LocalCA.rootCertificateGost),
+            trustedCertificates = when (provider) {
+                CmsOperationProvider.BOUNCY_CASTLE -> listOf(LocalCA.rootCertificateGost, LocalCA.rootCertificateEcdsa)
+                CmsOperationProvider.PKCS11_WRAPPER -> listOf(LocalCA.rootCertificateGost)
+            },
             session = session
         )
 
@@ -68,7 +86,23 @@ suspend fun verifyPaymentSignature(
 }
 
 @WorkerThread
-fun encryptPayment(payment: Payment, encryptionAlgorithm: BankEncryptionAlgorithm, applicationContext: Context) {
+fun encryptPayment(
+    payment: Payment,
+    encryptionAlgorithm: BankEncryptionAlgorithm,
+    userCertificate: ByteArray,
+    applicationContext: Context
+) {
+    if (isEcCertificate(userCertificate)) {
+        payment.apply {
+            actionResultData = EcCmsOperations.encrypt(
+                readFile(applicationContext),
+                base64ToX509CertificateHolder(BANK_CERTIFICATE_ECDSA)
+            ).toBase64String()
+
+            actionTime = LocalDateTime.now()
+        }
+        return
+    }
     payment.apply {
         /*
          * BouncyCastleCmsOperations#encrypt method with the GOST28147_GCFB encryption algorithm can be used if
@@ -96,6 +130,10 @@ suspend fun Pkcs11Session.decryptPayment(
     certificateBytes: ByteArray,
     applicationContext: Context,
 ) {
+    if (isEcCertificate(certificateBytes)) {
+        decryptPaymentEcdh(payment, certificateCkaId, certificateBytes, applicationContext)
+        return
+    }
     payment.apply {
         val keyPair = findGost256KeyPairByCkaId(certificateCkaId)
         /*
@@ -115,6 +153,47 @@ suspend fun Pkcs11Session.decryptPayment(
             publicKey = keyPair.publicKey,
             privateKey = keyPair.privateKey
         ).toBase64String()
+
+        actionTime = LocalDateTime.now()
+    }
+}
+
+private suspend fun RtPkcs11Session.signPaymentEcdsa(
+    payment: Payment,
+    certificateCkaId: ByteArray,
+    applicationContext: Context,
+) = withPkcs11CallContext {
+    val container = findEcCertificateAndKeyContainerByCkaId(certificateCkaId)
+    val signature = EcdsaSignature(this@signPaymentEcdsa, container.keyPair.privateKey)
+    val contentSigner = EcdsaContentSigner(signature)
+
+    payment.apply {
+        actionResultData = EcCmsOperations.signDetached(
+            getActionData(applicationContext).decoded,
+            contentSigner,
+            container.certificate,
+            listOf(X509CertificateHolder(LocalCA.caCertificateEcdsa))
+        ).toBase64String()
+
+        actionTime = LocalDateTime.now()
+    }
+}
+
+private suspend fun Pkcs11Session.decryptPaymentEcdh(
+    payment: Payment,
+    certificateCkaId: ByteArray,
+    certificateBytes: ByteArray,
+    applicationContext: Context,
+) = withPkcs11CallContext {
+    val privateKey = findEcKeyPairByCkaId(certificateCkaId).privateKey
+
+    payment.apply {
+        actionResultData = EcCmsOperations.decrypt(
+            getActionData(applicationContext).decoded,
+            X509CertificateHolder(certificateBytes)
+        ) { peerPublicPoint ->
+            deriveEcdhSharedSecret(privateKey, peerPublicPoint)
+        }.toBase64String()
 
         actionTime = LocalDateTime.now()
     }

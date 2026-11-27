@@ -10,21 +10,19 @@ import org.bouncycastle.asn1.ASN1Integer
 import org.bouncycastle.asn1.DERSequence
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier
 import org.bouncycastle.asn1.x9.X9ObjectIdentifiers
+import org.bouncycastle.crypto.io.DigestOutputStream
 import org.bouncycastle.operator.ContentSigner
-import java.io.ByteArrayOutputStream
 import java.math.BigInteger
-import java.security.MessageDigest
 
 class EcdsaContentSigner(private val signature: EcdsaSignature) : ContentSigner {
-    private val stream = ByteArrayOutputStream()
+    private val digestStream = DigestOutputStream(signature.makeDigest())
 
     override fun getAlgorithmIdentifier() = AlgorithmIdentifier(X9ObjectIdentifiers.ecdsa_with_SHA256)
 
-    override fun getOutputStream() = stream
+    override fun getOutputStream() = digestStream
 
     override fun getSignature(): ByteArray {
-        val hash = MessageDigest.getInstance("SHA-256").digest(stream.toByteArray())
-        return rawEcdsaSignatureToDer(signature.sign(hash))
+        return rawEcdsaSignatureToDer(signature.sign(digestStream.digest))
     }
 }
 

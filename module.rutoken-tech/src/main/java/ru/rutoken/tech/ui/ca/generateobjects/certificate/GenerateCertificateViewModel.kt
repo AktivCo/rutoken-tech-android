@@ -18,8 +18,8 @@ import ru.rutoken.pkcs11wrapper.constant.standard.Pkcs11UserType.CKU_USER
 import ru.rutoken.pkcs11wrapper.`object`.certificate.Pkcs11CertificateObject
 import ru.rutoken.pkcs11wrapper.rutoken.main.RtPkcs11Token
 import ru.rutoken.tech.R
-import ru.rutoken.tech.pkcs11.createobjects.createCertificate
 import ru.rutoken.tech.pkcs11.createobjects.createEcCertificate
+import ru.rutoken.tech.pkcs11.createobjects.createGostCertificate
 import ru.rutoken.tech.pkcs11.findobjects.findEcKeyPairByCkaId
 import ru.rutoken.tech.pkcs11.findobjects.findGost256KeyPairByCkaId
 import ru.rutoken.tech.session.AppSessionHolder
@@ -119,7 +119,7 @@ class GenerateCertificateViewModel(
             session.login(CKU_USER, userPin).use {
                 val gostKeyPair = findOrNull { session.findGost256KeyPairByCkaId(keyPairCkaId) }
                 if (gostKeyPair != null)
-                    return@use session.createCertificate(gostKeyPair, dn, attributes, EXTENSIONS)
+                    return@use session.createGostCertificate(gostKeyPair, dn, attributes, GOST_EXTENSIONS)
 
                 val ecKeyPair = findOrNull { session.findEcKeyPairByCkaId(keyPairCkaId) }
                 if (ecKeyPair != null)

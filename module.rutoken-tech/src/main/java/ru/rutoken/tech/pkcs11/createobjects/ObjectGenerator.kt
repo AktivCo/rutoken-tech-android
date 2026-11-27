@@ -48,13 +48,13 @@ typealias EcKeyPair = Pkcs11KeyPair<Pkcs11EcPublicKeyObject, Pkcs11EcPrivateKeyO
 /**
  * Method supposes that the user is logged in.
  */
-suspend fun RtPkcs11Session.createCertificate(
-    keyPair: Pkcs11KeyPair<*, *>,
+suspend fun RtPkcs11Session.createGostCertificate(
+    keyPair: GostKeyPair,
     dn: List<String>,
     attributes: List<String>?,
     extensions: List<String>,
 ): Pkcs11CertificateObject = withPkcs11CallContext {
-    val ckaId = keyPair.publicKey.getByteArrayAttributeValue(this@createCertificate, CKA_ID).byteArrayValue
+    val ckaId = keyPair.publicKey.getByteArrayAttributeValue(this@createGostCertificate, CKA_ID).byteArrayValue
     val csr = createCsr(keyPair.publicKey, dn, keyPair.privateKey, attributes, extensions)
     val encodedCertificate = LocalCA.issueCertificate(csr)
 

@@ -52,7 +52,7 @@ private fun certificateExtensions(keyUsage: String): List<String> = listOf(
     keyUsage
 )
 
-val EXTENSIONS = certificateExtensions(
+val GOST_EXTENSIONS = certificateExtensions(
     keyUsage = "digitalSignature,nonRepudiation,keyEncipherment,dataEncipherment"
 )
 

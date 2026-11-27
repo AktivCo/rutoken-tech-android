@@ -23,6 +23,7 @@ import ru.rutoken.pkcs11wrapper.rutoken.main.RtPkcs11Session
 import ru.rutoken.tech.R
 import ru.rutoken.tech.pkcs11.Pkcs11CallScope.withPkcs11CallContext
 import ru.rutoken.tech.pkcs11.findobjects.Gost256CertificateAndKeyContainer
+import ru.rutoken.tech.pkcs11.findobjects.findEcKeyPairsWithoutCertificate
 import ru.rutoken.tech.pkcs11.findobjects.findGost256CertificateAndKeyContainerByCkaId
 import ru.rutoken.tech.pkcs11.findobjects.findGost256CertificateAndKeyContainers
 import ru.rutoken.tech.pkcs11.findobjects.findGost256KeyContainers
@@ -184,7 +185,8 @@ class LoginViewModel(
         var keyPairs: MutableList<CkaID> = mutableListOf()
 
         withTokenSession(tokenData, tokenInfo, tokenUserPin) { session ->
-            keyPairs = session.findGost256KeyContainers().map { CkaID(it.ckaId) }.toMutableList()
+            keyPairs = (session.findGost256KeyContainers().map { CkaID(it.ckaId) } +
+                    session.findEcKeyPairsWithoutCertificate().map { CkaID(it) }).toMutableList()
         }
 
         logd<LoginViewModel> { "New CA session created, found ${keyPairs.size} key pairs" }

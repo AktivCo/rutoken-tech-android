@@ -39,7 +39,7 @@ suspend fun RtPkcs11Session.signPayment(
             getActionData(applicationContext).decoded,
             findGost256KeyPairByCkaId(certificateCkaId).privateKey,
             findGost256CertificateByCkaId(certificateCkaId),
-            listOf(X509CertificateHolder(LocalCA.caCertificate))
+            listOf(X509CertificateHolder(LocalCA.caCertificateGost))
         ).toBase64String()
 
         actionTime = LocalDateTime.now()
@@ -57,7 +57,7 @@ suspend fun verifyPaymentSignature(
             provider = provider,
             cms = getActionData(applicationContext).decoded,
             data = getRenderData(applicationContext).decoded,
-            trustedCertificates = listOf(LocalCA.rootCertificate),
+            trustedCertificates = listOf(LocalCA.rootCertificateGost),
             session = session
         )
 

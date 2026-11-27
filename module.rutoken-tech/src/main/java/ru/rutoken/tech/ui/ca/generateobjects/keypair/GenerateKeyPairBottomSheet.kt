@@ -6,6 +6,7 @@
 
 package ru.rutoken.tech.ui.ca.generateobjects.keypair
 
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.SheetState
@@ -14,17 +15,18 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.map
 import kotlinx.coroutines.launch
 import ru.rutoken.tech.R
-import ru.rutoken.tech.pkcs11.createobjects.GostKeyPairParams
 import ru.rutoken.tech.ui.components.BottomSheetTitle
 import ru.rutoken.tech.ui.components.NavigationBarSpacer
 import ru.rutoken.tech.ui.components.PrimaryButtonBox
 import ru.rutoken.tech.ui.components.ProgressIndicatorDialog
+import ru.rutoken.tech.ui.components.SegmentedButtonRow
 import ru.rutoken.tech.ui.components.TextGroupBox
 import ru.rutoken.tech.ui.components.TextGroupItem
 import ru.rutoken.tech.ui.components.alertdialog.ConnectTokenDialog
@@ -40,15 +42,18 @@ import ru.rutoken.tech.ui.utils.figmaPaddingValues
 @Composable
 fun GenerateKeyPairScreen(viewModel: GenerateKeyPairViewModel, onNavigateBack: () -> Unit, onLogout: () -> Unit) {
     val keyPairId by viewModel.keyPairId.map { convertToDefaultString(it) }.observeAsState("")
+    val algorithm by viewModel.algorithm.observeAsState(KeyPairAlgorithm.GOST_2012_256)
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val scope = rememberCoroutineScope()
 
     if (keyPairId.isNotEmpty()) {
         GenerateKeyPairBottomSheet(
             keyPairId = keyPairId,
+            algorithm = algorithm,
             sheetState = sheetState,
             onDismiss = onNavigateBack,
-            onGenerationButtonClicked = { viewModel.generateGostKeyPair(GostKeyPairParams.GOST_2012_256) }
+            onAlgorithmSelected = viewModel::selectAlgorithm,
+            onGenerationButtonClicked = viewModel::generateKeyPair
         )
     }
 
@@ -73,8 +78,10 @@ fun GenerateKeyPairScreen(viewModel: GenerateKeyPairViewModel, onNavigateBack: (
 @Composable
 fun GenerateKeyPairBottomSheet(
     keyPairId: String,
+    algorithm: KeyPairAlgorithm,
     sheetState: SheetState,
     onDismiss: () -> Unit,
+    onAlgorithmSelected: (KeyPairAlgorithm) -> Unit,
     onGenerationButtonClicked: () -> Unit,
 ) {
     ModalBottomSheet(
@@ -85,6 +92,15 @@ fun GenerateKeyPairBottomSheet(
     ) {
         BottomSheetTitle(stringResource(id = R.string.key_pair_title))
 
+        SegmentedButtonRow(
+            onLeftSectionClicked = { onAlgorithmSelected(KeyPairAlgorithm.GOST_2012_256) },
+            onRightSectionClicked = { onAlgorithmSelected(KeyPairAlgorithm.ECDSA_SECP256R1) },
+            isLeftSectionSelected = algorithm == KeyPairAlgorithm.GOST_2012_256,
+            leftSectionText = stringResource(R.string.gost_short),
+            rightSectionText = stringResource(R.string.ecdsa_short),
+            modifier = Modifier.padding(horizontal = 16.dp)
+        )
+
         TextGroupBox(
             items = listOf(
                 TextGroupItem(
@@ -93,7 +109,7 @@ fun GenerateKeyPairBottomSheet(
                 ),
                 TextGroupItem(
                     title = stringResource(R.string.key_pair_algorithm),
-                    value = stringResource(R.string.gost256_algorithm)
+                    value = stringResource(algorithm.title)
                 )
             ),
             padding = figmaPaddingValues(0.dp, 16.dp, 16.dp, 16.dp)
@@ -157,8 +173,10 @@ private fun GenerateKeyPairBottomSheetPreview() {
     RutokenTechTheme {
         GenerateKeyPairBottomSheet(
             keyPairId = "5a:8b:22:34:11",
+            algorithm = KeyPairAlgorithm.ECDSA_SECP256R1,
             sheetState = expandedSheetState(),
-            onDismiss = {}
+            onDismiss = {},
+            onAlgorithmSelected = {}
         ) {}
     }
 }

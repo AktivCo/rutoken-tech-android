@@ -84,7 +84,7 @@ fun GenerateCertificateScreen(
             sheetState = sheetState,
             onDismissRequest = onNavigateBack,
             keyPairs = keyPairs,
-            onGenerationButtonClicked = viewModel::generateGostCertificate
+            onGenerationButtonClicked = viewModel::generateCertificate
         )
     }
 

@@ -38,6 +38,9 @@
     <string name="key_pair_id">ID</string>
     <string name="key_pair_algorithm">Алгоритм</string>
     <string name="gost256_algorithm">ГОСТ Р 34.10-2012 256 бит</string>
+    <string name="ecdsa_secp256r1_algorithm">ECDSA secp256r1 (P-256)</string>
+    <string name="gost_short">ГОСТ</string>
+    <string name="ecdsa_short">ECDSA</string>
 
     <!--Related to CA test certificate generation bottom sheet-->
     <string name="test_certificate_title">Тестовый сертификат</string>

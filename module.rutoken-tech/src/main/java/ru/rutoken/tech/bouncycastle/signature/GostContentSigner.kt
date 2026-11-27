@@ -14,7 +14,7 @@ import ru.rutoken.pkcs11wrapper.`object`.key.Pkcs11GostPrivateKeyObject
 import ru.rutoken.tech.bouncycastle.digest.DigestProvider
 import ru.rutoken.tech.bouncycastle.digest.GostDigestCalculator
 
-class GostContentSigner(private val signature: Signature) : ContentSigner {
+class GostContentSigner(private val signature: Gost256Signature) : ContentSigner {
     private val digestProvider: DigestProvider
 
     private val digestStream: DigestOutputStream
@@ -25,11 +25,7 @@ class GostContentSigner(private val signature: Signature) : ContentSigner {
         digestStream = DigestOutputStream(digest)
     }
 
-    override fun getAlgorithmIdentifier(): AlgorithmIdentifier {
-        return when (signature) {
-            is Gost256Signature -> AlgorithmIdentifier(id_tc26_signwithdigest_gost_3410_12_256)
-        }
-    }
+    override fun getAlgorithmIdentifier() = AlgorithmIdentifier(id_tc26_signwithdigest_gost_3410_12_256)
 
     override fun getOutputStream() = digestStream
 

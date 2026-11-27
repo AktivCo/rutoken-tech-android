@@ -126,5 +126,5 @@ private suspend fun Pkcs11Session.findGost256KeyPairs(): MutableList<Gost256KeyC
         result
     }
 
-private fun <T> Collection<T>.singleOrThrow() =
+internal fun <T> Collection<T>.singleOrThrow() =
     singleOrNull() ?: throw IllegalStateException("One object required, but $size found")

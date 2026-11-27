@@ -228,7 +228,7 @@ class DocumentsSignViewModel(
                     existingCmsBytes = document.signedCms,
                     privateKey = privateKey,
                     certificate = certificate,
-                    additionalCertificates = listOf(X509CertificateHolder(LocalCA.caCertificate))
+                    additionalCertificates = listOf(X509CertificateHolder(LocalCA.caCertificateGost))
                 )
             )
         }

@@ -69,6 +69,10 @@ import ru.rutoken.tech.utils.logd
 import ru.rutoken.tech.utils.loge
 import ru.rutoken.tech.utils.toDateString
 import java.util.Date
+import ru.rutoken.tech.pkcs11.findobjects.CertificateAndKeyContainer
+import ru.rutoken.tech.pkcs11.findobjects.EcCertificateAndKeyContainer
+import ru.rutoken.tech.pkcs11.findobjects.findCertificateAndKeyContainer
+import ru.rutoken.tech.pkcs11.findobjects.findCertificateAndKeyContainers
 
 class LoginViewModel(
     private val applicationContext: Context,
@@ -207,7 +211,7 @@ class LoginViewModel(
         var certificates: List<Certificate> = listOf()
 
         withTokenSession(tokenData, tokenInfo, tokenUserPin) { session ->
-            certificates = session.findGost256CertificateAndKeyContainers().map { container ->
+            certificates = session.findCertificateAndKeyContainers().map { container ->
                 container.toDomainCertificate()
             }.toMutableList().apply { sortBy { it.errorText != null } }
         }
@@ -284,11 +288,10 @@ class LoginViewModel(
 
         withTokenSession(tokenData, tokenInfo, tokenUserPin) { session ->
             try {
-                val container =
-                    session.findGost256CertificateAndKeyContainerByCkaId(currentBankSession.certificateCkaId)
-
-                if (!currentBankSession.certificate.contentEquals(container.certificate.encoded))
-                    throw IllegalStateException("Certificate on Rutoken does not equal to the saved value")
+                session.findCertificateAndKeyContainer(
+                    ckaId = currentBankSession.certificateCkaId,
+                    certificateBytes = currentBankSession.certificate,
+                )
 
                 if (currentBankSession.payments.isEmpty()) {
                     currentBankSession.payments = getInitialPaymentsStorage(
@@ -307,7 +310,7 @@ class LoginViewModel(
         return currentBankSession
     }
 
-    private suspend fun Gost256CertificateAndKeyContainer.toDomainCertificate(
+    private suspend fun CertificateAndKeyContainer.toDomainCertificate(
         isShiftCertificate: Boolean = false,
     ): Certificate {
         val certificateEncoded = certificate.encoded
@@ -320,7 +323,10 @@ class LoginViewModel(
             position = certificate.getIssuerRdnValue(BCStyle.T),
             certificateExpirationDate = certificate.notAfter.toDateString(),
             organization = certificate.getIssuerRdnValue(BCStyle.O),
-            algorithm = R.string.gost256_algorithm,
+            algorithm = when (this) {
+                is Gost256CertificateAndKeyContainer -> R.string.gost256_algorithm
+                is EcCertificateAndKeyContainer -> R.string.ecdsa_secp256r1_algorithm
+            },
             errorText = getErrorText(
                 certificateEncoded, certificate.notBefore, certificate.notAfter, isShiftCertificate
             )
